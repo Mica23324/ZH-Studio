@@ -1,0 +1,1054 @@
+===== ZH-Studio: building application =====
+-- CMAKE_GENERATOR_PLATFORM is  
+-- CMAKE_SYSTEM_PROCESSOR is AMD64 
+-- SLIC3R_ALLOW_MCUT_BOOLEAN: OFF
+-- SLIC3R_ASAN: OFF
+-- SLIC3R_BUILD_SANDBOXES: OFF
+-- SLIC3R_BUILD_TESTS: OFF
+-- SLIC3R_DESKTOP_INTEGRATION: ON
+-- SLIC3R_ENABLE_OPENMESHCRAFT_BOOLEAN: ON
+-- SLIC3R_ENC_CHECK: OFF
+-- SLIC3R_FHS: OFF
+-- SLIC3R_GTK: 2
+-- SLIC3R_GUI: ON
+-- SLIC3R_HAS_OPENMESHCRAFT_BOOLEAN: TRUE
+-- SLIC3R_MSVC_COMPILE_PARALLEL: ON
+-- SLIC3R_MSVC_PDB: ON
+-- SLIC3R_PCH: ON
+-- SLIC3R_PERL_XS: OFF
+-- SLIC3R_PROFILE: OFF
+-- SLIC3R_STATIC: ON
+-- SLIC3R_WX_STABLE: OFF
+-- SLIC3R_STATIC: ON
+-- CMAKE_PREFIX_PATH: C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local (from cache or command line)
+-- PROJECT_SOURCE_DIR: C:/Users/micaj/Desktop/ZH-Studio
+-- CMAKE_MODULE_PATH: C:/Users/micaj/Desktop/ZH-Studio/cmake/modules/
+-- .git: directory
+-- LIBDIR: C:/Users/micaj/Desktop/ZH-Studio/src
+-- LIBDIR_BIN: C:/Users/micaj/Desktop/ZH-Studio/build_zh/src
+-- Found Boost: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/cmake/Boost-1.84.0/BoostConfig.cmake (found suitable version "1.84.0", minimum required is "1.83.0") found components: system filesystem thread log locale regex chrono atomic date_time iostreams
+-- Boost::boost exists
+-- TBB found in C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/cmake/TBB
+-- FindGLEW: did not find GLEW CMake config file. Searching for libraries.
+-- FindGLEW: GLEW_USE_STATIC_LIBS: ON.
+-- FindGLEW: GLEW_INCLUDE_DIR: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/include
+-- FindGLEW: GLEW_INCLUDE_DIRS: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/include
+-- FindGLEW: CMAKE_FIND_LIBRARY_SUFFIXES for SHARED: .lib
+-- FindGLEW: CMAKE_FIND_LIBRARY_SUFFIXES for STATIC: .lib;.a;.dll.a
+-- FindGLEW: GLEW_SHARED_LIBRARY_RELEASE: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/GLEW.lib
+-- FindGLEW: GLEW_STATIC_LIBRARY_RELEASE: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/GLEW.lib
+-- FindGLEW: GLEW_SHARED_LIBRARY_DEBUG: GLEW_SHARED_LIBRARY_DEBUG-NOTFOUND
+-- FindGLEW: GLEW_STATIC_LIBRARY_DEBUG: GLEW_STATIC_LIBRARY_DEBUG-NOTFOUND
+-- FindGLEW: GLEW_SHARED_LIBRARY: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/GLEW.lib
+-- FindGLEW: GLEW_STATIC_LIBRARY: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/GLEW.lib
+-- FindGLEW: GLEW_LIBRARIES: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/GLEW.lib
+-- FindGLEW: GLEW_VERSION_MAJOR: 2
+-- FindGLEW: GLEW_VERSION_MINOR: 2
+-- FindGLEW: GLEW_VERSION_MICRO: 0
+-- FindGLEW: GLEW_VERSION: 2.2.0
+-- FindGLEW: Creating GLEW::glew_s imported target.
+-- FindGLEW: Creating GLEW::GLEW imported target.
+-- Found NLopt in 'C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib'.
+-- Using NLopt include directory 'C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/include'.
+-- Using NLopt library 'C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/nlopt.lib'.
+-- OpenVDB ABI Version: 8
+-- TBB found in C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/cmake/TBB
+CMake Warning (dev) at cmake/modules/FindOpenVDB.cmake:388 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  CMakeLists.txt:693 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/cmake/Boost-1.84.0/BoostConfig.cmake (found version "1.84.0") found components: iostreams system
+-- OpenVDB libraries: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/libopenvdb.lib
+CMake Deprecation Warning at src/clipper/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/miniz/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/minilzo/CMakeLists.txt:2 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Minilzo using bundled version...
+CMake Deprecation Warning at src/glu-libtess/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/qhull/CMakeLists.txt:32 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- qhull Version: 7.2.0 (static linking)
+CMake Deprecation Warning at src/Shiny/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/semver/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/libigl/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- IGL NOT found, using bundled version...
+-- [MCUT] version: 1.2.0
+-- [MCUT] MCUT_INCLUDE_DIR=C:/Users/micaj/Desktop/ZH-Studio/src/mcut/include
+-- [MCUT] compilation_flags=/W4;/wd26812;/bigobj
+-- [MCUT] preprocessor_defs=-DMCUT_WITH_COMPUTE_HELPER_THREADPOOL=1;-D_CRT_SECURE_NO_WARNINGS
+-- [MCUT] extra_libs=Threads::Threads
+-- [MCUT] create target: name=mcut type=STATIC
+-- [MCUT] MCUT_LIB_PATH=$<TARGET_FILE:mcut>
+CMake Warning (dev) at src/mcut/CMakeLists.txt:327 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- OpenMeshCraft boolean backend enabled.
+-- Boost_INCLUDE_DIRS = C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/include/boost-1_84
+CMake Warning at deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGALConfig.cmake:92 (message):
+  CGAL_DATA_DIR cannot be deduced, set the variable CGAL_DATA_DIR to set the
+  default value of CGAL::data_file_path()
+Call Stack (most recent call first):
+  src/libslic3r/CMakeLists.txt:547 (find_package)
+
+
+CMake Warning (dev) at deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGAL_Common.cmake:30 (exec_program):
+  Policy CMP0153 is not set: The exec_program command should not be called.
+  Run "cmake --help-policy CMP0153" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  Use execute_process() instead.
+Call Stack (most recent call first):
+  deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGALConfig.cmake:110 (include)
+  src/libslic3r/CMakeLists.txt:547 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Visual Leak Detector (VLD) is not found.
+-- Using header-only CGAL
+-- Targetting Ninja
+-- Target build environment supports auto-linking
+-- Using VC toolset 143.
+CMake Warning (dev) at deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGAL_SetupBoost.cmake:20 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGAL_SetupCGALDependencies.cmake:47 (include)
+  deps/build_zh/destdir/usr/local/lib/cmake/CGAL/CGALConfig.cmake:153 (include)
+  src/libslic3r/CMakeLists.txt:547 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/cmake/Boost-1.84.0/BoostConfig.cmake (found suitable version "1.84.0", minimum required is "1.48")
+-- Boost include dirs: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/include/boost-1_84
+-- Boost libraries:    
+-- OpenCV ARCH: x64
+-- OpenCV RUNTIME: vc17
+-- OpenCV STATIC: ON
+-- Found OpenCV 4.6.0 in C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/x64/vc17/staticlib
+-- Adding precompiled header pchheader.hpp to target libslic3r.
+CMake Deprecation Warning at src/imgui/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at src/imguizmo/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- WXWIN environment set to: 
+-- wx libs: C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_html.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_adv.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_gl.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_core.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxbase31u.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_webview.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_aui.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxbase31u_net.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_media.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxmsw31u_richtext.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxbase31u_xml.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/vc_x64_lib/wxregexu.lib;opengl32;glu32;gdiplus;msimg32;winmm;comctl32;uuid;oleacc;uxtheme;rpcrt4;shlwapi;version;wsock32;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/libpng16_static.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/zlib.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/tiff.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/jpeg-static.lib;C:/Users/micaj/Desktop/ZH-Studio/deps/build_zh/destdir/usr/local/lib/expat.lib
+-- Checking for node binary at C:/Users/micaj/Desktop/ZH-Studio/_toolchain/node-cache/node-v22.22.2-win-x64/node.exe
+-- Checking for pnpm binary C:/Users/micaj/Desktop/ZH-Studio/_toolchain/node-cache/node-v22.22.2-win-x64/pnpm.exe
+-- Found cached Node.js: C:/Users/micaj/Desktop/ZH-Studio/_toolchain/node-cache/node-v22.22.2-win-x64/node.exe
+-- Found cached pnpm: C:/Users/micaj/Desktop/ZH-Studio/_toolchain/node-cache/node-v22.22.2-win-x64/pnpm.exe
+-- Adding precompiled header pchheader.hpp to target libslic3r_gui.
+Building with Win10 Netfabb STL fixing service support
+set out_dir to CMAKE_CURRENT_BINARY_DIR: C:/Users/micaj/Desktop/ZH-Studio/build_zh/src
+-- libslic3r-CMAKE_BUILD_TYPE: Release
+-- CMAKE_CURRENT_BINARY_DIR: C:/Users/micaj/Desktop/ZH-Studio/build_zh/src
+-- Configuring done (5.2s)
+-- Generating done (1.8s)
+-- Build files have been written to: C:/Users/micaj/Desktop/ZH-Studio/build_zh
+[0/2] Re-checking globbed directories...
+[1/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r_cgal.dir\MeshBooleanOpenMeshCraft.cpp.obj
+[2/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r_cgal.dir\IntersectionPoints.cpp.obj
+[3/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r_cgal.dir\Triangulation.cpp.obj
+[4/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\cmake_pch.cxx.obj
+[5/727] Building CXX object src\libnest2d\CMakeFiles\libnest2d.dir\src\libnest2d.cpp.obj
+[6/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\pchheader.cpp.obj
+[7/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PerfTrace.cpp.obj
+[8/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ArcFitter.cpp.obj
+[9/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\BoundingBox.cpp.obj
+[10/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Desensitize.cpp.obj
+[11/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\AABBMesh.cpp.obj
+[12/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\BridgeDetector.cpp.obj
+[13/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Log.cpp.obj
+[14/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\LogSink.cpp.obj
+[15/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\clipper.cpp.obj
+[16/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Circle.cpp.obj
+[17/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Clipper2Utils.cpp.obj
+[18/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Color.cpp.obj
+[19/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\cmake_pch.cxx.obj
+[20/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ClipperUtils.cpp.obj
+[21/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\CurveAnalyzer.cpp.obj
+[22/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\BuildVolume.cpp.obj
+[23/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r_cgal.dir\CutSurface.cpp.obj
+[24/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FaceDetector.cpp.obj
+[25/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ByObjectPrintData.cpp.obj
+[26/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\EdgeGrid.cpp.obj
+[27/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ExPolygonsIndex.cpp.obj
+[28/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Algorithm\LineSegmentation\LineSegmentation.cpp.obj
+[29/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ExPolygon.cpp.obj
+[30/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ElephantFootCompensation.cpp.obj
+[31/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ExtrusionEntityCollection.cpp.obj
+[32/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ExtrusionSimulator.cpp.obj
+[33/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Calib.cpp.obj
+[34/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Emboss.cpp.obj
+[35/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Brim.cpp.obj
+[36/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Config.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\Config.cpp(1963) : warning C4172: returning address of local variable or temporary 
+[37/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\CutUtils.cpp.obj
+[38/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PaintReproject.cpp.obj
+[39/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ExtrusionEntity.cpp.obj
+[40/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Extruder.cpp.obj
+[41/727] Building CXX object src\CMakeFiles\BambuStudio.dir\BambuStudio.cpp.obj
+[42/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Fill3DHoneycomb.cpp.obj
+[43/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillConcentricInternal.cpp.obj
+[44/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillConcentric.cpp.obj
+[45/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillBase.cpp.obj
+[46/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillCrossHatch.cpp.obj
+[47/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Fill.cpp.obj
+[48/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Lightning\Layer.cpp.obj
+[49/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillLine.cpp.obj
+[50/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Lightning\TreeNode.cpp.obj
+[51/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillHoneycomb.cpp.obj
+[52/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillPlanePath.cpp.obj
+[53/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillGyroid.cpp.obj
+[54/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Frustum.cpp.obj
+[55/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillConformalChart.cpp.obj
+[56/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r_cgal.dir\MeshBoolean.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\MeshBoolean.cpp(742): warning C4018: '<': signed/unsigned mismatch
+[57/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillAdaptive.cpp.obj
+[58/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Lightning\DistanceField.cpp.obj
+[59/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\AssemblyTreeJson.cpp.obj
+[60/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillLightning.cpp.obj
+[61/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillConformal.cpp.obj
+[62/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillRadialZigZag.cpp.obj
+[63/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\Lightning\Generator.cpp.obj
+[64/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\objparser.cpp.obj
+[65/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillRectilinear.cpp.obj
+[66/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FlushVolCalc.cpp.obj
+[67/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Fill\FillFloatingConcentric.cpp.obj
+[68/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FuzzySkin.cpp.obj
+[69/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\AssimpImport.cpp.obj
+[70/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Flow.cpp.obj
+[71/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\AssemblyStepsJson.cpp.obj
+[72/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\ThumbnailData.cpp.obj
+[73/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\AMF.cpp.obj
+[74/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\STL.cpp.obj
+[75/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\OBJ.cpp.obj
+[76/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\3mf.cpp.obj
+[77/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TexturePainting.cpp.obj
+[78/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\STEP.cpp.obj
+[79/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\svg.cpp.obj
+[80/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TextureToColor\TextureToColor.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\TextureToColor\TextureToColor.cpp(275): warning C5051: attribute [[unlikely]] requires at least '/std:c++20'; ignored
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\TextureToColor\TextureToColor.cpp(319): warning C5051: attribute [[unlikely]] requires at least '/std:c++20'; ignored
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\TextureToColor\TextureToColor.cpp(473): warning C5051: attribute [[unlikely]] requires at least '/std:c++20'; ignored
+[81/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\SL1.cpp.obj
+[82/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\PostProcessor.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\GCode\PostProcessor.cpp(217): warning C4477: 'snprintf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'size_t'
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\GCode\PostProcessor.cpp(217): note: consider using '%zd' in the format string
+[83/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Format\bbs_3mf.cpp.obj
+[84/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TextureToColor\ColorUtils.cpp.obj
+[85/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\GCodeEditor.cpp.obj
+[86/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\PrintExtents.cpp.obj
+[87/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\RetractWhenCrossingPerimeters.cpp.obj
+[88/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\AvoidCrossingPerimeters.cpp.obj
+[89/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\SpiralVase.cpp.obj
+[90/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\CoolingBuffer.cpp.obj
+[91/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\Smoothing.cpp.obj
+[92/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\Circle.cpp.obj
+[93/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\WipeTower.cpp.obj
+[94/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\BedExcludeChecker.cpp.obj
+[95/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\ToolOrdering.cpp.obj
+[96/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\MedialAxis.cpp.obj
+[97/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\ConvexHull.cpp.obj
+[98/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\VoronoiUtils.cpp.obj
+[99/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\Voronoi.cpp.obj
+[100/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\VoronoiOffset.cpp.obj
+[101/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\InternalBridgeDetector.cpp.obj
+[102/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\SeamPlacer.cpp.obj
+[103/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\ConflictChecker.cpp.obj
+[104/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\BlacklistedLibraryCheck.cpp.obj
+[105/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\LocalesUtils.cpp.obj
+[106/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\GCodeProcessor.cpp.obj
+[107/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Line.cpp.obj
+[108/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCodeReader.cpp.obj
+[109/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry\VoronoiUtilsCgal.cpp.obj
+[110/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Geometry.cpp.obj
+[111/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCodeWriter.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\GCodeWriter.cpp(960): warning C4018: '<': signed/unsigned mismatch
+[112/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\TimelapsePosPicker.cpp.obj
+[113/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode.cpp.obj
+[114/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\LayerRegion.cpp.obj
+[115/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ModelArrange.cpp.obj
+[116/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MultiPoint.cpp.obj
+[117/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\JumpPointSearch.cpp.obj
+[118/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ObjectID.cpp.obj
+[119/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\NormalUtils.cpp.obj
+[120/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\CustomGCode.cpp.obj
+[121/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Layer.cpp.obj
+[122/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Platform.cpp.obj
+[123/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\NSVGUtils.cpp.obj
+[124/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Measure.cpp.obj
+[125/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ObjColorUtils.cpp.obj
+[126/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MutablePolygon.cpp.obj
+[127/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MultiMaterialSegmentation.cpp.obj
+[128/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Point.cpp.obj
+[129/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\OverhangDetector.cpp.obj
+[130/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Polygon.cpp.obj
+[131/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Polyline.cpp.obj
+[132/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PolygonTrimmer.cpp.obj
+[133/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrincipalComponents2D.cpp.obj
+[134/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Model.cpp.obj
+[135/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ProjectTask.cpp.obj
+[136/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arrange.cpp.obj
+[137/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ParameterUtils.cpp.obj
+[138/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Orient.cpp.obj
+[139/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\NozzleInventory.cpp.obj
+[140/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\AppConfig.cpp.obj
+[141/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Preset.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\Preset.cpp(2833): warning C4018: '<': signed/unsigned mismatch
+[142/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PerimeterGenerator.cpp.obj
+[143/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PNGReadWrite.cpp.obj
+[144/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\QuadricEdgeCollapse.cpp.obj
+[145/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Semver.cpp.obj
+[146/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\AdaptiveLayerMerge.cpp.obj
+[147/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PresetBundle.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\PresetBundle.cpp(1348): warning C4018: '<': signed/unsigned mismatch
+C:\Users\micaj\Desktop\ZH-Studio\src\libslic3r\PresetBundle.cpp(6434): warning C4101: 'e': unreferenced local variable
+[148/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SupportMergePlan.cpp.obj
+[149/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintBase.cpp.obj
+[150/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintConfig.cpp.obj
+[151/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Print.cpp.obj
+[152/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SupportRecommendedParams.cpp.obj
+[153/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SlicesToTriangleMesh.cpp.obj
+[154/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintApply.cpp.obj
+[155/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ShortEdgeCollapse.cpp.obj
+[156/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintRegion.cpp.obj
+[157/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintObjectSlice.cpp.obj
+[158/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLAPrint.cpp.obj
+[159/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MinimumSpanningTree.cpp.obj
+[160/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Surface.cpp.obj
+[161/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SurfaceCollection.cpp.obj
+[162/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Slicing.cpp.obj
+[163/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Tesselate.cpp.obj
+[164/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SVG.cpp.obj
+[165/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PrintObject.cpp.obj
+[166/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ShortestPath.cpp.obj
+[167/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MeshDiagnostics.cpp.obj
+[168/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLAPrintSteps.cpp.obj
+[169/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MeshRaycast.cpp.obj
+[170/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangulateWall.cpp.obj
+[171/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Time.cpp.obj
+[172/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Timer.cpp.obj
+[173/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangleMeshDeal.cpp.obj
+[174/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\PlaceholderParser.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/spirit/include/phoenix_core.hpp(12): note: This header is deprecated. Use <boost/phoenix/core.hpp> instead.
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/spirit/include/phoenix_operator.hpp(12): note: This header is deprecated. Use <boost/phoenix/operator.hpp> instead.
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/spirit/include/phoenix_fusion.hpp(12): note: This header is deprecated. Use <boost/phoenix/fusion.hpp> instead.
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/spirit/include/phoenix_stl.hpp(12): note: This header is deprecated. Use <boost/phoenix/stl.hpp> instead.
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/spirit/include/phoenix_object.hpp(12): note: This header is deprecated. Use <boost/phoenix/object.hpp> instead.
+[175/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Thread.cpp.obj
+[176/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\utils.cpp.obj
+[177/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangleSetSampling.cpp.obj
+[178/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Zipper.cpp.obj
+[179/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\VariableWidth.cpp.obj
+[180/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\miniz_extension.cpp.obj
+[181/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SlicingAdaptive.cpp.obj
+[182/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\Pad.cpp.obj
+[183/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MinAreaBoundingBox.cpp.obj
+[184/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangleMeshSlicer.cpp.obj
+[185/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SupportTreeBuildsteps.cpp.obj
+[186/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Support\SupportMaterial.cpp.obj
+[187/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SupportTreeMesher.cpp.obj
+[188/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\RasterBase.cpp.obj
+[189/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\RasterToPolygons.cpp.obj
+[190/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\ConcaveHull.cpp.obj
+[191/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SpatIndex.cpp.obj
+[192/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Support\SupportCommon.cpp.obj
+[193/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Support\TreeSupport3D.cpp.obj
+[194/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\BeadingStrategy.cpp.obj
+[195/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\BeadingStrategyFactory.cpp.obj
+[196/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\DistributedBeadingStrategy.cpp.obj
+[197/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\LimitedBeadingStrategy.cpp.obj
+[198/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Support\TreeModelVolumes.cpp.obj
+[199/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\OuterWallInsetBeadingStrategy.cpp.obj
+[200/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\IndexedMesh.cpp.obj
+[201/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\RedistributeBeadingStrategy.cpp.obj
+[202/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\WideningBeadingStrategy.cpp.obj
+[203/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\utils\ExtrusionJunction.cpp.obj
+[204/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\BeadingStrategy\OuterWallContourStrategy.cpp.obj
+[205/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\utils\SquareGrid.cpp.obj
+[206/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\Clustering.cpp.obj
+[207/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\utils\PolylineStitcher.cpp.obj
+[208/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\utils\ExtrusionLine.cpp.obj
+[209/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SupportTreeBuilder.cpp.obj
+[210/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\SkeletalTrapezoidationGraph.cpp.obj
+[211/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Support\TreeSupport.cpp.obj
+[212/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\RegionExpansion.cpp.obj
+[213/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\SkeletalTrapezoidation.cpp.obj
+[214/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FlushVolPredictor.cpp.obj
+[215/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangleMesh.cpp.obj
+[216/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\TriangleSelector.cpp.obj
+[217/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\Hollowing.cpp.obj
+[218/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FilamentMixer.cpp.obj
+[219/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SupportTree.cpp.obj
+[220/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\ColorDecomposeRecipe.cpp.obj
+[221/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\SupportPointGenerator.cpp.obj
+[222/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\pchheader.cpp.obj
+[223/727] Linking CXX static library src\libslic3r\libslic3r_cgal.lib
+[224/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Arachne\WallToolPaths.cpp.obj
+[225/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\AnimaController.cpp.obj
+[226/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\AxisCtrlButton.cpp.obj
+[227/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\Button.cpp.obj
+[228/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleChipButton.cpp.obj
+[229/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\CheckBox.cpp.obj
+[230/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FilamentGroup.cpp.obj
+[231/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\RadioBox.cpp.obj
+[232/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\RoundedRectangle.cpp.obj
+[233/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\BreathingDot.cpp.obj
+[234/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\GCode\ToolOrderUtils.cpp.obj
+[235/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Shape\TextShape.cpp.obj
+[236/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ComboBox.cpp.obj
+[237/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SideButton.cpp.obj
+[238/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\PopupWindow.cpp.obj
+[239/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Printer\LiveViewTrackContext.cpp.obj
+[240/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\DropDown.cpp.obj
+[241/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\LinkLabel.cpp.obj
+[242/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\Scrollbar.cpp.obj
+[243/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ScrolledWindow.cpp.obj
+[244/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Interlocking\VoxelUtils.cpp.obj
+[245/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StaticGroup.cpp.obj
+[246/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ImageSwitchButton.cpp.obj
+[247/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StaticBox.cpp.obj
+[248/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleVariantSwitcher.cpp.obj
+[249/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\SLA\Rotfinder.cpp.obj
+[250/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ProgressDialog.cpp.obj
+[251/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StaticLine.cpp.obj
+[252/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SpinInput.cpp.obj
+[253/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\FilamentGroupUtils.cpp.obj
+[254/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StateColor.cpp.obj
+[255/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StateHandler.cpp.obj
+[256/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\TextTabbar.cpp.obj
+[257/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\TabCtrl.cpp.obj
+[258/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SideMenuPopup.cpp.obj
+[259/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\TextInput.cpp.obj
+[260/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\FilamentView.cpp.obj
+[261/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\Interlocking\InterlockingGenerator.cpp.obj
+[262/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\PillView.cpp.obj
+[263/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Printer\PrinterFileSystem.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Printer\PrinterFileSystem.cpp(1349): warning C4996: 'MD5_Init': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Printer\PrinterFileSystem.cpp(1375): warning C4996: 'MD5_Update': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Printer\PrinterFileSystem.cpp(1379): warning C4996: 'MD5_Final': Since OpenSSL 3.0
+[264/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\Label.cpp.obj
+[265/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\OpenVDBUtils.cpp.obj
+[266/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\TempInput.cpp.obj
+[267/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SwitchButton.cpp.obj
+[268/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\StepCtrl.cpp.obj
+[269/727] Building CXX object src\libslic3r\CMakeFiles\libslic3r.dir\MultiNozzleUtils.cpp.obj
+[270/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\wgtCircleItem.cpp.obj
+[271/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ProgressBar.cpp.obj
+[272/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\IconView.cpp.obj
+[273/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\WebViewTraceLogger.cpp.obj
+[274/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\WebViewWatcher.cpp.obj
+[275/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\MappingRow.cpp.obj
+[276/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\ErrorMsgStaticText.cpp.obj
+[277/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceWebHealth.cpp.obj
+[278/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\WebView.cpp.obj
+[279/727] Linking CXX static library src\libslic3r\libslic3r.lib
+[280/727] Linking CXX static library src\libnest2d\libnest2d.lib
+[281/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SideTools.cpp.obj
+[282/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\AmsSlotPopup.cpp.obj
+[283/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\AMSControl.cpp.obj
+[284/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\AMSItem.cpp.obj
+[285/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SyncAmsDialog.cpp.obj
+[286/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\FilamentLoad.cpp.obj
+[287/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\FanControl.cpp.obj
+[288/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ModelPreview.cpp.obj
+[289/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SyncMachineInfoDialog.cpp.obj
+[290/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\RoundedPopupWindow.cpp.obj
+[291/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\CascadeMenu.cpp.obj
+[292/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\MultiNozzleSync.cpp.obj
+[293/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ZHSplash.cpp.obj
+[294/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\SyncPresetWithPrinterDialog.cpp.obj
+[295/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MixedFilamentDialog.cpp.obj
+[296/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GradientCurveEditor.cpp.obj
+[297/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AuxiliaryDialog.cpp.obj
+[298/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleSettingsCardDialog.cpp.obj
+[299/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleSettingsListDialog.cpp.obj
+[300/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MixingKitsHelpDialog.cpp.obj
+[301/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleDetailPopup.cpp.obj
+[302/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Widgets\NozzleAmsRow.cpp.obj
+[303/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\NetworkTestDialog.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\NetworkTestDialog.cpp(50): warning C4996: 'GetVersionExW': was declared deprecated
+[304/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\EncodedFilament.cpp.obj
+[305/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BitmapCache.cpp.obj
+[306/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MixSupplementFilamentDialog.cpp.obj
+[307/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ImageGrid.cpp.obj
+[308/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLShader.cpp.obj
+[309/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MP4\Mp4Recorder.cpp.obj
+[310/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ColorDecomposeSupport.cpp.obj
+[311/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MP4\PBOReader.cpp.obj
+[312/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ZHStudioTools.cpp.obj
+[313/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\OpenGLManager.cpp.obj
+[314/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AboutDialog.cpp.obj
+[315/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLShadersManager.cpp.obj
+[316/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DailyTips.cpp.obj
+[317/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Auxiliary.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(348): warning C4996: 'boost::filesystem::path::branch_path': Use path::parent_path() instead
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(464): warning C4996: 'boost::filesystem::path::branch_path': Use path::parent_path() instead
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(465): warning C4996: 'boost::filesystem::path::branch_path': Use path::parent_path() instead
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(509): warning C4996: 'boost::filesystem::path::branch_path': Use path::parent_path() instead
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(510): warning C4996: 'boost::filesystem::path::branch_path': Use path::parent_path() instead
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Auxiliary.cpp(951): warning C4996: 'boost::filesystem::copy_file': Use copy_options instead of copy_option
+[318/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BackgroundSlicingProcess.cpp.obj
+[319/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Project.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Project.cpp(723): warning C4996: 'boost::filesystem::copy_file': Use copy_options instead of copy_option
+[320/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SlicingProgressNotification.cpp.obj
+[321/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\3DScene.cpp.obj
+[322/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\FacetPicker.cpp.obj
+[323/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmosCommon.cpp.obj
+[324/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmosManager.cpp.obj
+[325/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoBase.cpp.obj
+[326/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoMove.cpp.obj
+[327/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoRotate.cpp.obj
+[328/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoScale.cpp.obj
+[329/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLCanvas3D.cpp.obj
+[330/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Selection.cpp.obj
+[331/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoFdmSupports.cpp.obj
+[332/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoSlaSupports.cpp.obj
+[333/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoSimplify.cpp.obj
+[334/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoPainterBase.cpp.obj
+[335/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoFaceDetector.cpp.obj
+[336/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoFlatten.cpp.obj
+[337/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoMmuSegmentation.cpp.obj
+[338/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoHollow.cpp.obj
+[339/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UIHelpers\TextEllipsis.cpp.obj
+[340/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoFuzzySkin.cpp.obj
+[341/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoAssembly.cpp.obj
+[342/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UIHelpers\ImGuiFilamentWidgets.cpp.obj
+[343/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoAdvancedCut.cpp.obj
+[344/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UIHelpers\MeshBooleanUI.cpp.obj
+[345/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoSeam.cpp.obj
+[346/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GuiColor.cpp.obj
+[347/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoBrimEars.cpp.obj
+[348/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\IMToolbar.cpp.obj
+[349/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoMeasure.cpp.obj
+[350/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoText.cpp.obj
+[351/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoMeshBoolean.cpp.obj
+[352/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoAlignment.cpp.obj
+[353/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLSelectionRectangle.cpp.obj
+[354/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GLGizmoSVG.cpp.obj
+[355/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Gizmos\GizmoObjectManipulation.cpp.obj
+[356/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLTexture.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\stb_dxt/stb_dxt.h(361): warning C4005: 'MAX': macro redefinition
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Widgets\Scrollbar.hpp(8): note: see previous definition of 'MAX'
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GLTexture.cpp(492): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GLTexture.cpp(494): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GLTexture.cpp(856): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+[357/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLToolbar.cpp.obj
+[358/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PresetHints.cpp.obj
+[359/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AMSNewFilamentDialogs.cpp.obj
+[360/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GCodeViewer.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r/GUI/GCodeRenderer/AdvancedRenderer.hpp(137): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r/GUI/GCodeRenderer/AdvancedRenderer.hpp(143): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r/GUI/GCodeRenderer/AdvancedRenderer.hpp(144): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r/GUI/GCodeRenderer/AdvancedRenderer.hpp(212): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r/GUI/GCodeRenderer/AdvancedRenderer.hpp(213): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+[361/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentSelectDialog.cpp.obj
+[362/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GLModel.cpp.obj
+[363/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\I18N.cpp.obj
+[364/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ExtrusionCalibration.cpp.obj
+[365/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\IconManager.cpp.obj
+[366/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ImageDPIFrame.cpp.obj
+[367/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AMSSetting.cpp.obj
+[368/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_Utils.cpp.obj
+[369/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Preferences.cpp.obj
+[370/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI.cpp.obj
+[371/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UserNotification.cpp.obj
+[372/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AMSDryControl.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\AMSDryControl.cpp(203): warning C4101: 'e': unreferenced local variable
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\AMSDryControl.cpp(1706): warning C4101: 'e': unreferenced local variable
+[373/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AMSMaterialsSetting.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\AMSMaterialsSetting.cpp(1022): warning C4101: 'e': unreferenced local variable
+[374/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_Init.cpp.obj
+[375/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_Colors.cpp.obj
+[376/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BedShapeDialog.cpp.obj
+[377/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_Preview.cpp.obj
+[378/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SavePresetDialog.cpp.obj
+[379/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BBLTopbar.cpp.obj
+[380/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WipeTowerPlacement.cpp.obj
+[381/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MainFrame.cpp.obj
+[382/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BitmapComboBox.cpp.obj
+[383/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_App.cpp.obj
+[384/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TickCode.cpp.obj
+[385/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PresetComboBoxes.cpp.obj
+[386/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PartPlate.cpp.obj
+[387/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_Factories.cpp.obj
+[388/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_ObjectLayers.cpp.obj
+[389/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_AuxiliaryList.cpp.obj
+[390/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_ObjectList.cpp.obj
+[391/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_ObjectTable.cpp.obj
+[392/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_ObjectTableSettings.cpp.obj
+[393/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GUI_ObjectSettings.cpp.obj
+[394/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MonitorBasePanel.cpp.obj
+[395/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SupportComboAdvisor.cpp.obj
+[396/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Plater.cpp.obj
+[397/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ParamsDialog.cpp.obj
+[398/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AmsWidgets.cpp.obj
+[399/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MonitorPage.cpp.obj
+[400/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MeshUtils.cpp.obj
+[401/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrintHostDialogs.cpp.obj
+[402/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MediaPlayCtrl.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\MediaPlayCtrl.cpp(1458): warning C4996: 'boost::filesystem::copy_file': Use copy_options instead of copy_option
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\MediaPlayCtrl.cpp(1474): warning C4101: 'e': unreferenced local variable
+[403/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Tab.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Tab.cpp(8298): warning C4018: '<': signed/unsigned mismatch
+[404/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ParamsPanel.cpp.obj
+[405/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MediaFilePanel.cpp.obj
+[406/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrintQueueManager.cpp.obj
+[407/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ThermalPreconditioningDialog.cpp.obj
+[408/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SliceInfoPanel.cpp.obj
+[409/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HMS.cpp.obj
+[410/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceOperationsTooltip.cpp.obj
+[411/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UpgradePanel.cpp.obj
+[412/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HMSPanel.cpp.obj
+[413/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HintNotification.cpp.obj
+[414/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UxProgramTermsDialog.cpp.obj
+[415/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\QueuePrintController.cpp.obj
+[416/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DragDropPanel.cpp.obj
+[417/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CameraPopup.cpp.obj
+[418/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\StatusPanel.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\StatusPanel.cpp(4884): warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+[419/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CapsuleButton.cpp.obj
+[420/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Monitor.cpp.obj
+[421/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrinterWebView.cpp.obj
+[422/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WebDownPluginDlg.cpp.obj
+[423/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WindowShadow.cpp.obj
+[424/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WebViewDialog.cpp.obj
+[425/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WebGuideDialog.cpp.obj
+[426/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WebUserLoginDialog.cpp.obj
+[427/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ConfigManipulation.cpp.obj
+[428/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Field.cpp.obj
+[429/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\TinyExportMardDown.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Overview\TinyExportMardDown.cpp(44): warning C4996: 'boost::filesystem::copy_file': Use copy_options instead of copy_option
+[430/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentMapPanel.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\FilamentMapPanel.cpp(859): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\FilamentMapPanel.cpp(1497): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[431/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\AssemblyPdfExportDialog.cpp.obj
+[432/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\2DBed.cpp.obj
+[433/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentMapDialog.cpp.obj
+[434/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\AssemblyExportProgressWindow.cpp.obj
+[435/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\OG_CustomCtrl.cpp.obj
+[436/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\OptionsGroup.cpp.obj
+[437/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TextureImportPopupDismiss.cpp.obj
+[438/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MarkdownTip.cpp.obj
+[439/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ParamTooltip.cpp.obj
+[440/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CameraUtils.cpp.obj
+[441/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TextureImportUi.cpp.obj
+[442/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\RemovableDriveManager.cpp.obj
+[443/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentBitmapUtils.cpp.obj
+[444/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Camera.cpp.obj
+[445/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\3DBed.cpp.obj
+[446/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\OverviewUtils.cpp.obj
+[447/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\wxExtensions.cpp.obj
+[448/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TextureImportDialog.cpp.obj
+[449/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentPickerDialog.cpp.obj
+[450/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\AssemblyStepsUtilsImgui.cpp.obj
+[451/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\WipeTowerDialog.cpp.obj
+[452/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Overview\AssemblyStepsUtils.cpp.obj
+[453/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\StepMeshDialog.cpp.obj
+[454/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SendSystemInfoDialog.cpp.obj
+[455/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BaseTransparentDPIFrame.cpp.obj
+[456/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SyncAmsToasts.cpp.obj
+[457/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ImGuiWrapper.cpp.obj
+[458/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Config\Version.cpp.obj
+[459/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\ASCIIFolding.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\ASCIIFolding.cpp(1956): warning C4996: 'std::codecvt_utf8<wchar_t,1114111,(std::codecvt_mode)0>': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning.
+C:\Users\micaj\Desktop\ZH-Studio\_toolchain\msvc\VC\Tools\MSVC\14.44.35207\include\codecvt(34): note: see declaration of 'std::codecvt_utf8'
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\ASCIIFolding.cpp(1956): warning C4996: 'std::wstring_convert<std::codecvt_utf8<wchar_t,1114111,(std::codecvt_mode)0>,wchar_t,std::allocator<wchar_t>,std::allocator<char>>': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning.
+C:\Users\micaj\Desktop\ZH-Studio\_toolchain\msvc\VC\Tools\MSVC\14.44.35207\include\xlocbuf(303): note: see declaration of 'std::wstring_convert'
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\ASCIIFolding.cpp(1956): warning C4996: 'std::wstring_convert<std::codecvt_utf8<wchar_t,1114111,(std::codecvt_mode)0>,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::wstring_convert': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning.
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\ASCIIFolding.cpp(1957): warning C4996: 'std::wstring_convert<std::codecvt_utf8<wchar_t,1114111,(std::codecvt_mode)0>,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::to_bytes': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning.
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\ASCIIFolding.cpp(1967): warning C4996: 'std::wstring_convert<std::codecvt_utf8<wchar_t,1114111,(std::codecvt_mode)0>,wchar_t,std::allocator<wchar_t>,std::allocator<char>>::from_bytes': warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning.
+[460/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PlateSettingsDialog.cpp.obj
+[461/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SurfaceDrag.cpp.obj
+[462/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TextLines.cpp.obj
+[463/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ConnectPrinter.cpp.obj
+[464/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HttpServer.cpp.obj
+[465/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PlateMoveDialog.cpp.obj
+[466/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\Job.cpp.obj
+[467/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\BoostThreadWorker.cpp.obj
+[468/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ImageMessageDialog.cpp.obj
+[469/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UserManager.cpp.obj
+[470/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceErrorDialog.cpp.obj
+[471/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\UpgradeNetworkJob.cpp.obj
+[472/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceManager.cpp.obj
+[473/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Config\Snapshot.cpp.obj
+[474/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ConfigWizard.cpp.obj
+[475/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MsgDialog.cpp.obj
+[476/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DownloadProgressDialog.cpp.obj
+[477/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\PlaterJob.cpp.obj
+[478/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UpdateDialogs.cpp.obj
+[479/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\CreateFontNameImageJob.cpp.obj
+[480/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\NotificationProgressIndicator.cpp.obj
+[481/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\CreateFontStyleImagesJob.cpp.obj
+[482/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\EmbossJob.cpp.obj
+[483/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\OrientJob.cpp.obj
+[484/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\BooleanOperationJob.cpp.obj
+[485/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\ArrangeJob.cpp.obj
+[486/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\RotoptimizeJob.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Jobs\RotoptimizeJob.cpp(58): warning C4390: ';': empty controlled statement found; is this the intent?
+[487/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ProgressStatusBar.cpp.obj
+[488/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\FillBedJob.cpp.obj
+[489/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BBLStatusBar.cpp.obj
+[490/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BBLStatusBarSend.cpp.obj
+[491/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BBLStatusBarBind.cpp.obj
+[492/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TabButton.cpp.obj
+[493/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BBLStatusBarPrint.cpp.obj
+[494/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\SLAImportJob.cpp.obj
+[495/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\SendJob.cpp.obj
+[496/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\BindJob.cpp.obj
+[497/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Notebook.cpp.obj
+[498/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Jobs\PrintJob.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\Jobs\PrintJob.cpp(610): warning C4834: discarding return value of function with [[nodiscard]] attribute
+[499/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Tabbook.cpp.obj
+[500/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AuxiliaryDataViewModel.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\AuxiliaryDataViewModel.cpp(338): warning C4996: 'boost::filesystem::copy_file': Use copy_options instead of copy_option
+[501/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PhysicalPrinterDialog.cpp.obj
+[502/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Mouse3DController.cpp.obj
+[503/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DesktopIntegrationDialog.cpp.obj
+[504/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\IMSlider.cpp.obj
+[505/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentGroupPopup.cpp.obj
+[506/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ObjectDataViewModel.cpp.obj
+[507/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DragCanvas.cpp.obj
+[508/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\InstanceCheck.cpp.obj
+[509/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\FilamentNozzlePopup.cpp.obj
+[510/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Search.cpp.obj
+[511/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UserPresetsDialog.cpp.obj
+[512/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ExtraRenderers.cpp.obj
+[513/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\NotificationManager.cpp.obj
+[514/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\NozzleSetupTelemetry.cpp.obj
+[515/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\RecenterDialog.cpp.obj
+[516/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrivacyUpdateDialog.cpp.obj
+[517/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MinorsLogoutDialog.cpp.obj
+[518/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\UnsavedChangesDialog.cpp.obj
+[519/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SkipPartCanvas.cpp.obj
+[520/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BonjourDialog.cpp.obj
+[521/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ProjectDirtyStateManager.cpp.obj
+[522/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PartSkipDialog.cpp.obj
+[523/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ExtruderPanel.cpp.obj
+[524/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ExtruderPanelGroup.cpp.obj
+[525/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PublishDialog.cpp.obj
+[526/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ExtruderHelpers.cpp.obj
+[527/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\VersionPolicyDialog.cpp.obj
+[528/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ModelMall.cpp.obj
+[529/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrePrintChecker.cpp.obj
+[530/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BindDialog.cpp.obj
+[531/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SelectMachinePop.cpp.obj
+[532/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MaterialItemHotend.cpp.obj
+[533/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AmsMappingPopup.cpp.obj
+[534/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DevMappingHelpers.cpp.obj
+[535/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AmsMappingPopupUpdate.cpp.obj
+[536/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SendToPrinter.cpp.obj
+[537/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SelectMachine.cpp.obj
+[538/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\ReleaseNote.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\ReleaseNote.cpp(453): warning C4101: 'err': unreferenced local variable
+[539/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CaliHistoryDialog.cpp.obj
+[540/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SingleChoiceDialog.cpp.obj
+[541/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HelioHistoryDialog.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\HelioHistoryDialog.cpp(395): warning C4101: 'e': unreferenced local variable
+[542/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\BetaVersionDialog.cpp.obj
+[543/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\HelioReleaseNote.cpp.obj
+[544/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizardStartPage.cpp.obj
+[545/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizardPage.cpp.obj
+[546/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationPanel.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(273): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(509): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(602): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(607): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(613): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\CalibrationPanel.cpp(656): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[547/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizard.cpp.obj
+[548/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PurgeModeDialog.cpp.obj
+[549/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiNozzleTpuTipsDialog.cpp.obj
+[550/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizardPresetPage.cpp.obj
+[551/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\json_diff.cpp.obj
+[552/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\PrintOptionsDialog.cpp.obj
+[553/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SafetyOptionsDialog.cpp.obj
+[554/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizardCaliPage.cpp.obj
+[555/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiPrintJob.cpp.obj
+[556/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\calib_dlg.cpp.obj
+[557/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiTaskModel.cpp.obj
+[558/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CalibrationWizardSavePage.cpp.obj
+[559/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiSendMachineModel.cpp.obj
+[560/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\Calibration.cpp.obj
+[561/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\EditFilamentWebDialog.cpp.obj
+[562/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CreateFilamentWebDialog.cpp.obj
+[563/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\CreatePresetsDialog.cpp.obj
+[564/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\KBShortcutsDialog.cpp.obj
+[565/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\WxFontUtils.cpp.obj
+[566/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiMachine.cpp.obj
+[567/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\Http.cpp.obj
+[568/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiMachineManagerPage.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\MultiMachineManagerPage.cpp(682): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[569/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiMachinePage.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\MultiMachinePage.cpp(64): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[570/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\BBLUtil.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(136): warning C4996: 'AES_set_encrypt_key': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(142): warning C4996: 'AES_encrypt': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(166): warning C4996: 'AES_set_decrypt_key': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(172): warning C4996: 'AES_decrypt': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(218): warning C4996: 'AES_set_encrypt_key': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(228): warning C4996: 'AES_cbc_encrypt': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(256): warning C4996: 'AES_set_decrypt_key': Since OpenSSL 3.0
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\BBLUtil.cpp(266): warning C4996: 'AES_cbc_encrypt': Since OpenSSL 3.0
+[571/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FileHelp.cpp.obj
+[572/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\Bonjour.cpp.obj
+[573/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\MultiTaskManagerPage.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\MultiTaskManagerPage.cpp(1409): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[574/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\SendMultiMachinePage.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\SendMultiMachinePage.cpp(820): warning C4996: 'wxTimerEvent::wxTimerEvent': deprecated: wxTimerEvent not supposed to be created by user code
+[575/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\VersionPolicyParser.cpp.obj
+[576/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\TaskManager.cpp.obj
+[577/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\OBB.cpp.obj
+[578/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\HexFile.cpp.obj
+[579/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\TCPConsole.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\deps\build_zh\destdir\usr\local\include\boost-1_84\boost/bind.hpp(41): note: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\TCPConsole.cpp(161): warning C4101: 'e': unreferenced local variable
+[580/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\minilzo_extension.cpp.obj
+[581/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\VersionPolicyFetcher.cpp.obj
+[582/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\ColorSpaceConvert.cpp.obj
+[583/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\VersionPolicyManager.cpp.obj
+[584/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\Process.cpp.obj
+[585/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GCodeRenderer\AdvancedRenderer.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.hpp(137): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.hpp(143): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.hpp(144): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.hpp(212): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.hpp(213): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(162): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(1861): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(1864): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(1914): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(1926): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(2405): warning C4018: '>': signed/unsigned mismatch
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(2436): warning C4018: '>': signed/unsigned mismatch
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\GCodeRenderer\AdvancedRenderer.cpp(2555): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+[586/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\CpuMemory.cpp.obj
+[587/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\PrintHost.cpp.obj
+[588/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\OctoPrint.cpp.obj
+[589/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\NetworkAgent.cpp.obj
+[590/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FlashAir.cpp.obj
+[591/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\Duet.cpp.obj
+[592/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FontConfigHelp.cpp.obj
+[593/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\MKS.cpp.obj
+[594/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FontUtils.cpp.obj
+[595/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\AstroBox.cpp.obj
+[596/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\RaycastManager.cpp.obj
+[597/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\Repetier.cpp.obj
+[598/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\HelioRetryPolicy.cpp.obj
+[599/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\CertificateVerify.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\Utils\CertificateVerify.cpp(16): warning C4005: '_WIN32_WINNT': macro redefinition
+C:\Users\micaj\Desktop\ZH-Studio\_toolchain\msvc\Windows Kits\10\Include\10.0.22621.0\shared\sdkddkver.h(224): note: see previous definition of '_WIN32_WINNT'
+[600/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FileTransferObject.cpp.obj
+[601/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\HelioSupportData.cpp.obj
+[602/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GCodeRenderer\BaseRenderer.cpp.obj
+[603/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FixModelByWin10.cpp.obj
+[604/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\GCodeRenderer\LegacyRenderer.cpp.obj
+[605/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevAirPurifier.cpp.obj
+[606/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevAxis.cpp.obj
+[607/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevBed.cpp.obj
+[608/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\FileTransferUtils.cpp.obj
+[609/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevConfig.cpp.obj
+[610/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\EmbossStyleManager.cpp.obj
+[611/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevCtrlToken.cpp.obj
+[612/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\PresetUpdater.cpp.obj
+[613/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevCtrlTokenMgr.cpp.obj
+[614/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevChamber.cpp.obj
+[615/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevConfigUtil.cpp.obj
+[616/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevAxisCtrl.cpp.obj
+[617/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevExtensionTool.cpp.obj
+[618/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevCalib.cpp.obj
+[619/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevChamberCtrl.cpp.obj
+[620/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevExtruderSystemCtrl.cpp.obj
+[621/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaAmsSetting.cpp.obj
+[622/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevCtrl.cpp.obj
+[623/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaAutoRefillMgr.cpp.obj
+[624/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaAutoRefillMgrCtrl.cpp.obj
+[625/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaAmsSettingCtrl.cpp.obj
+[626/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFan.cpp.obj
+[627/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevAmsRfidRefreshCtrl.cpp.obj
+[628/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevHMS.cpp.obj
+[629/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevPrintTaskInfo.cpp.obj
+[630/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaSystemCtrl.cpp.obj
+[631/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFirmware.cpp.obj
+[632/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaSwitch.cpp.obj
+[633/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevLamp.cpp.obj
+[634/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevMcTask.cpp.obj
+[635/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaSystem.cpp.obj
+[636/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevPrintOptions.cpp.obj
+[637/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\UndoRedo.cpp.obj
+[638/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevInfo.cpp.obj
+[639/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\CalibUtils.cpp.obj
+[640/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\Utils\HelioDragon.cpp.obj
+[641/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevMapping.cpp.obj
+[642/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevLampCtrl.cpp.obj
+[643/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevNozzleRack.cpp.obj
+[644/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevStatus.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\DeviceCore\DevStatus.cpp(24): warning C4101: 'e': unreferenced local variable
+[645/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevHMSQuery.cpp.obj
+[646/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevStorage.cpp.obj
+[647/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevNozzleSystem.cpp.obj
+[648/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevUtil.cpp.obj
+[649/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevExtruderSystem.cpp.obj
+[650/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevUpgradeCtrl.cpp.obj
+[651/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevNozzleRackCtrl.cpp.obj
+[652/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevUpgrade.cpp.obj
+[653/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevMappingNozzle.cpp.obj
+[654/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtDeviceNozzleSelect.cpp.obj
+[655/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\uiDeviceUpdateVersion.cpp.obj
+[656/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevFilaBlackList.cpp.obj
+C:\Users\micaj\Desktop\ZH-Studio\src\slic3r\GUI\DeviceCore\DevFilaBlackList.cpp(43): warning C4101: 'e': unreferenced local variable
+[657/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtMsgBox.cpp.obj
+[658/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtMsgPanel.cpp.obj
+[659/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevSliceContext.cpp.obj
+[660/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevManager.cpp.obj
+[661/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\FilamentHotend\wgtHotendRackControl.cpp.obj
+[662/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerFeature.cpp.obj
+[663/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceCore\DevUtilBackend.cpp.obj
+[664/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtRackExtruder.cpp.obj
+[665/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\uiAmsHumidityPopup.cpp.obj
+[666/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\AmsControl\wgtAmsControlWebPanel.cpp.obj
+[667/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\uiAMSBestPositionPopup.cpp.obj
+[668/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtDeviceNozzleRack.cpp.obj
+[669/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtDeviceNozzleRackUpdate.cpp.obj
+[670/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\AmsAutoPushThrottle.cpp.obj
+[671/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\wgtDeviceAutoRefillWebDialog.cpp.obj
+[672/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\FilamentHotend\wgtDeviceFilamentHotendWebPanel.cpp.obj
+[673/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerStore.cpp.obj
+[674/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerPanel.cpp.obj
+[675/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerSync.cpp.obj
+[676/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceHttpServer.cpp.obj
+[677/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerCloudClient.cpp.obj
+[678/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceWebManager.cpp.obj
+[679/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\FilamentHotend\wgtDeviceFilamentHotendWebDialog.cpp.obj
+[680/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceTab\FilamentHotend\wgtDeviceFilamentHotendHtmlDialog.cpp.obj
+[681/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerCloudDispatcher.cpp.obj
+[682/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\fila_manager\wgtFilaManagerCloudSync.cpp.obj
+[683/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceWebBridge.cpp.obj
+[684/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsControlWeb\ViewModelDataBuilder.cpp.obj
+[685/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsControlWeb\ViewModelLayoutBuilder.cpp.obj
+[686/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsControlWeb\ViewModelDisplayBuilder.cpp.obj
+[687/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\ViewModel.cpp.obj
+[688/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\ActionHandlerExtAms.cpp.obj
+[689/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceWebPage.cpp.obj
+[690/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\BuilderHotendRackProgressStatus.cpp.obj
+[691/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\DeviceWebHost.cpp.obj
+[692/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\BuilderFilamentChangeStatus.cpp.obj
+[693/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\BuilderFilamentManualPullStatus.cpp.obj
+[694/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\DevicePageDialogHelpers.cpp.obj
+[695/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\Modes\BatchModeCommon.cpp.obj
+[696/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\Modes\NormalModeBuilder.cpp.obj
+[697/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\FilamentManager\FilamentManagerVM.cpp.obj
+[698/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsControlWeb\ViewModelActions.cpp.obj
+[699/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsControlWeb\ViewModel.cpp.obj
+[700/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\ResolverSlotState.cpp.obj
+[701/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\Modes\BatchUnloadModeBuilder.cpp.obj
+[702/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\Modes\BatchAmsLoadModeBuilder.cpp.obj
+[703/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\PageFilament.cpp.obj
+[704/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\Modes\BatchExtLoadModeBuilder.cpp.obj
+[705/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\ExtFilamentEditDialog.cpp.obj
+[706/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\refill_info\Builder.cpp.obj
+[707/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\BridgeDebugDialog.cpp.obj
+[708/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\PageHotend.cpp.obj
+[709/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\ViewModel.cpp.obj
+[710/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\add_refill_filaments\Builder.cpp.obj
+[711/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\dark_mode.cpp.obj
+[712/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\refill_info\Actions.cpp.obj
+[713/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\AVVideoDecoder.cpp.obj
+[714/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\wxMediaCtrl2.cpp.obj
+[715/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\add_refill_filaments\BlockCodeUtil.cpp.obj
+[716/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\ConnectedSlots\ViewModel.cpp.obj
+[717/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\wxMediaCtrl3.cpp.obj
+[718/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AutoRefill_RefillInfo\add_refill_filaments\Actions.cpp.obj
+[719/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\FilamentManualPullDialog.cpp.obj
+[720/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\ConnectedSlots\ViewModelState.cpp.obj
+[721/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\PrintQueue\PrintQueueVM.cpp.obj
+[722/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsFilamentHotend\ResolverDeviceState.cpp.obj
+[723/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\AmsMappingHotend\DevicePageAmsMappingHotendVM.cpp.obj
+[724/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\ConnectedSlots\PageConnectedSlots.cpp.obj
+[725/727] Building CXX object src\slic3r\CMakeFiles\libslic3r_gui.dir\GUI\DeviceWeb\ViewModels\DevicePage\ConnectedSlots\ViewModelActions.cpp.obj
+[726/727] Linking CXX shared library src\BambuStudio.dll
+===== ZH-Studio: build finished =====
