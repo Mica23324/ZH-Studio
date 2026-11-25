@@ -24,6 +24,7 @@
 #include "slic3r/GUI/GUI_App.hpp"
 #include "DevUtil.h"
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -438,20 +439,32 @@ void HMSQueryMgr::ensure_loaded(const std::string& dev_type)
 
     const std::string lang = hms_language_code();
     const std::string key  = cache_key(dev_type, lang);
+    const bool offline = NetworkPolicy::is_offline();
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         HMSEntry& e = m_entries[key];
-        if (e.inflight)
-            return; // one request per (dev_type + lang) in flight
-        if (e.status == HMSStatus::Ready && !need_update(e))
-            return; // fresh enough
-        if (e.status == HMSStatus::Unknown)
-            seed_from_local(e, dev_type, lang);
-        if (e.status != HMSStatus::Ready)
-            e.status = HMSStatus::Loading;
-        e.inflight = true;
+        if (offline) {
+            if (e.status == HMSStatus::Unknown)
+                seed_from_local(e, dev_type, lang);
+            e.status = (e.info || e.action) ? HMSStatus::Ready : HMSStatus::Failed;
+            e.inflight = false;
+        } else {
+            if (e.inflight)
+                return; // one request per (dev_type + lang) in flight
+            if (e.status == HMSStatus::Ready && !need_update(e))
+                return; // fresh enough
+            if (e.status == HMSStatus::Unknown)
+                seed_from_local(e, dev_type, lang);
+            if (e.status != HMSStatus::Ready)
+                e.status = HMSStatus::Loading;
+            e.inflight = true;
+        }
     }
 
+    if (offline) {
+        notify_subscribers(dev_type); // local cloud cache / bundled dictionaries remain usable offline
+        return;
+    }
     start_download(dev_type, lang);
 }
 
@@ -480,6 +493,12 @@ void HMSQueryMgr::start_download(const std::string& dev_type, const std::string&
     auto ctx      = std::make_shared<DownloadCtx>();
     ctx->dev_type = dev_type;
     ctx->lang     = lang;
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "HMS: remote download skipped in offline mode";
+        ctx->ok.store(false);
+        apply_download(ctx);
+        return;
+    }
 
     std::string info_ver, action_ver;
     {
@@ -506,6 +525,12 @@ void HMSQueryMgr::start_download(const std::string& dev_type, const std::string&
 
 void HMSQueryMgr::fetch_leg(const std::shared_ptr<DownloadCtx>& ctx, bool is_info, const std::string& url, const std::string& local_ver)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "HMS: remote request skipped in offline mode";
+        ctx->ok.store(false);
+        finish_leg(ctx);
+        return;
+    }
     const std::string hms_type = is_info ? HMS_QUERY_INFO : HMS_QUERY_ACTION;
 
     Slic3r::Http::get(url)

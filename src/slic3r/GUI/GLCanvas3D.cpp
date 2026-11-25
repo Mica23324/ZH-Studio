@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "libslic3r/libslic3r.h"
 #include "GLCanvas3D.hpp"
 #include "WipeTowerPlacement.hpp"
@@ -119,8 +120,10 @@ static const float SLIDER_DEFAULT_BOTTOM_MARGIN = 10.0f;
 static const float SLIDER_RIGHT_MARGIN          = 124.0f;
 static const float SLIDER_BOTTOM_MARGIN         = 64.0f;
 
-float GLCanvas3D::DEFAULT_BG_LIGHT_COLOR[3] = { 0.906f, 0.906f, 0.906f };
-float GLCanvas3D::DEFAULT_BG_LIGHT_COLOR_DARK[3] = { 0.329f, 0.329f, 0.353f };
+float GLCanvas3D::DEFAULT_BG_LIGHT_COLOR[3] = { 0.933f, 0.949f, 0.969f };
+// ZH-Studio: the viewport uses the same deep navy as the rest of the workspace
+// instead of the upstream mid grey, so the 3D view belongs to the dark UI.
+float GLCanvas3D::DEFAULT_BG_LIGHT_COLOR_DARK[3] = { 0.043f, 0.071f, 0.125f };
 float GLCanvas3D::ERROR_BG_LIGHT_COLOR[3] = { 0.753f, 0.192f, 0.039f };
 float GLCanvas3D::ERROR_BG_LIGHT_COLOR_DARK[3] = { 0.753f, 0.192f, 0.039f };
 
@@ -438,7 +441,7 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::accent(1.00f));
     if(ImGui::BBLSliderScalar("##radius_slider", ImGuiDataType_S32, &radius, &v_min, &v_max)){
         radius = std::clamp(radius, 1, 10);
         m_smooth_params.radius = (unsigned int)radius;
@@ -449,9 +452,9 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     input_align = std::max(input_align, ImGui::GetCursorPosX());
     ImGui::SetCursorPosX(input_align);
     ImGui::PushItemWidth(input_box_width);
-    ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.00f, 0.68f, 0.26f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.00f, 0.68f, 0.26f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImGuiWrapper::accent(0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImGuiWrapper::accent(0.00f));
     if (ImGui::BBLDragScalar("##radius_input", ImGuiDataType_S32, &radius, 1, &v_min, &v_max)) {
         radius = std::clamp(radius, 1, 10);
         m_smooth_params.radius = (unsigned int)radius;
@@ -10365,9 +10368,9 @@ void GLCanvas3D::_render_assembly_view_thumbnail_toolbar()
     if (ImGui::ImageButton3(help_id, help_id, button_icon_size, ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1), ImVec2(0, 0))) {
         bool is_zh = wxGetApp().app_config->get("language") == "zh_CN";
         if (is_zh) {
-            wxLaunchDefaultBrowser("https://wiki.bambulab.com/zh/bambu-studio/assembly-view");
+            Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/zh/bambu-studio/assembly-view");
         } else {
-            wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/bambu-studio/assembly-view");
+            Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/bambu-studio/assembly-view");
         }
     }
     help_button_hovered = ImGui::IsItemHovered();

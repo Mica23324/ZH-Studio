@@ -1800,6 +1800,7 @@ int CLI::run(int argc, char **argv)
         params.argv = argv;
         params.load_configs = load_configs;
         params.extra_config = std::move(m_extra_config);
+        params.offline = m_config.has("offline") && m_config.opt_bool("offline");
 
         std::vector<std::string>    gcode_files;
         std::vector<std::string>    non_gcode_files;
@@ -8851,17 +8852,17 @@ bool CLI::setup(int argc, char **argv)
     detect_platform();
 
 #ifdef WIN32
-    // Notify user that a blacklisted DLL was injected into BambuStudio process (for example Nahimic, see GH #5573).
-    // We hope that if a DLL is being injected into a BambuStudio process, it happens at the very start of the application,
+    // Notify user that a blacklisted DLL was injected into the ZH-Studio process (for example Nahimic, see GH #5573).
+    // We hope that if a DLL is being injected into a ZH-Studio process, it happens at the very start of the application,
     // thus we shall detect them now.
     if (BlacklistedLibraryCheck::get_instance().perform_check()) {
-        std::wstring text = L"Following DLLs have been injected into the BambuStudio process:\n\n";
+        std::wstring text = L"Following DLLs have been injected into the ZH-Studio process:\n\n";
         text += BlacklistedLibraryCheck::get_instance().get_blacklisted_string();
         text += L"\n\n"
-                L"BambuStudio is known to not run correctly with these DLLs injected. "
+                L"ZH-Studio is known to not run correctly with these DLLs injected. "
                 L"We suggest stopping or uninstalling these services if you experience "
-                L"crashes or unexpected behaviour while using BambuStudio.\n"
-                L"For example, ASUS Sonic Studio injects a Nahimic driver, which makes BambuStudio "
+                L"crashes or unexpected behaviour while using ZH-Studio.\n"
+                L"For example, ASUS Sonic Studio injects a Nahimic driver, which makes ZH-Studio "
                 L"to crash on a secondary monitor";
         MessageBoxW(NULL, text.c_str(), L"Warning"/*L"Incopatible library found"*/, MB_OK);
     }
@@ -9206,9 +9207,9 @@ LONG WINAPI VectoredExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 }*/
 
 // BBS: out-of-memory new-handler, installed on every platform
-#define BBL_OOM_TITLE "Bambu Studio - Out of Memory"
+#define BBL_OOM_TITLE "ZH-Studio - Out of Memory"
 #define BBL_OOM_BODY \
-    "Bambu Studio has run out of memory and must close.\n\n" \
+    "ZH-Studio has run out of memory and must close.\n\n" \
     "Your project may be too large for the available memory. " \
     "Try closing other applications, reducing the model complexity " \
     "or plate count, and restart."

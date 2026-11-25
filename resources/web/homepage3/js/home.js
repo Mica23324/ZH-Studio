@@ -17,11 +17,10 @@ function OnHomeInit()
 	SendMsg_GetPrintHistory();	    
 	
     document.getElementById('HotModel_Search_Input').onkeydown = function (event) {
-		if (event.key === 'Enter') {
+		if (event.key === 'Enter' && !event.isComposing) {
+			event.preventDefault();
 			OnSearchOnline();
 		}
-		
-		event.defaultPrevented();
     };
 	
 	let ModelSearchTip=GetCurrentTextByKey('t122');
@@ -80,7 +79,7 @@ var sImages = {};
  
 function Set_RecentFile_MouseRightBtn_Event()
 {
-	$(".FileItem").mousedown(
+	$(".FileItem").off('mousedown.zhRecentMenu').on('mousedown.zhRecentMenu',
 		function(e)
 		{			
 			//FilePath
@@ -97,12 +96,12 @@ function Set_RecentFile_MouseRightBtn_Event()
 			}
 		});
 
-	$(document).bind("contextmenu",function(e){
+	$(document).off('contextmenu.zhRecentMenu').on('contextmenu.zhRecentMenu',function(e){
 		//在这里书写代码，构建个性右键化菜单
 		return false;
 	});	
 	
-    $(document).mousemove( function(e){
+    $(document).off('mousemove.zhRecentMenu').on('mousemove.zhRecentMenu', function(e){
 		MousePosX=e.pageX;
 		MousePosY=e.pageY;
 		
@@ -118,8 +117,8 @@ function Set_RecentFile_MouseRightBtn_Event()
 	} );
 	
 
-	$(document).click( function(){		
-		var e = e || window.event;
+	$(document).off('click.zhRecentMenu').on('click.zhRecentMenu', function(e){
+		// Use the dispatched event, not the browser-specific window.event.
         var elem = e.target || e.srcElement;
         while (elem) {
 			if (elem.id && elem.id == 'recnet_context_menu') {
@@ -292,6 +291,7 @@ function HandleStudio( pVal )
 
 function OnBoardChange( strMenu )
 {
+    $('#zh-intro').toggle(strMenu === 'home');
 	if( strMenu=='home' )
 	{
 		$('#MenuArea').css('display','flex');	

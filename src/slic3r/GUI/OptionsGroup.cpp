@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "OptionsGroup.hpp"
 #include "ConfigExceptions.hpp"
 #include "Plater.hpp"
@@ -7,6 +8,8 @@
 #include "MsgDialog.hpp"
 #include "format.hpp"
 #include "Widgets/StaticLine.hpp"
+#include "ZHStyle.hpp"
+#include "ZHTheme.hpp"
 
 #include <utility>
 #include <wx/bookctrl.h>
@@ -543,6 +546,9 @@ bool OptionsGroup::activate(std::function<void()> throw_if_canceled/* = [](){}*/
 			throw_if_canceled();
 			activate_line(line);
 		}
+
+        // ZH-Studio look for the whole option group.
+        ZHStyle::ApplyOptionSizer(sizer, ZHTheme::accent(), wxGetApp().dark_mode());
 
         ctrl_horiz_alignment = horiz_alignment;
         if (custom_ctrl)
@@ -1419,7 +1425,7 @@ wxString OptionsGroup::get_url(const std::string& path_end)
 
 bool OptionsGroup::launch_browser(const std::string& path_end)
 {
-    return wxLaunchDefaultBrowser(OptionsGroup::get_url(path_end));
+    return Slic3r::GUI::zh_open_external_browser(OptionsGroup::get_url(path_end));
 }
 
 

@@ -109,11 +109,11 @@ function HandleModelList( pVal )
 		let CoverImage="../../image/printer/"+OneModel['model']+"_cover.png";
 		let	CoverImage2="../../../profiles/"+strVendor+"/"+OneModel['model']+"_cover.png";
 		let CoverImage3=pVal['configpath']+"/system/"+strVendor+"/"+OneModel['model']+"_cover.png";
-		
+
 		//alert( 'FinalCover: '+FinalCover );
 		ModelHtml[strVendor]+='<div class="PrinterBlock">'+
         '<div class="PImg">'+
-		    '<img class="ModelThumbnail" src="'+CoverImage3+'" onerror="ShowPrinterThumb(this,\''+CoverImage2+'\')" />'+
+		    '<img class="ModelThumbnail" src="'+CoverImage2+'" onerror="ShowPrinterThumb(this,\''+CoverImage3+'\')" />'+
 			'<div class="ModelCheckBox" model="'+OneModel['model']+'" onClick="ChooseModel(\''+OneModel['model']+'\')"></div>'+
 		'</div>'+
         '    <div class="PName">'+OneModel['model']+'</div>'+ 

@@ -38,6 +38,8 @@
 #include "GUI.hpp"
 #include "GUI_App.hpp"
 #include "EncodedFilament.hpp"
+#include "ZHTheme.hpp"
+#include "BitmapCache.hpp"
 #include "GUI_Utils.hpp"
 #include "I18N.hpp"
 #include "Field.hpp"
@@ -59,6 +61,13 @@
 namespace Slic3r {
 namespace GUI {
 
+namespace {
+// Shared ZH-Studio setup palette so every wizard surface follows the app theme.
+wxColour zh_setup_bg()      { return wxColour(wxGetApp().dark_mode() ? "#0B1220" : "#F3F6FA"); }
+wxColour zh_setup_surface() { return wxColour(wxGetApp().dark_mode() ? "#111C2D" : "#FFFFFF"); }
+wxColour zh_setup_fg()      { return wxColour(wxGetApp().dark_mode() ? "#E7EEF8" : "#172B43"); }
+wxColour zh_setup_muted()   { return wxColour(wxGetApp().dark_mode() ? "#A5B6CC" : "#51647C"); }
+} // namespace
 
 using Config::Snapshot;
 using Config::SnapshotDB;
@@ -461,7 +470,8 @@ ConfigWizardPage::ConfigWizardPage(ConfigWizard *parent, wxString title, wxStrin
     auto *text = new wxStaticText(this, wxID_ANY, std::move(title), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
     const auto font = GetFont().MakeBold().Scaled(1.5);
     text->SetFont(font);
-    text->SetForegroundColour(*wxBLACK);
+    text->SetForegroundColour(zh_setup_fg());
+    SetBackgroundColour(zh_setup_surface());
     sizer->Add(text, 0, wxALIGN_LEFT, 0);
     sizer->AddSpacer(10);
 
@@ -647,7 +657,7 @@ PageMaterials::PageMaterials(ConfigWizard *parent, Materials *materials, wxStrin
     , list_vendor(new StringList(this))
     , list_profile(new PresetList(this))
 {
-    SetBackgroundColour(*wxWHITE);
+    SetBackgroundColour(zh_setup_surface());
     append_spacer(VERTICAL_SPACING);
 
     const int em = parent->em_unit();
@@ -1499,6 +1509,7 @@ ConfigWizardIndex::ConfigWizardIndex(wxWindow *parent)
 #ifndef __WXOSX__ 
     SetDoubleBuffered(true);// SetDoubleBuffered exists on Win and Linux/GTK, but is missing on OSX
 #endif //__WXOSX__
+    SetBackgroundColour(zh_setup_bg());
     SetMinSize(bg.bmp().GetSize());
 
     const wxSize size = GetTextExtent("m");
@@ -1625,7 +1636,9 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
     if (size.GetHeight() == 0 || size.GetWidth() == 0) { return; }
    
     wxPaintDC dc(this);
-    
+    dc.SetBackground(wxBrush(zh_setup_bg()));
+    dc.Clear();
+
     const auto bullet_w = bullet_black.bmp().GetSize().GetWidth();
     const auto bullet_h = bullet_black.bmp().GetSize().GetHeight();
     const int yoff_icon = bullet_h < em_h ? (em_h - bullet_h) / 2 : 0;
@@ -1639,15 +1652,30 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
         const Item& item = items[i];
         unsigned x = em_w/2 + item.indent * em_w;
 
-        if (i == item_active || (item_hover >= 0 && i == (size_t)item_hover)) {
-            dc.DrawBitmap(bullet_blue.bmp(), x, y + yoff_icon, false);
+        // Vector step bullets in the palette instead of the upstream PNG dots.
+        const int bcx = x + bullet_w / 2;
+        const int bcy = y + yoff_icon + bullet_h / 2;
+        const int br = std::max(3, bullet_w / 2 - 1);
+        const bool active = (i == item_active || (item_hover >= 0 && i == (size_t)item_hover));
+        if (active) {
+            dc.SetPen(wxPen(ZHTheme::hovered(), 1));
+            dc.SetBrush(wxBrush(ZHTheme::accent()));
+            dc.DrawCircle(bcx, bcy, br);
+            dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.DrawCircle(bcx, bcy, br + 3);
+        } else if (i < item_active) {
+            dc.SetPen(*wxTRANSPARENT_PEN);
+            dc.SetBrush(wxBrush(ZHTheme::accent()));
+            dc.DrawCircle(bcx, bcy, br - 1);
+        } else {
+            dc.SetPen(wxPen(zh_setup_muted(), 1));
+            dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.DrawCircle(bcx, bcy, br - 1);
         }
-        else if (i < item_active)  { dc.DrawBitmap(bullet_black.bmp(), x, y + yoff_icon, false); }
-        else if (i > item_active)  { dc.DrawBitmap(bullet_white.bmp(), x, y + yoff_icon, false); }
 
         x += + bullet_w + em_w/2;
         const auto text_size = dc.GetTextExtent(item.label);
-        dc.SetTextForeground(wxGetApp().get_label_clr_default());
+        dc.SetTextForeground(active ? zh_setup_fg() : zh_setup_muted());
         dc.DrawText(item.label, x, y + yoff_text);
 
         y += yinc;
@@ -2652,11 +2680,11 @@ bool ConfigWizard::priv::check_sla_selected()
 // Public
 
 ConfigWizard::ConfigWizard(wxWindow *parent)
-    : DPIDialog(parent, wxID_ANY, wxString(SLIC3R_APP_NAME) + " - " + _(name()), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE /*| wxRESIZE_BORDER*/)
+    : DPIDialog(parent, wxID_ANY, wxString(SLIC3R_APP_FULL_NAME) + " - " + _(name()), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE /*| wxRESIZE_BORDER*/)
     , p(new priv(this))
 {
     this->SetFont(wxGetApp().normal_font());
-    SetBackgroundColour(*wxWHITE);
+    SetBackgroundColour(zh_setup_bg());
     p->load_vendors();
     //BBS: add bed exclude areas
     p->custom_config.reset(DynamicPrintConfig::new_from_defaults_keys({
@@ -2665,6 +2693,28 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     }));
 
     p->index = new ConfigWizardIndex(this);
+
+    // Branded setup header: ZH mark, Alpha wordmark and the product tagline.
+    auto *header = new wxPanel(this);
+    header->SetBackgroundColour(wxColour("#0B1524"));
+    auto *hsizer = new wxBoxSizer(wxHORIZONTAL);
+    BitmapCache logo_cache;
+    auto *logo = new wxStaticBitmap(header, wxID_ANY, *logo_cache.load_svg("ZH-Studio", FromDIP(44), FromDIP(44)));
+    auto *htext = new wxBoxSizer(wxVERTICAL);
+    auto *htitle = new wxStaticText(header, wxID_ANY, wxString::FromUTF8("ZH-Studio Alpha"));
+    htitle->SetFont(GetFont().MakeBold().Scaled(1.4));
+    htitle->SetForegroundColour(wxColour("#F1F5F9"));
+    auto *htag = new wxStaticText(header, wxID_ANY, wxString::FromUTF8("THIS IS NOT NOW. IT'S THE FUTURE."));
+    htag->SetFont(GetFont().Scaled(0.85));
+    htag->SetForegroundColour(ZHTheme::hovered());
+    htext->Add(htitle, 0, wxALIGN_LEFT);
+    htext->AddSpacer(FromDIP(2));
+    htext->Add(htag, 0, wxALIGN_LEFT);
+    hsizer->Add(logo, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(12));
+    hsizer->Add(htext, 1, wxALIGN_CENTER_VERTICAL);
+    auto *houter = new wxBoxSizer(wxVERTICAL);
+    houter->Add(hsizer, 0, wxEXPAND | wxALL, FromDIP(14));
+    header->SetSizer(houter);
 
     auto *vsizer = new wxBoxSizer(wxVERTICAL);
     auto *topsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -2701,6 +2751,18 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     wxGetApp().UpdateDarkUI(p->btn_finish);
     wxGetApp().UpdateDarkUI(p->btn_cancel);
 
+    // Primary actions carry the palette accent; secondary actions stay neutral.
+    const wxColour on_accent = ZHTheme::index() == 0 || ZHTheme::index() == 3 ? wxColour("#081522") : wxColour("#FFFFFE");
+    for (Button* primary : {p->btn_next, p->btn_finish}) {
+        primary->SetBackgroundColor(StateColor(
+            std::pair{ZHTheme::down(), (int)StateColor::Pressed},
+            std::pair{ZHTheme::hovered(), (int)StateColor::Hovered},
+            std::pair{ZHTheme::accent(), (int)StateColor::Normal}));
+        primary->SetBorderColor(StateColor(std::pair{ZHTheme::accent(), (int)StateColor::Normal}));
+        primary->SetTextColor(StateColor(std::pair{on_accent, (int)StateColor::Normal}));
+        primary->SetCornerRadius(FromDIP(7));
+    }
+
     //BBS: add BBL as default
     const auto bbl_it = p->bundles.find("BBL");
     wxCHECK_RET(bbl_it != p->bundles.cend(), "Vendor BambooLab not found");
@@ -2725,6 +2787,7 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
 
     p->load_pages();
 
+    vsizer->Add(header, 0, wxEXPAND);
     vsizer->Add(topsizer, 1, wxEXPAND | wxALL, DIALOG_MARGIN);
     vsizer->Add(hline, 0, wxEXPAND | wxLEFT | wxRIGHT, VERTICAL_SPACING);
     vsizer->Add(p->btnsizer, 0, wxEXPAND | wxALL, DIALOG_MARGIN);

@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "ViewModel.hpp"
 #include "ResolverDeviceState.hpp"
 #include "ResolverSlotState.hpp"
@@ -263,7 +264,7 @@ void show_nozzle_hint_dialog(int addr_id)
     const bool with_wiki = !wiki_url.empty();
     MessageDialog dlg(wxGetApp().mainframe, message, _L("Tip"), wxOK);
     if (with_wiki) dlg.SetButtonLabel(wxID_OK, _L("View details"));
-    if (dlg.ShowModal() == wxID_OK && with_wiki) wxLaunchDefaultBrowser(wxString::FromUTF8(wiki_url));
+    if (dlg.ShowModal() == wxID_OK && with_wiki) Slic3r::GUI::zh_open_external_browser(wxString::FromUTF8(wiki_url));
 }
 
 } // namespace

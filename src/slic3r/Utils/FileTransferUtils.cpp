@@ -4,6 +4,7 @@
 #include "slic3r/GUI/GUI_App.hpp"
 #include "slic3r/GUI/DeviceCore/DevManager.h"
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r {
 
@@ -40,6 +41,10 @@ FileTransferModule::FileTransferModule(ModuleHandle networking_module, int requi
 
 FileTransferTunnel::FileTransferTunnel(FileTransferModule &m, const std::string &url) : m_(&m)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping proprietary file-transfer tunnel creation in offline mode";
+        return;
+    }
     FT_TunnelHandle *h{};
     if (m_->ft_tunnel_create(url.c_str(), &h) != 0 || !h) {
 
@@ -62,6 +67,12 @@ FileTransferTunnel::FileTransferTunnel(FileTransferModule &m, const std::string 
 
 void FileTransferTunnel::start_connect()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "File-transfer tunnel connection rejected in offline mode";
+        if (conn_cb_)
+            conn_cb_(false, FT_EINVAL, "Offline mode");
+        return;
+    }
     // C API: ft_conn_cb(void* user, int ok, int err, const char* msg)
     auto tramp = [](void *user, int ok, int ec, const char *msg) noexcept {
         auto *pcb = reinterpret_cast<ConnectionCb *>(user);
@@ -77,6 +88,10 @@ void FileTransferTunnel::start_connect()
 
 bool FileTransferTunnel::sync_start_connect()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "File-transfer tunnel connection rejected in offline mode";
+        return false;
+    }
     return m_->ft_tunnel_sync_connect(h_) == FT_OK;
 }
 
@@ -85,11 +100,19 @@ void FileTransferTunnel::on_status(TunnelStatusCb cb) { status_cb_ = std::move(c
 
 void FileTransferTunnel::shutdown()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "File-transfer tunnel shutdown skipped in offline mode";
+        return;
+    }
     if (m_->ft_tunnel_shutdown) (void) m_->ft_tunnel_shutdown(h_);
 }
 
 FileTransferJob::FileTransferJob(FileTransferModule &m, const std::string &params_json) : m_(&m)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping proprietary file-transfer job creation in offline mode";
+        return;
+    }
     FT_JobHandle *h{};
     if (m_->ft_job_create(params_json.c_str(), &h) != 0 || !h) {
 
@@ -133,6 +156,8 @@ void FileTransferJob::on_result(ResultCb cb) { result_cb_ = std::move(cb); }
 
 bool FileTransferJob::get_result(int &ec, int &resp_ec, std::string &json, std::vector<std::byte> &bin, uint32_t timeout_ms)
 {
+    if (NetworkPolicy::is_offline())
+        return false;
     if (!h_) throw std::runtime_error("job handle invalid");
     ft_job_result result;
     if (m_->ft_job_get_result(h_, timeout_ms, &result) == ft_err::FT_EXCEPTION) return false;
@@ -147,6 +172,10 @@ bool FileTransferJob::get_result(int &ec, int &resp_ec, std::string &json, std::
 
 void FileTransferJob::start_on(FileTransferTunnel &t)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "File-transfer job rejected in offline mode";
+        throw std::runtime_error("File-transfer operations are unavailable in offline mode");
+    }
     if (!h_) throw std::runtime_error("job handle invalid");
     if (!t.native()) throw std::runtime_error("tunnel handle invalid");
     if (m_->ft_tunnel_start_job(t.native(), h_) == ft_err::FT_EXCEPTION) { throw std::runtime_error("ft_tunnel_start_job failed"); }
@@ -184,6 +213,8 @@ void FileTransferJob::on_msg(MsgCb cb)
 
 bool FileTransferJob::try_get_msg(int &kind, std::string &json)
 {
+    if (NetworkPolicy::is_offline())
+        return false;
     if (!h_) return false;
     ft_job_msg m{};
     int        rc = m_->ft_job_try_get_msg(h_, &m);
@@ -202,6 +233,8 @@ bool FileTransferJob::try_get_msg(int &kind, std::string &json)
 
 bool FileTransferJob::get_msg(uint32_t timeout_ms, int &kind, std::string &json)
 {
+    if (NetworkPolicy::is_offline())
+        return false;
     if (!h_) return false;
     ft_job_msg m{};
     int        rc = m_->ft_job_get_msg(h_, timeout_ms, &m);

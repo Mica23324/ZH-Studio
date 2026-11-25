@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "AMSNewFilamentDialogs.hpp"
 
 #include "GUI_App.hpp"
@@ -420,11 +421,11 @@ void AMSNewOfficialFilamentDlg::create()
     m_btn_confirm->SetMinSize(AMS_MATERIALS_SETTING_BUTTON_SIZE);
     m_btn_confirm->SetCornerRadius(FromDIP(12));
     m_btn_confirm->SetBackgroundColor(StateColor(
-        std::pair<wxColour, int>(wxColour(27, 136, 68),  StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66),   StateColor::Normal)
+        std::pair<wxColour, int>(ZHTheme::down(),  StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(),   StateColor::Normal)
     ));
-    m_btn_confirm->SetBorderColor(wxColour(0, 174, 66));
+    m_btn_confirm->SetBorderColor(ZHTheme::accent());
     m_btn_confirm->SetTextColor(wxColour("#FFFFFE"));
     m_btn_confirm->Bind(wxEVT_BUTTON, &AMSNewOfficialFilamentDlg::on_confirm, this);
     btn_sizer->Add(m_btn_confirm, 0);
@@ -685,11 +686,11 @@ void AMSNewFilamentRecordedDlg::create(const FilamentSpool& sp)
     btn_ok->SetMinSize(AMS_MATERIALS_SETTING_BUTTON_SIZE);
     btn_ok->SetCornerRadius(FromDIP(12));
     btn_ok->SetBackgroundColor(StateColor(
-        std::pair<wxColour, int>(wxColour(27, 136, 68),  StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66),   StateColor::Normal)
+        std::pair<wxColour, int>(ZHTheme::down(),  StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(),   StateColor::Normal)
     ));
-    btn_ok->SetBorderColor(wxColour(0, 174, 66));
+    btn_ok->SetBorderColor(ZHTheme::accent());
     btn_ok->SetTextColor(wxColour("#FFFFFE"));
     btn_ok->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { EndModal(wxID_OK); });
     btn_sizer->Add(btn_ok, 0);

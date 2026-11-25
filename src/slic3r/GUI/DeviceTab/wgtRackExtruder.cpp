@@ -59,7 +59,7 @@ constexpr double kArrowWidth  = 8.0;
 constexpr double kArrowHeight = 8.0;
 constexpr double kArrowPitch  = 12.5;
 
-// Green '#00AE42' is the Bambu accent that the design uses for active hotend.
+// Green '#0EA5E9' is the Bambu accent that the design uses for active hotend.
 const wxColour kCircleGreen{ 0x00, 0xAE, 0x42 };
 const wxColour kCircleDisabled{ 0xC2, 0xC2, 0xC2 };
 

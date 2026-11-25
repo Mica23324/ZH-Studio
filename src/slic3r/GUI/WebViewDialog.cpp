@@ -1,4 +1,6 @@
 #include "WebViewDialog.hpp"
+#include "ZHTheme.hpp"
+#include "ZHBrowser.hpp"
 
 #include "I18N.hpp"
 #include "slic3r/GUI/wxExtensions.hpp"
@@ -140,6 +142,10 @@ WebViewPanel::WebViewPanel(wxWindow *parent)
              UrlWiki = wxString::Format("file://%s/web/homepage3/wiki.html?lang=%s", from_u8(resources_dir()), strlang);
      }
 
+    // ZH-Studio: pass the active (validated) palette to the bundled homepage only.
+    const wxString zh_palette = wxString::FromUTF8(ZHTheme::ids[ZHTheme::index()]);
+    UrlLeft += (UrlLeft.Contains("?") ? "&zh_theme=" : "?zh_theme=") + zh_palette;
+    UrlRight += (UrlRight.Contains("?") ? "&zh_theme=" : "?zh_theme=") + zh_palette;
     topsizer = new wxBoxSizer(wxVERTICAL);
 
 #if !BBL_RELEASE_TO_PUBLIC
@@ -649,7 +655,7 @@ void WebViewPanel::OnOpenInBrowser(wxCommandEvent& WXUNUSED(evt))
     if (IsBlankWebUrl(current_url))
         return;
 
-    wxLaunchDefaultBrowser(current_url);
+    Slic3r::GUI::zh_open_external_browser(current_url);
     UpdateOnlineToolbarState();
 }
 
@@ -1732,7 +1738,7 @@ void WebViewPanel::OnNavigationRequest(wxWebViewEvent& evt)
             surl.EndsWith("bbsflmt")
             )
         {
-            wxLaunchDefaultBrowser(url);
+            Slic3r::GUI::zh_open_external_browser(url);
 
             evt.Veto();
             return;
@@ -1917,7 +1923,7 @@ void WebViewPanel::OnNewWindow(wxWebViewEvent& evt)
     if (m_tools_handle_new_window->IsChecked())
     {
         evt.Veto();
-        wxLaunchDefaultBrowser(url);
+        Slic3r::GUI::zh_open_external_browser(url);
     }
 
     UpdateState();
@@ -1997,7 +2003,8 @@ void WebViewPanel::OnScriptMessage(wxWebViewEvent& evt)
     /* remove \n in response string */
     response.erase(std::remove(response.begin(), response.end(), '\n'), response.end());
     if (!response.empty()) {
-        m_response_js = wxString::Format("window.postMessage('%s')", response);
+        const std::string response_js = json(response).dump();
+        m_response_js = wxString::Format("window.postMessage(%s)", wxString::FromUTF8(response_js));
         wxCommandEvent* event = new wxCommandEvent(EVT_RESPONSE_MESSAGE, this->GetId());
         wxQueueEvent(this, event);
     }
@@ -2384,7 +2391,7 @@ void WebViewPanel::SwitchWebContent(std::string modelname, int refresh)
         else
             MakerSupplyUrl = "https://store.bambulab.com/collections/makers-supply?from=bambustudio&from=mw_homepage_ms";
 
-        wxLaunchDefaultBrowser(MakerSupplyUrl);
+        Slic3r::GUI::zh_open_external_browser(MakerSupplyUrl);
     }
     else if (modelname.compare("makerlab") == 0)
     {

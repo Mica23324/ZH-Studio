@@ -15,6 +15,7 @@
 
 #include "libslic3r/Utils.hpp"
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r { namespace GUI {
 
@@ -209,6 +210,10 @@ DeviceHttpServer::~DeviceHttpServer()
 
 void DeviceHttpServer::start()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "[DeviceHttpServer] listener disabled in offline mode";
+        return;
+    }
     BOOST_LOG_TRIVIAL(info) << "[DeviceHttpServer] starting on port " << DEVICE_LOCALHOST_PORT;
     if (running_.exchange(true))
         return; // already running

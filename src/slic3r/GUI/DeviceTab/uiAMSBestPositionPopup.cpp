@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "../ZHTheme.hpp"
 //**********************************************************/
 /* File: uiAMSBestPositionPopup.hpp
 *  Description: The popup with suggest best ams position
@@ -600,13 +602,13 @@ ReselectMachineDialog::ReselectMachineDialog(wxWindow* parent)
     suggestText = new Label(textPanel, wxEmptyString);
 
     linkwiki = new Label(textPanel, _L("How to save time?→"));
-    linkwiki->SetForegroundColour(wxColour("#00AE42"));
+    linkwiki->SetForegroundColour(ZHTheme::accent());
     linkwiki->SetBackgroundColour(wxColour("#FFFFFF"));
     linkwiki->SetFont(Label::Body_14);
     linkwiki->Bind(wxEVT_ENTER_WINDOW, [this](auto& e) { SetCursor(wxCURSOR_HAND); });
     linkwiki->Bind(wxEVT_LEAVE_WINDOW, [this](auto& e) { SetCursor(wxCURSOR_ARROW); });
     linkwiki->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&){
-        wxLaunchDefaultBrowser(wxString("https://e.bambulab.com/t?c=yElVKjHwyw9o3pND"));
+        Slic3r::GUI::zh_open_external_browser(wxString("https://e.bambulab.com/t?c=yElVKjHwyw9o3pND"));
         // e.Skip();
     });
     textSizer->Add(suggestText, 0, wxALIGN_LEFT | wxTOP, FromDIP(5));
@@ -673,7 +675,7 @@ ReselectMachineDialog::ReselectMachineDialog(wxWindow* parent)
     m_buttonClose = new Button(this, _L("Close"));
     m_buttonClose->SetMinSize(wxSize(FromDIP(80), FromDIP(32)));
     m_buttonClose->SetMaxSize(wxSize(FromDIP(80), FromDIP(32)));
-    m_buttonClose->SetBackgroundColor(wxColour("#00AE42"));
+    m_buttonClose->SetBackgroundColor(ZHTheme::accent());
     m_buttonClose->Bind(wxEVT_BUTTON, [this](wxCommandEvent &e){
         this->Close();
     });

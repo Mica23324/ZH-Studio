@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "CameraPopup.hpp"
 
 #include "I18N.hpp"
@@ -177,7 +178,7 @@ CameraPopup::CameraPopup(wxWindow *parent)
     vcamera_guide_link->Wrap(-1);
     vcamera_guide_link->SetForegroundColour(wxColour(0x1F, 0x8E, 0xEA));
     auto text_size = vcamera_guide_link->GetTextExtent(text);
-    vcamera_guide_link->Bind(wxEVT_LEFT_DOWN, [this, url](wxMouseEvent& e) {wxLaunchDefaultBrowser(url); });
+    vcamera_guide_link->Bind(wxEVT_LEFT_DOWN, [this, url](wxMouseEvent& e) {Slic3r::GUI::zh_open_external_browser(url); });
 
     link_underline = new wxPanel(m_panel, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
     link_underline->SetBackgroundColour(wxColour(0x1F, 0x8E, 0xEA));
@@ -647,7 +648,7 @@ void CameraPopup::OnLeftUp(wxMouseEvent &event)
         auto h_rect = vcamera_guide_link->ClientToScreen(wxPoint(0, 0));
         if (mouse_pos.x > h_rect.x && mouse_pos.y > h_rect.y && mouse_pos.x < (h_rect.x + vcamera_guide_link->GetSize().x) && mouse_pos.y < (h_rect.y + vcamera_guide_link->GetSize().y)) {
             auto url = wxString::Format(L"https://wiki.bambulab.com/%s/software/bambu-studio/virtual-camera", L"en");
-            wxLaunchDefaultBrowser(url);
+            Slic3r::GUI::zh_open_external_browser(url);
         }
     }
 }

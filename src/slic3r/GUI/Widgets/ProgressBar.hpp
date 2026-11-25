@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include <wx/timer.h>
 #include <wx/window.h>
 #include "../wxExtensions.hpp"
 
@@ -77,11 +78,23 @@ private:
     int  findHoveredMarker(const wxPoint &position) const;
     void updateControlHeight();
 
+    void   animate_to(int step);
+    double animated_step();
+    void   on_anim_timer(wxTimerEvent &evt);
+
     int                 m_barHeight = miniHeight;
     int                 m_hoveredMarker = -1;
     std::optional<wxPoint> m_lastMousePosition;
     std::vector<Marker> m_markers;
 
+    // Progress values are eased towards the reported value. The percentage
+    // text keeps showing the exact target, only the filled width animates.
+    wxTimer   m_anim_timer;
+    bool      m_anim_animating = false;
+    long long m_anim_started_ms = 0;
+    double    m_display_step = 0.0;
+    double    m_anim_from = 0.0;
+    double    m_anim_to = 0.0;
 
     DECLARE_EVENT_TABLE()
 };

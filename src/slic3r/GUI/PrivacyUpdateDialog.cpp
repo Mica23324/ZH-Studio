@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "PrivacyUpdateDialog.hpp"
 #include "GUI_App.hpp"
 #include "BitmapCache.hpp"
@@ -66,8 +68,8 @@ PrivacyUpdateDialog::PrivacyUpdateDialog(wxWindow* parent, wxWindowID id, const 
     m_sizer_right->Add(m_vebview_release_note, 0, wxEXPAND | wxRIGHT | wxLEFT, FromDIP(15));
 
     auto sizer_button = new wxBoxSizer(wxHORIZONTAL);
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(220, 220, 220), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
@@ -150,7 +152,7 @@ void PrivacyUpdateDialog::OnNavigating(wxWebViewEvent& event)
     wxString jump_url = event.GetURL();
     if (jump_url != m_host_url) {
         event.Veto();
-        wxLaunchDefaultBrowser(jump_url);
+        Slic3r::GUI::zh_open_external_browser(jump_url);
     }
     else {
         event.Skip();

@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 // #include "libslic3r/GCodeSender.hpp"
 //#include "slic3r/Utils/Serial.hpp"
 #include "Tab.hpp"
@@ -605,14 +607,14 @@ void Tab::create_preset_tab()
         m_wiki_bmp->Hide();
         wiki_sizer->Add(m_wiki_label, 0, wxALIGN_CENTER_VERTICAL);
         auto set_hover = [this, wiki_icon, wiki_icon_hover](bool hover) {
-            wxColour color = hover ? wxColour("#00AE42") : wxColour("#6B6B6B");
+            wxColour color = hover ? ZHTheme::accent() : wxColour("#6B6B6B");
             m_wiki_bmp->SetBitmap(hover ? wiki_icon_hover->bmp() : wiki_icon->bmp());
             m_wiki_label->SetForegroundColour(color);
             m_wiki_label->SetFont(hover ? Label::Body_13.Underlined() : Label::Body_13);
             m_wiki_label->SetCursor(hover ? wxCURSOR_HAND : wxCURSOR_ARROW);
         };
         auto open_wiki = [](wxMouseEvent&) {
-            wxLaunchDefaultBrowser("https://wiki.bambulab.com");
+            Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com");
         };
         m_wiki_label->Bind(wxEVT_LEFT_DOWN, open_wiki);
         m_wiki_bmp->Bind(wxEVT_ENTER_WINDOW, [set_hover](wxMouseEvent &) { set_hover(true); });
@@ -8803,7 +8805,7 @@ void Tab::update_nozzle_status_display()
 
     wxStaticText *reminder_text = new wxStaticText(this, wxID_ANY, _L("Available nozzles for current preset: "));
     reminder_text->SetFont(Label::Body_13);
-    reminder_text->SetForegroundColour(wxColour("#00AE42"));
+    reminder_text->SetForegroundColour(ZHTheme::accent());
     m_nozzle_status_sizer->Add(reminder_text, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
 
     auto add_nozzle_label = [this](const wxString &name) {
@@ -8813,7 +8815,7 @@ void Tab::update_nozzle_status_display()
         btn->SetFont(wxGetApp().bold_font());
         StateColor bg_color(wxColour("#E6F7ED"));
         btn->SetBackgroundColor(bg_color);
-        StateColor fg_color(wxColour("#00AE42"));
+        StateColor fg_color(ZHTheme::accent());
         btn->SetTextColor(fg_color);
         btn->SetCornerRadius(6);
         btn->Enable(false);

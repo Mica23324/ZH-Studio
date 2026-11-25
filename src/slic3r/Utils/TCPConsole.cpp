@@ -13,6 +13,7 @@
 
 #include "TCPConsole.hpp"
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 using boost::asio::steady_timer;
 using boost::asio::ip::tcp;
@@ -118,6 +119,11 @@ bool TCPConsole::is_deadline_over() const
 
 bool TCPConsole::run_queue()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "TCPConsole: connection rejected in offline mode";
+        m_error_code = make_error_code(boost::asio::error::operation_aborted);
+        return false;
+    }
     try {
         // TODO: Add more resets and initializations after previous run (reset() method?..)
         set_deadline_in(m_connect_timeout);

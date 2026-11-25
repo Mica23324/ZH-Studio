@@ -30,6 +30,7 @@
 #include <iomanip>
 #include <sstream>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r { namespace GUI {
 
@@ -52,7 +53,7 @@ bool is_spool_cloud_write_action(const std::string& action)
 
 bool can_write_spool_to_cloud(NetworkAgent* agent)
 {
-    return agent && agent->is_user_login() && agent->is_server_connected();
+    return !NetworkPolicy::is_offline() && agent && agent->is_user_login() && agent->is_server_connected();
 }
 
 std::string normalize_ams_hex_for_web(const std::string& raw)
@@ -157,8 +158,10 @@ FilamentManagerVM::FilamentManagerVM()
             if (op == "create" && !id.empty()) {
                 m_pending_pull_added_hint += 1;
             }
-            if (auto* d = wxGetApp().fila_manager_cloud_disp()) {
-                d->enqueue_pull();
+            if (!NetworkPolicy::is_offline()) {
+                if (auto* d = wxGetApp().fila_manager_cloud_disp()) {
+                    d->enqueue_pull();
+                }
             }
         });
     }
@@ -419,7 +422,7 @@ nlohmann::json FilamentManagerVM::HandleSpool(const std::string& action, const n
                                   {{"action", "mark_empty"}, {"spool_id", sid}});
             }
         }
-        if (disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
+        if (!NetworkPolicy::is_offline() && disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
         publish_sync_state();
         return MakeResp("spool", action, 0, "", build_spool_list());
     }
@@ -438,7 +441,7 @@ nlohmann::json FilamentManagerVM::HandleSpool(const std::string& action, const n
                                   {{"action", "toggle_favorite"}, {"spool_id", sid}, {"favorite", u.favorite}});
             }
         }
-        if (disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
+        if (!NetworkPolicy::is_offline() && disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
         publish_sync_state();
         return MakeResp("spool", action, 0, "", build_spool_list());
     }
@@ -457,7 +460,7 @@ nlohmann::json FilamentManagerVM::HandleSpool(const std::string& action, const n
                                   {{"action", "archive"}, {"spool_id", sid}});
             }
         }
-        if (disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
+        if (!NetworkPolicy::is_offline() && disp && !sid.empty()) disp->enqueue_push_update(sid, nlohmann::json::object());
         publish_sync_state();
         return MakeResp("spool", action, 0, "", build_spool_list());
     }
@@ -473,6 +476,7 @@ nlohmann::json FilamentManagerVM::HandleSync(const std::string& action, const nl
         return MakeResp("sync", action, 0, "", build_sync_state());
     }
     if (action == "pull") {
+        if (NetworkPolicy::is_offline()) return MakeResp("sync", action, -1, "Offline mode: cloud sync is unavailable");
         if (!disp) return MakeResp("sync", action, -1, "cloud disabled");
         publish_debug_log("data", "info", "Manual pull requested",
                           "The web page requested a cloud pull",
@@ -481,6 +485,7 @@ nlohmann::json FilamentManagerVM::HandleSync(const std::string& action, const nl
         return MakeResp("sync", action, 0, "", build_sync_state());
     }
     if (action == "push_all_now") {
+        if (NetworkPolicy::is_offline()) return MakeResp("sync", action, -1, "Offline mode: cloud sync is unavailable");
         auto* cloud = wxGetApp().fila_manager_cloud_sync();
         if (!cloud) return MakeResp("sync", action, -1, "cloud disabled");
         publish_debug_log("data", "info", "Manual push_all_now requested",
@@ -506,6 +511,7 @@ nlohmann::json FilamentManagerVM::HandleConfig(const std::string& action, const 
             return MakeResp("config", action, 0, "cached", m_cached_cloud_config);
         }
 
+        if (NetworkPolicy::is_offline()) return MakeResp("config", action, -1, "Offline mode: cloud config is unavailable");
         if (!sync) return MakeResp("config", action, -1, "cloud disabled");
         sync->fetch_filament_config([this](const nlohmann::json& cfg) {
             m_cached_cloud_config = cfg;
@@ -564,6 +570,7 @@ nlohmann::json FilamentManagerVM::HandleMachine(const std::string& action, const
         return MakeResp("machine", action, 0, "", build_machine_list());
     }
     if (action == "request_pushall") {
+        if (NetworkPolicy::is_offline()) return MakeResp("machine", action, -1, "Offline mode: printer networking is unavailable");
         std::string dev_id = payload.value("dev_id", "");
         auto* mgr = wxGetApp().getDeviceManager();
         if (!mgr) {
@@ -716,8 +723,10 @@ void FilamentManagerVM::publish_push_failed(const std::string& spool_id,
                                         int code,
                                         const std::string& message)
 {
-    if (auto* disp = wxGetApp().fila_manager_cloud_disp()) {
-        disp->enqueue_pull();
+    if (!NetworkPolicy::is_offline()) {
+        if (auto* disp = wxGetApp().fila_manager_cloud_disp()) {
+            disp->enqueue_pull();
+        }
     }
     if (!m_bridge) return;
     nlohmann::json body;
@@ -751,10 +760,12 @@ void FilamentManagerVM::publish_debug_log(const std::string& category,
 nlohmann::json FilamentManagerVM::build_spool_list()
 {
     auto* store = wxGetApp().fila_manager_store();
+    nlohmann::json spools = store ? store->spools_to_json() : nlohmann::json::array();
+    if (NetworkPolicy::is_offline())
+        return spools; // locally stored spools remain available without a cloud session
     auto* agent = wxGetApp().getAgent();
     if (!agent || !agent->is_user_login())
         return nlohmann::json::array();
-    nlohmann::json spools = store ? store->spools_to_json() : nlohmann::json::array();
     if (!spools.is_array()) return spools;
 
     auto* clr_query = wxGetApp().get_filament_color_code_query();

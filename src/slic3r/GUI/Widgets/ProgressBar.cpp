@@ -1,12 +1,28 @@
+#include "../ZHTheme.hpp"
 #include "ProgressBar.hpp"
 
 #include <algorithm>
+#include <chrono>
 
 #include "../I18N.hpp"
+#include "../ZHMotion.hpp"
 #include <wx/dcclient.h>
 #include <wx/dcgraph.h>
 #include "Label.hpp"
 #include "StateColor.hpp"
+
+namespace {
+
+long long progress_now_ms()
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
+constexpr int kProgressFrameMs = 16;
+constexpr double kProgressDurationMs = 240.0;
+
+} // namespace
 
 
 
@@ -45,6 +61,8 @@ ProgressBar::~ProgressBar() {}
 void ProgressBar::create(wxWindow *parent, wxWindowID id, const wxPoint &pos,  wxSize &size)
 {
     wxWindow::Create(parent, id, pos, size);
+    m_anim_timer.SetOwner(this);
+    Bind(wxEVT_TIMER, &ProgressBar::on_anim_timer, this, m_anim_timer.GetId());
     // m_static_info = new wxStaticText(this, wxID_ANY,wxT(""),wxPoint(this->padding, 20), wxSize(GetSize().GetWidth() - this->padding * 3, -1), wxST_ELLIPSIZE_END);
     // m_static_info->Wrap(-1);
 
@@ -52,8 +70,8 @@ void ProgressBar::create(wxWindow *parent, wxWindowID id, const wxPoint &pos,  w
 
      auto m_progress_bk = new StaticBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
      m_progress_bk->SetBackgroundColour(wxColour(238, 130, 238));
-     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                             std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+     StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                             std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
      wxBoxSizer *m_sizer_progress= new wxBoxSizer(wxHORIZONTAL);
 
@@ -148,6 +166,9 @@ void ProgressBar::Disable(wxString text)
     if (m_disable) return;
     m_disable_text = text;
     m_disable = true;
+    m_anim_animating = false;
+    m_anim_timer.Stop();
+    m_display_step = m_step;
     Refresh();
 }
 
@@ -161,6 +182,52 @@ void ProgressBar::Reset()
 {
     m_step = 0;
     SetValue(0);
+    m_anim_animating = false;
+    m_anim_timer.Stop();
+    m_display_step = 0.0;
+    Refresh();
+}
+
+void ProgressBar::animate_to(int step)
+{
+    m_anim_from = m_anim_animating ? animated_step() : m_display_step;
+    m_anim_to   = step;
+    if (!ZHMotion::enabled() || std::abs(m_anim_to - m_anim_from) < 0.01) {
+        m_anim_animating = false;
+        m_anim_timer.Stop();
+        m_display_step = m_anim_to;
+        return;
+    }
+    m_anim_started_ms = progress_now_ms();
+    m_anim_animating  = true;
+    if (!m_anim_timer.Start(kProgressFrameMs)) {
+        m_anim_animating = false;
+        m_display_step   = m_anim_to;
+    }
+}
+
+double ProgressBar::animated_step()
+{
+    if (!m_anim_animating)
+        return m_display_step;
+    const double progress = std::min(1.0, static_cast<double>(progress_now_ms() - m_anim_started_ms) /
+                                             kProgressDurationMs);
+    const double eased = ZHMotion::ease_out(static_cast<float>(progress));
+    m_display_step = m_anim_from + (m_anim_to - m_anim_from) * eased;
+    if (progress >= 1.0) {
+        m_anim_animating = false;
+        m_anim_timer.Stop();
+        m_display_step = m_anim_to;
+    }
+    return m_display_step;
+}
+
+void ProgressBar::on_anim_timer(wxTimerEvent &)
+{
+    if (!m_anim_animating)
+        return;
+    animated_step();
+    Refresh(false);
 }
 
 void ProgressBar::SetProgress(int step)
@@ -172,7 +239,8 @@ void ProgressBar::SetProgress(int step)
     }
 
     m_disable = false;
-    m_step = step;
+    m_step = std::min(step, m_max);
+    animate_to(m_step);
     Refresh();
 }
 
@@ -263,6 +331,7 @@ void ProgressBar::doRender(wxDC &dc)
     if (m_step >= m_max) m_step = m_max;
     const wxSize size      = GetClientSize();
     const int    barHeight = std::min(m_barHeight, size.y);
+    const double shown     = m_disable ? static_cast<double>(m_step) : animated_step();
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(GetBackgroundColour()));
     dc.DrawRectangle(0, 0, size.x, size.y);
@@ -277,7 +346,7 @@ void ProgressBar::doRender(wxDC &dc)
 
     //draw progress
     if (m_disable) {
-        m_proportion = float(size.x * float(this->m_step) / float(this->m_max));
+        m_proportion = float(size.x * shown / float(this->m_max));
         if (m_proportion < m_radius * 2 && m_proportion != 0) { m_proportion = m_radius * 2; }
 
         dc.SetPen(wxPen(m_progress_colour_disable, 1));
@@ -297,7 +366,7 @@ void ProgressBar::doRender(wxDC &dc)
         dc.DrawText(m_disable_text, pt);
 
     } else {
-        m_proportion = float(size.x * float(this->m_step) / float(this->m_max));
+        m_proportion = float(size.x * shown / float(this->m_max));
         if (m_proportion < m_radius * 2  && m_proportion != 0) { m_proportion = m_radius * 2; }
 
         dc.SetPen(wxPen(m_progress_colour, 1));

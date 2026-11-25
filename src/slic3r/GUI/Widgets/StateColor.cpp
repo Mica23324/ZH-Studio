@@ -7,9 +7,9 @@ static bool operator<(wxColour const &l, wxColour const &r) { return l.GetRGBA()
 
 // Light → dark color mapping
 static std::map<wxColour, wxColour> gDarkColors{
-    {ThemeColor::BrandGreen,  "#21A452"},/*green*/
-    {ThemeColor::BrandGreenPressed, "#1C8A46"},
-    {ThemeColor::BrandGreenHovered, "#37B865"},
+    {ThemeColor::BrandGreen,  "#0EA5E9"},/*green*/
+    {ThemeColor::BrandGreenPressed, "#0284C7"},
+    {ThemeColor::BrandGreenHovered, "#38BDF8"},
     // {"#1F8EEA", "#2778D2"},/*blue*/ -- dead, only used by disabled Notebook.cpp:80 OnPaint
     {ThemeColor::Warning,     "#D15B00"},
     {ThemeColor::Danger,      "#BB2A3A"},/*red*/
@@ -19,14 +19,14 @@ static std::map<wxColour, wxColour> gDarkColors{
     {"#E5E7EB", "#374151"},/*gray200 -> gray800*/
     {ThemeColor::TextMuted,   "#818183"},/*gray -> */    // same hex as Grey700
     {"#ACACAC", "#54545A"},/*gray -> */
-    {ThemeColor::Grey300,     "#4C4C55"},/*gray -> */
-    {ThemeColor::Grey350,     "#3E3E45"},
+    {ThemeColor::Grey300,     "#2B3E56"},
+    {ThemeColor::Grey350,     "#344761"},
     {ThemeColor::TextSecondary, "#E5E5E4"}, // #323A3D
     {ThemeColor::TextDisabled,  "#5A5A5A"}, // #909090
-    {ThemeColor::White,       "#2D2D31"},
-    {ThemeColor::Grey200,     "#36363C"},
-    {ThemeColor::Grey250,     "#36363B"},
-    {"#3B4446", "#2D2D30"},
+    {ThemeColor::White,       "#192539"},
+    {ThemeColor::Grey200,     "#101827"},
+    {ThemeColor::Grey250,     "#152134"},
+    {"#3B4446", "#101E31"},
     {ThemeColor::Grey400,     "#54545B"},
     {"#DBFDD5", "#3B3B40"},
     {"#000000", "#FFFFFE"},
@@ -61,11 +61,14 @@ void StateColor::SetDarkMode(bool dark) { gDarkMode = dark; }
 
 inline wxColour darkModeColorFor2(wxColour const &color)
 {
+    const wxColour themed = ZHTheme::map(color);
     if (!gDarkMode)
-        return color;
+        return themed;
+    if (themed == ZHTheme::tint()) return ZHTheme::dark_tint();
+    if (themed == ZHTheme::accent() || themed == ZHTheme::hovered() || themed == ZHTheme::down()) return themed;
     auto iter = gDarkColors.find(color);
     if (iter != gDarkColors.end()) return iter->second;
-    return color;
+    return themed;
 }
 
 std::map<wxColour, wxColour> revert(std::map<wxColour, wxColour> const & map)
@@ -77,6 +80,7 @@ std::map<wxColour, wxColour> revert(std::map<wxColour, wxColour> const & map)
 
 wxColour StateColor::lightModeColorFor(wxColour const &color)
 {
+    if (color == ZHTheme::dark_tint()) return ZHTheme::tint();
     static std::map<wxColour, wxColour> gLightColors = revert(gDarkColors);
     auto iter = gLightColors.find(color);
     if (iter != gLightColors.end()) return iter->second;

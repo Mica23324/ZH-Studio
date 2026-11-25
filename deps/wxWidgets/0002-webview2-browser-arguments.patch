@@ -1,0 +1,58 @@
+diff --git a/include/wx/msw/private/webview_edge.h b/include/wx/msw/private/webview_edge.h
+index 6966726665..254ebfa5be 100644
+--- a/include/wx/msw/private/webview_edge.h
++++ b/include/wx/msw/private/webview_edge.h
+@@ -60,6 +60,7 @@ public:
+     wxString m_scriptMsgHandlerName;
+     wxString m_customUserAgent;
+     wxString m_customUserDataPath;// use wxStandardPaths::Get().GetUserLocalDataDir() if empty
++    wxString m_additionalBrowserArguments;
+ 
+     // WebView Events tokens
+     EventRegistrationToken m_navigationStartingToken = { };
+diff --git a/include/wx/msw/webview_edge.h b/include/wx/msw/webview_edge.h
+index c4bf528962..603e42cadc 100644
+--- a/include/wx/msw/webview_edge.h
++++ b/include/wx/msw/webview_edge.h
+@@ -88,6 +88,7 @@ public:
+ 
+     virtual bool SetUserAgent(const wxString& userAgent) wxOVERRIDE;
+     virtual void SetUserDataPathOption(const wxString& path) wxOVERRIDE;
++    void SetAdditionalBrowserArguments(const wxString& arguments);
+ 
+     virtual bool RunScript(const wxString& javascript, wxString* output = NULL) const wxOVERRIDE;
+     virtual bool AddScriptMessageHandler(const wxString& name) wxOVERRIDE;
+diff --git a/src/msw/webview_edge.cpp b/src/msw/webview_edge.cpp
+index b5195fcf0e..fec084ceee 100644
+--- a/src/msw/webview_edge.cpp
++++ b/src/msw/webview_edge.cpp
+@@ -97,9 +97,15 @@ bool wxWebViewEdgeImpl::Create()
+     auto options =
+         Make<CoreWebView2EnvironmentOptions>();
+ 
++    wxString browserArguments = m_additionalBrowserArguments;
+     if (!m_customUserAgent.empty())
+-        options->put_AdditionalBrowserArguments(
+-            wxString::Format("--user-agent=\"%s\"", m_customUserAgent).wc_str());
++    {
++        if (!browserArguments.empty())
++            browserArguments += " ";
++        browserArguments += wxString::Format("--user-agent=\"%s\"", m_customUserAgent);
++    }
++    if (!browserArguments.empty())
++        options->put_AdditionalBrowserArguments(browserArguments.wc_str());
+ #endif
+ 
+     HRESULT hr = wxCreateCoreWebView2EnvironmentWithOptions(
+@@ -821,6 +827,11 @@ void wxWebViewEdge::SetUserDataPathOption(const wxString& path)
+     m_impl->m_customUserDataPath = path;
+ };
+ 
++void wxWebViewEdge::SetAdditionalBrowserArguments(const wxString& arguments)
++{
++    m_impl->m_additionalBrowserArguments = arguments;
++}
++
+ void* wxWebViewEdge::GetNativeBackend() const
+ {
+     return m_impl->m_webView;

@@ -1,0 +1,34 @@
+/* ZH-Studio setup guide. Loaded after zh-studio.css (tokens + light/dark) on every guide page. */
+html{background:var(--zh-bg)!important}
+body{background:var(--zh-bg)!important;color:var(--zh-text);max-width:none;max-height:none}
+/* The setup hero lays its children out in a column, so the language switch has to be
+   pinned to the corner again instead of sitting on top of the heading. */
+#SetupHero .zh-langtoggle,.zh-langtoggle{position:absolute;top:16px;right:16px;z-index:6;
+  min-width:44px;height:30px;padding:0 12px;border-radius:8px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--zh-link);background:var(--zh-elev);border:1px solid var(--zh-border)}
+#SetupHero .zh-langtoggle:hover,.zh-langtoggle:hover{background:var(--zh-elev-hover);border-color:var(--zh-accent);transform:translateY(-1px)}
+#Title{height:auto;padding:26px 40px 6px}
+#Title div{color:var(--zh-text)!important;font-size:24px;font-weight:650;letter-spacing:-.4px;line-height:1.25;padding:0}
+#Content{color:var(--zh-muted);padding:16px 40px}
+#AcceptArea{padding:14px 40px 22px;border-top:1px solid var(--zh-border)}
+.NormalBtn{background:var(--zh-accent)!important;color:var(--zh-on-accent)!important;border-radius:10px;
+  font-weight:700;padding:10px 26px;transition:background-color .15s,transform .15s}
+.NormalBtn:hover{background:var(--zh-hover)!important;transform:translateY(-1px)}
+.GrayBtn{border:1px solid var(--zh-border-strong)!important;color:var(--zh-muted)!important;background:transparent!important;border-radius:10px;padding:10px 26px}
+.GrayBtn:hover{background:var(--zh-elev)!important;color:var(--zh-text)!important}
+.SmallBtn{background:var(--zh-elev)!important;color:var(--zh-text)!important;border-radius:7px}
+.SmallBtn:hover{background:var(--zh-elev-hover)!important}
+.SmallBtn_Green{background:var(--zh-accent)!important;color:var(--zh-on-accent)!important;border-radius:7px}
+.SmallBtn_Green:hover{background:var(--zh-hover)!important}
+.HyperLink{color:var(--zh-link)!important}
+#RegionList{border-color:var(--zh-border)!important;background:transparent!important}
+.RegionItem{border:1px solid var(--zh-border);border-radius:10px;background:var(--zh-card);color:var(--zh-text)!important;
+  padding:10px 14px;margin:6px 0;cursor:pointer;transition:border-color .15s,background-color .15s}
+.RegionItem:hover{border-color:var(--zh-border-strong);background:var(--zh-elev)}
+.RegionSelected{background:var(--zh-soft)!important;color:var(--zh-link)!important;border:1px solid var(--zh-accent)!important}
+.ZScrol::-webkit-scrollbar{width:9px;height:9px}
+.ZScrol::-webkit-scrollbar-track{background:var(--zh-bg)!important;box-shadow:none!important}
+.ZScrol::-webkit-scrollbar-thumb{background:var(--zh-scroll)!important;box-shadow:none!important;border-radius:6px}
+.ZScrol::-webkit-scrollbar-thumb:hover{background:var(--zh-scroll-hover)!important}
+input,select,textarea{background:var(--zh-elev)!important;color:var(--zh-text)!important;border:1px solid var(--zh-border)!important;border-radius:8px}
+input:focus,select:focus,textarea:focus{border-color:var(--zh-accent)!important;outline:none}

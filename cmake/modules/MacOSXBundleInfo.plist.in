@@ -11,7 +11,7 @@
   <key>CFBundleIconFile</key>
   <string>${MACOSX_BUNDLE_ICON_FILE}</string>
   <key>CFBundleIdentifier</key>
-  <string>com.bambulab.bambu-studio</string>
+  <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleLongVersionString</key>
@@ -70,7 +70,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>images/BambuStudio.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>STL</string>
+			<string>OBJ</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LISsAppleDefaultForType</key>

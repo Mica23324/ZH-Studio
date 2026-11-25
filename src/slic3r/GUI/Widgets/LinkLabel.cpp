@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include <wx/sizer.h>
 #include "LinkLabel.hpp"
 
@@ -45,7 +46,7 @@ void LinkLabel::setLabel(wxString label)
 void LinkLabel::link(wxMouseEvent &evt)
 {
     if (!m_url.IsEmpty()) {
-        wxLaunchDefaultBrowser(m_url);
+        Slic3r::GUI::zh_open_external_browser(m_url);
     }
 
     wxCommandEvent e(EVT_LINK_LABEL_LEFT_DOWN, GetId());

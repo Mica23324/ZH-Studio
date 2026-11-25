@@ -1,3 +1,4 @@
+#include "../ZHTheme.hpp"
 #ifndef slic3r_GUI_SIDETOOLS_hpp_
 #define slic3r_GUI_SIDETOOLS_hpp_
 
@@ -14,7 +15,7 @@
 #define SIDE_TOOLS_GREY900 wxColour(38, 46, 48)
 #define SIDE_TOOLS_GREY600 wxColour(144, 144, 144)
 #define SIDE_TOOLS_GREY400 wxColour(206, 206, 206)
-#define SIDE_TOOLS_BRAND wxColour(0, 174, 66)
+#define SIDE_TOOLS_BRAND ZHTheme::accent()
 #define SIDE_TOOLS_LIGHT_GREEN wxColour(219, 253, 231)
 
 enum WifiSignal {

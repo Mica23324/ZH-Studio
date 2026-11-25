@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "FilamentSelectDialog.hpp"
 #include "AMSMaterialsSetting.hpp"  // AMS_MATERIALS_SETTING_GREY* colour constants
 #include "FilamentBitmapUtils.hpp"
@@ -277,9 +278,9 @@ void FilamentSelectDialog::create()
     SetBackgroundColour(dlg_bg());
 
     m_btn_bg_green = StateColor(
-        std::pair<wxColour, int>(wxColour(27,  136, 68),  StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61,  203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0,   174, 66),  StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::down(),  StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(),  StateColor::Normal));
 
     m_btn_bg_gray = StateColor(
         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
@@ -337,7 +338,7 @@ void FilamentSelectDialog::create()
 
     auto* ok = new Button(this, _L("Confirm"));
     ok->SetBackgroundColor(m_btn_bg_green);
-    ok->SetBorderColor(sc(wxColour(0, 174, 66)));
+    ok->SetBorderColor(sc(ZHTheme::accent()));
     ok->SetTextColor(sc(wxColour("#FFFFFE")));
     ok->SetMinSize(AMS_MATERIALS_SETTING_BUTTON_SIZE);
     ok->SetCornerRadius(FromDIP(12));

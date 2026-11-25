@@ -309,8 +309,8 @@ void GLGizmoSimplify::on_render_input_window(float x, float y, float bottom_limi
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGuiWrapper::accent(1.00f));
+        ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImGuiWrapper::accent(1.00f));
         if (m_imgui->bbl_sliderin("##ReductionLevel", &m_detail_level, 0, 4, reduce_captions[std::clamp(m_detail_level, 0, 4)].c_str())) {
             m_detail_level = std::clamp(m_detail_level, 0, 4);
             switch (m_detail_level) {

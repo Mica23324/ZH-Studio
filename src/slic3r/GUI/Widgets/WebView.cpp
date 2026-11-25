@@ -25,6 +25,7 @@
 #endif
 #include <wx/uri.h>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 #if defined(__WIN32__) || defined(__WXMAC__)
 #include "wx/private/jsscriptwrapper.h"
 #endif
@@ -95,9 +96,48 @@ static bool                         webview_alive(wxWebView *webView);
 
 namespace {
 
+/// Offline WebViews may only navigate to process-local content. Everything
+/// else, including WebSockets, remote file shares and protocol handlers, is
+/// rejected fail-closed.
+bool is_offline_local_url(const wxString &url)
+{
+    wxString lower = url;
+    lower.MakeLower();
+    if (lower.empty() || lower.StartsWith("wxfs:") ||
+        lower.StartsWith("bbl:") || lower.StartsWith("memory:") ||
+        lower.StartsWith("data:") || lower.StartsWith("blob:"))
+        return true;
+    if (lower == "about:blank" || lower.StartsWith("about:blank#") ||
+        lower.StartsWith("about:blank?"))
+        return true;
+    if (!lower.StartsWith("file:"))
+        return false;
+
+    // Chromium accepts several equivalent file spellings. Permit drive paths
+    // and file:///C:/..., but reject UNC paths and remote authorities before
+    // wxFileSystem or WebView2 can turn them into SMB traffic.
+    wxString path = lower.Mid(5);
+    if (path.StartsWith("\\\\"))
+        return false;
+    if (path.StartsWith("//")) {
+        path = path.Mid(2);
+        // file:////server/share is a UNC path; file:///C:/ is local.
+        if (path.StartsWith("//"))
+            return false;
+        const size_t slash = path.find('/');
+        const wxString host = slash == wxString::npos ? path : path.Left(slash);
+        if (!host.empty() && host != "localhost")
+            return false;
+    }
+    return true;
+}
+
 /// Checks whether a file URL points at a missing local file.
 bool local_target_missing(const wxString &url, wxString &path_out)
 {
+    // Do not probe remote URLs or UNC shares in offline mode.
+    if (Slic3r::NetworkPolicy::is_offline() && !is_offline_local_url(url))
+        return false;
     if (!url.StartsWith("file://"))
         return false;
 
@@ -141,6 +181,13 @@ bool user_data_path_usable(const wxString &path)
 
 void enable_default_webview2_cdp_for_internal_builds()
 {
+    // A debugging listener is an independent network service. Never create
+    // one in offline mode, even in an internal build.
+    if (Slic3r::NetworkPolicy::is_offline()) {
+        wxUnsetEnv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS");
+        wxUnsetEnv("WEBVIEW2_REMOTE_DEBUGGING_PORT");
+        return;
+    }
 #if !BBL_RELEASE_TO_PUBLIC
     wxString existing;
     if (wxGetEnv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", &existing) && !existing.empty())
@@ -325,7 +372,40 @@ class WebViewEdge : public wxWebViewEdge
 public:
     ~WebViewEdge()
     {
+        UnsubscribeOfflinePolicy();
         UnsubscribeProcessFailed();
+    }
+
+    void SetAdditionalBrowserArguments(const wxString &arguments)
+    {
+        wxWebViewEdge::SetAdditionalBrowserArguments(arguments);
+    }
+
+    void SetOfflineTarget(const wxString &url)
+    {
+        m_offlineTarget = url;
+    }
+
+    void LoadURL(const wxString &url) override
+    {
+        if (Slic3r::NetworkPolicy::is_offline()) {
+            m_offlineTarget = url;
+            m_offlineTargetDispatched = false;
+            if (!is_offline_local_url(url)) {
+                BOOST_LOG_TRIVIAL(info) << GetName() << " [WebView] Blocked offline navigation";
+                return;
+            }
+            // wxWebViewEdge queues LoadURL() until its asynchronous controller
+            // exists. Queue locally instead so the all-frame resource filter is
+            // installed before the first application document can load.
+            if (!GetNativeBackend() || !EnsureOfflinePolicy()) {
+                m_offlinePendingUrl = url;
+                return;
+            }
+            m_offlineTargetDispatched = true;
+            m_offlinePendingUrl.clear();
+        }
+        wxWebViewEdge::LoadURL(url);
     }
 
     bool SetUserAgent(const wxString &userAgent)
@@ -336,25 +416,19 @@ public:
         ICoreWebView2 *webView2 = (ICoreWebView2 *) GetNativeBackend();
         if (webView2) {
             EnsureProcessFailedSubscribed();
-            ICoreWebView2Settings *settings;
-            HRESULT                hr = webView2->get_Settings(&settings);
-            if (hr == S_OK) {
-                ICoreWebView2Settings2 *settings2;
-                hr = settings->QueryInterface(&settings2);
-                if (hr == S_OK) {
-                    settings2->put_UserAgent(userAgent.wc_str());
-                    settings2->Release();
-                    ICoreWebView2Settings4 *settings4;
-                    hr = settings->QueryInterface(&settings4);
-                    if (hr == S_OK) {
-                        settings4->put_IsGeneralAutofillEnabled(Slic3r::GUI::wxGetApp().app_config->get_bool("webview_auto_fill"));
-                        settings4->Release();
-                    }
-                    return true;
-                }
-            }
-            settings->Release();
-            return false;
+            using Microsoft::WRL::ComPtr;
+            ComPtr<ICoreWebView2Settings> settings;
+            HRESULT hr = webView2->get_Settings(settings.GetAddressOf());
+            if (FAILED(hr) || !settings)
+                return false;
+            ComPtr<ICoreWebView2Settings2> settings2;
+            if (FAILED(settings.As(&settings2)) || !settings2)
+                return false;
+            settings2->put_UserAgent(userAgent.wc_str());
+            ComPtr<ICoreWebView2Settings4> settings4;
+            if (SUCCEEDED(settings.As(&settings4)) && settings4)
+                settings4->put_IsGeneralAutofillEnabled(Slic3r::GUI::wxGetApp().app_config->get_bool("webview_auto_fill"));
+            return true;
         }
         pendingUserAgent = userAgent;
         return true;
@@ -390,8 +464,14 @@ public:
         // only returns one once the asynchronous WebView2 setup has finished, well
         // after Create() returned. wx exposes no "backend ready" hook, so this
         // frequently called override doubles as the polling point; the pending
-        // property flushes below are here for exactly the same reason.
+        // property flushes and the homepage keyboard setup are here for exactly
+        // that same reason.
         thiz->EnsureProcessFailedSubscribed();
+        thiz->EnsureHomepageKeyboardShortcuts();
+        if (Slic3r::NetworkPolicy::is_offline()) {
+            thiz->EnsureOfflinePolicy();
+            thiz->FlushOfflineTarget();
+        }
         if (!pendingUserAgent.empty()) {
             auto userAgent = std::move(thiz->pendingUserAgent);
             thiz->pendingUserAgent.clear();
@@ -417,6 +497,142 @@ public:
     }
 
 private:
+    bool EnsureOfflinePolicy()
+    {
+        if (m_offlinePolicyConfigured)
+            return true;
+        ICoreWebView2 *backend = static_cast<ICoreWebView2 *>(GetNativeBackend());
+        if (!backend)
+            return false;
+
+        using Microsoft::WRL::ComPtr;
+        ComPtr<ICoreWebView2Settings> settings;
+        if (FAILED(backend->get_Settings(settings.GetAddressOf())) || !settings)
+            return false;
+        settings->put_AreDevToolsEnabled(FALSE);
+        ComPtr<ICoreWebView2Settings3> settings3;
+        if (SUCCEEDED(settings.As(&settings3)) && settings3)
+            settings3->put_AreBrowserAcceleratorKeysEnabled(FALSE);
+
+        ComPtr<ICoreWebView2_22> webView22;
+        if (FAILED(backend->QueryInterface(IID_PPV_ARGS(&webView22))) || !webView22) {
+            BOOST_LOG_TRIVIAL(error) << GetName()
+                << " [WebView] Offline mode requires ICoreWebView2_22; local page loading stayed disabled";
+            return false;
+        }
+        ComPtr<ICoreWebView2Environment> environment;
+        ComPtr<ICoreWebView2WebResourceResponse> probe_response;
+        if (FAILED(webView22->get_Environment(environment.GetAddressOf())) || !environment ||
+            FAILED(environment->CreateWebResourceResponse(
+                nullptr, 403, L"Blocked by offline mode", L"Content-Type: text/plain\r\n",
+                probe_response.GetAddressOf())) || !probe_response) {
+            BOOST_LOG_TRIVIAL(error) << GetName()
+                << " [WebView] Offline responses unavailable; local page loading stayed disabled";
+            return false;
+        }
+
+        // Keep one validated response in the callback object. If a per-request
+        // response allocation fails, unknown requests are still denied instead
+        // of accidentally falling through to the network. The capture owns only
+        // a COM response, never this WebView, so it is safe after destruction.
+        const auto fallback_response = probe_response;
+        HRESULT hr = webView22->add_WebResourceRequested(
+            Microsoft::WRL::Callback<ICoreWebView2WebResourceRequestedEventHandler>(
+                [fallback_response](ICoreWebView2 *sender,
+                                    ICoreWebView2WebResourceRequestedEventArgs *args) -> HRESULT {
+                    using Microsoft::WRL::ComPtr;
+                    const auto deny = [&args, &fallback_response]() {
+                        const HRESULT result = args->put_Response(fallback_response.Get());
+                        if (FAILED(result))
+                            BOOST_LOG_TRIVIAL(error) << "[WebView] Could not install offline 403 response";
+                        return result;
+                    };
+
+                    ComPtr<ICoreWebView2WebResourceRequest> request;
+                    if (FAILED(args->get_Request(request.GetAddressOf())) || !request)
+                        return deny();
+                    LPWSTR raw_uri = nullptr;
+                    if (FAILED(request->get_Uri(&raw_uri)) || !raw_uri)
+                        return deny();
+                    const wxString uri(raw_uri);
+                    CoTaskMemFree(raw_uri);
+                    if (is_offline_local_url(uri))
+                        return S_OK;
+
+                    ComPtr<ICoreWebView2_22> webView22;
+                    ComPtr<ICoreWebView2Environment> environment;
+                    ComPtr<ICoreWebView2WebResourceResponse> response;
+                    if (FAILED(sender->QueryInterface(IID_PPV_ARGS(&webView22))) || !webView22 ||
+                        FAILED(webView22->get_Environment(environment.GetAddressOf())) || !environment ||
+                        FAILED(environment->CreateWebResourceResponse(
+                            nullptr, 403, L"Blocked by offline mode",
+                            L"Content-Type: text/plain\r\nCache-Control: no-store\r\n",
+                            response.GetAddressOf())) || !response)
+                        return deny();
+                    return args->put_Response(response.Get());
+                }).Get(),
+            &m_offlineResourceToken);
+        if (FAILED(hr)) {
+            BOOST_LOG_TRIVIAL(error) << GetName()
+                << " [WebView] Could not install offline resource handler: 0x"
+                << wxString::Format("%08x", static_cast<unsigned>(hr));
+            return false;
+        }
+        m_offlineResourceSubscribed = true;
+
+        hr = webView22->AddWebResourceRequestedFilterWithRequestSourceKinds(
+            L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL,
+            COREWEBVIEW2_WEB_RESOURCE_REQUEST_SOURCE_KINDS_ALL);
+        if (FAILED(hr)) {
+            webView22->remove_WebResourceRequested(m_offlineResourceToken);
+            m_offlineResourceSubscribed = false;
+            BOOST_LOG_TRIVIAL(error) << GetName()
+                << " [WebView] Could not install all-frame offline resource filter: 0x"
+                << wxString::Format("%08x", static_cast<unsigned>(hr));
+            return false;
+        }
+
+        m_offlinePolicyConfigured = true;
+        BOOST_LOG_TRIVIAL(info) << GetName() << " [WebView] Offline resource firewall active";
+        return true;
+    }
+
+    void FlushOfflineTarget()
+    {
+        if (m_offlineTargetDispatched || m_offlineTarget.empty() || !EnsureOfflinePolicy())
+            return;
+        m_offlineTargetDispatched = true;
+        if (!is_offline_local_url(m_offlineTarget)) {
+            BOOST_LOG_TRIVIAL(info) << GetName() << " [WebView] Remote page disabled by offline mode";
+            return;
+        }
+        if (!m_offlinePendingUrl.empty()) {
+            m_offlinePendingUrl.clear();
+        }
+        wxWebViewEdge::LoadURL(m_offlineTarget);
+    }
+
+    void UnsubscribeOfflinePolicy()
+    {
+        ICoreWebView2 *backend = static_cast<ICoreWebView2 *>(GetNativeBackend());
+        if (!backend)
+            return;
+        using Microsoft::WRL::ComPtr;
+        ComPtr<ICoreWebView2_22> webView22;
+        if (FAILED(backend->QueryInterface(IID_PPV_ARGS(&webView22))) || !webView22)
+            return;
+        if (m_offlineResourceSubscribed) {
+            webView22->remove_WebResourceRequested(m_offlineResourceToken);
+            m_offlineResourceSubscribed = false;
+        }
+        if (m_offlinePolicyConfigured) {
+            webView22->RemoveWebResourceRequestedFilterWithRequestSourceKinds(
+                L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL,
+                COREWEBVIEW2_WEB_RESOURCE_REQUEST_SOURCE_KINDS_ALL);
+            m_offlinePolicyConfigured = false;
+        }
+    }
+
     // Generous on purpose: a first-ever WebView2 launch on a slow disk is slow, and
     // this only writes a log line, so erring towards a late report is harmless.
     static constexpr int kBackendReadyTimeoutMs = 30000;
@@ -584,6 +800,30 @@ private:
         return S_OK;
     }
 
+    void EnsureHomepageKeyboardShortcuts()
+    {
+        if (m_homepageKeyboardConfigured || GetName() != "Home")
+            return;
+
+        ICoreWebView2 *webView2 = (ICoreWebView2 *) GetNativeBackend();
+        if (!webView2)
+            return;
+        // The backend is ready. Settings3 may be unavailable on an old runtime;
+        // only mark success after the call so transient failures can be retried.
+        using Microsoft::WRL::ComPtr;
+        ComPtr<ICoreWebView2Settings> settings;
+        if (FAILED(webView2->get_Settings(settings.GetAddressOf())) || !settings)
+            return;
+        ComPtr<ICoreWebView2Settings3> settings3;
+        if (FAILED(settings.As(&settings3)) || !settings3)
+            return;
+        // WebView2 otherwise consumes shortcuts such as Ctrl+K as browser
+        // accelerators before the page or wxEVT_CHAR_HOOK can see them. The
+        // homepage owns these keys and forwards them through its local bridge.
+        if (SUCCEEDED(settings3->put_AreBrowserAcceleratorKeysEnabled(FALSE)))
+            m_homepageKeyboardConfigured = true;
+    }
+
     void EnsureProcessFailedSubscribed()
     {
         if (m_processFailedSubscribed)
@@ -664,6 +904,13 @@ private:
     COREWEBVIEW2_PREFERRED_COLOR_SCHEME pendingColorScheme = COREWEBVIEW2_PREFERRED_COLOR_SCHEME_AUTO;
     EventRegistrationToken m_processFailedToken{};
     bool m_processFailedSubscribed{false};
+    bool m_homepageKeyboardConfigured{false};
+    bool m_offlinePolicyConfigured{false};
+    bool m_offlineResourceSubscribed{false};
+    bool m_offlineTargetDispatched{false};
+    EventRegistrationToken m_offlineResourceToken{};
+    wxString m_offlineTarget;
+    wxString m_offlinePendingUrl;
     wxTimer m_backendWatchdog;
 
     std::deque<int64_t>      m_selfReloads;
@@ -869,6 +1116,11 @@ wxString WebView::BuildEdgeUserDataPath()
 void on_webview_evt(wxWebView *webview)
 {
     webview->Bind(wxEVT_WEBVIEW_NAVIGATING, [webview](wxWebViewEvent &e) {
+        if (Slic3r::NetworkPolicy::is_offline() && !is_offline_local_url(e.GetURL())) {
+            e.Veto();
+            BOOST_LOG_TRIVIAL(info) << webview->GetName() << " [WebView] Blocked offline navigation";
+            return;
+        }
         if (e.GetURL() == "about:blank") {
             e.Skip();
             return;
@@ -967,6 +1219,15 @@ wxWebView *WebView::CreateWebView(wxWindow *parent, wxString const &url, wxStrin
 
     WebViewEdge* edgeView = new WebViewEdge;
     wxWebView*   webView  = edgeView;
+    const bool offline = Slic3r::NetworkPolicy::is_offline();
+    if (offline) {
+        edgeView->SetOfflineTarget(url2);
+        edgeView->SetAdditionalBrowserArguments(
+            "--disable-background-networking --disable-component-update "
+            "--disable-default-apps --disable-sync --disable-domain-reliability "
+            "--no-first-run --no-default-browser-check --proxy-server=direct:// "
+            "--host-resolver-rules=\"MAP * ~NOTFOUND, EXCLUDE localhost\"");
+    }
     const wxString user_data_path = BuildEdgeUserDataPath();
     if (!user_data_path_usable(user_data_path)) {
         if (!creation_fault)
@@ -998,7 +1259,8 @@ wxWebView *WebView::CreateWebView(wxWindow *parent, wxString const &url, wxStrin
         webView->SetUserAgent(wxString::Format("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                                                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52 BBL-Slicer/v%s (%s) BBL-Language/%s",
                                                SLIC3R_VERSION, Slic3r::GUI::wxGetApp().dark_mode() ? "dark" : "light", language_code.mb_str()));
-        if (!webView->Create(parent, wxID_ANY, url2, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)) {
+        if (!webView->Create(parent, wxID_ANY, offline ? wxEmptyString : url2,
+                             wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)) {
             creation_fault = Slic3r::GUI::WebViewWatcher::Fault::BackendUnavailable;
             log_webview(Slic3r::GUI::WebViewTraceLogger::Stage::L0_BACKEND, name, "create_failed");
             delete webView;
@@ -1149,6 +1411,11 @@ void WebView::LoadUrl(wxWebView * webView, wxString const &url)
     url2.Replace("\\", "/");
 #endif
     if (!url2.empty()) { url2 = wxURI(url2).BuildURI(); }
+    if (Slic3r::NetworkPolicy::is_offline() && !is_offline_local_url(url2)) {
+        BOOST_LOG_TRIVIAL(info) << (webView ? webView->GetName() : wxString())
+            << " [WebView] Blocked offline LoadUrl request";
+        return;
+    }
     //BOOST_LOG_TRIVIAL(trace) << __FUNCTION__ << url2.ToUTF8();
     webView->LoadURL(url2);
 }

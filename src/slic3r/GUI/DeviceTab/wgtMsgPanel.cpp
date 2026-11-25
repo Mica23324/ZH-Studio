@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "wgtMsgPanel.h"
 
 #include "slic3r/GUI/GUI_App.hpp"
@@ -96,7 +97,7 @@ void wgtMsgPanelItem::SetWiki(const wxString& wiki_url)
 void wgtMsgPanelItem::OnClickWiki(wxHyperlinkEvent& evt)
 {
     if (!m_wiki_url.IsEmpty()) {
-        wxLaunchDefaultBrowser(m_wiki_url);
+        Slic3r::GUI::zh_open_external_browser(m_wiki_url);
     }
 }
 

@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "SendToPrinter.hpp"
 #include "I18N.hpp"
 
@@ -289,8 +290,8 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
     m_comboBox_printer->Bind(wxEVT_COMBOBOX, &SendToPrinterDialog::on_selection_changed, this);
 
     m_sizer_printer->Add(m_comboBox_printer, 1, wxEXPAND | wxRIGHT, FromDIP(5));
-    btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                               std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    btn_bg_enable = StateColor(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                               std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     m_button_refresh = new Button(this, _L("Refresh"));
     m_button_refresh->SetBackgroundColor(btn_bg_enable);
@@ -383,7 +384,7 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
 
     m_statictext_finish = new wxStaticText(m_panel_finish, wxID_ANY, L("send completed"), wxDefaultPosition, wxDefaultSize, 0);
     m_statictext_finish->Wrap(-1);
-    m_statictext_finish->SetForegroundColour(wxColour(0, 174, 66));
+    m_statictext_finish->SetForegroundColour(ZHTheme::accent());
     m_sizer_finish_h->Add(m_statictext_finish, 0, wxALIGN_CENTER | wxALL, FromDIP(5));
 
     m_sizer_finish_v->Add(m_sizer_finish_h, 1, wxALIGN_CENTER, 0);

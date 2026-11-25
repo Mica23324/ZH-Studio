@@ -1,4 +1,8 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "MainFrame.hpp"
+#include "ZHStyle.hpp"
+#include "ZHStudioTools.hpp"
 #include "GLToolbar.hpp"
 #include <wx/panel.h>
 #include <wx/notebook.h>
@@ -22,6 +26,7 @@
 #include "libslic3r/SLAPrint.hpp"
 #include "libslic3r/PresetBundle.hpp"
 #include "libslic3r/AppConfig.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 #include "libslic3r/Thread.hpp"
 
 #include "Tab.hpp"
@@ -51,7 +56,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <fstream>
 #include <mutex>
 #include <string_view>
 #include <thread>
@@ -314,7 +318,7 @@ DPIFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, BORDERLESS_FRAME_
     default:
     case GUI_App::EAppMode::Editor:
         m_taskbar_icon = std::make_unique<BambuStudioTaskBarIcon>(wxTBI_DOCK);
-        m_taskbar_icon->SetIcon(wxIcon(Slic3r::var("BambuStudio-mac_256px.ico"), wxBITMAP_TYPE_ICO), "BambuStudio");
+        m_taskbar_icon->SetIcon(wxIcon(Slic3r::var("BambuStudio-mac_256px.ico"), wxBITMAP_TYPE_ICO), SLIC3R_APP_FULL_NAME);
         break;
     case GUI_App::EAppMode::GCodeViewer:
         break;
@@ -700,7 +704,20 @@ DPIFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, BORDERLESS_FRAME_
             });
 ;    }
     this->Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent &evt) {
+        // Modal dialogs own the keyboard while they are visible. In particular,
+        // ZH dialogs call Skip() for normal keys so their controls still work;
+        // without this guard those keys could also trigger slice/new/open behind them.
+        if (zh_has_visible_modal_dialog(this)) {
+            evt.Skip();
+            return;
+        }
         const int key_code = evt.GetKeyCode();
+        if (evt.CmdDown() && !evt.ShiftDown() && !evt.AltDown() &&
+            (key_code == 'K' || key_code == 'k')) {
+            if (show_zh_command_palette(this)) return;
+            evt.Skip();
+            return;
+        }
 #ifdef __APPLE__
         if (evt.CmdDown() && (evt.GetKeyCode() == 'H')) {
             // Pass Cmd+H through to the macOS application menu so the
@@ -727,23 +744,11 @@ DPIFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, BORDERLESS_FRAME_
         // Do NOT also SetSelection(tpPreview) here: that posts a second preview-enter event whose
         // do_reslice would run the version-policy guard a second time (double dialog on a blocked version).
         if (evt.CmdDown() && evt.GetKeyCode() == 'R') {
-            if (wxGetApp().check_slice_version_policy() && m_slice_enable) {
-                wxGetApp().plater()->update(true, true);
-                wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_SLICE_PLATE));
-                if (m_tabpanel && m_tabpanel->GetSelection() != (int) tpPreview) {
-                    m_tabpanel->ChangeSelection(tpPreview);
-                    m_last_selected_tab = tpPreview;
-                }
-            }
+            slice_plate();
             return;
         }
         if (evt.CmdDown() && evt.ShiftDown() && evt.GetKeyCode() == 'G') {
-            m_plater->apply_background_progress();
-            m_print_enable = get_enable_print_status();
-            m_print_btn->Enable(m_print_enable);
-            if (m_print_enable) {
-                wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_PRINT_PLATE));
-            }
+            print_plate();
             evt.Skip();
             return;
         }
@@ -1257,17 +1262,18 @@ void MainFrame::update_title()
     // on macOS/Linux (both set by Plater::priv::set_project_name).
     const wxString name  = m_plater->get_project_name();
     const wxString title = (m_plater->is_project_dirty() && !name.IsEmpty()) ? ("* " + name) : name;
+    const wxString mode_suffix = Slic3r::NetworkPolicy::is_offline() ? wxString::FromUTF8("  [Offline]") : wxString{};
     if (title == m_title_cache)
         return;
     m_title_cache = title;
 #ifdef __WINDOWS__
     if (m_topbar)
-        m_topbar->SetTitle(title);
+        m_topbar->SetTitle(title + mode_suffix);
     // Also reflect the "*" in the window/taskbar title, which set_project_name builds
     // as "<name> - BambuStudio".
-    SetTitle(title + " - BambuStudio");
+    SetTitle(title + mode_suffix + " - " + SLIC3R_APP_FULL_NAME);
 #else
-    SetTitle(title);
+    SetTitle(title + mode_suffix);
 #ifdef __APPLE__
     if (!title.IsEmpty())
         update_title_colour_after_set_title();
@@ -1356,7 +1362,7 @@ void MainFrame::init_tabpanel()
    // BBS
     wxBoxSizer* side_tools = create_side_tools();
     m_tabpanel = new Notebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, side_tools, wxNB_TOP | wxTAB_TRAVERSAL | wxNB_NOPAGETHEME);
-    m_tabpanel->SetBackgroundColour(*wxWHITE);
+    m_tabpanel->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
 
 #ifndef __WXOSX__ // Don't call SetFont under OSX to avoid name cutting in ObjectList
     m_tabpanel->SetFont(Slic3r::GUI::wxGetApp().normal_font());
@@ -1558,7 +1564,7 @@ void MainFrame::init_tabpanel()
     }
 
     m_plater = new Plater(this, this);
-    m_plater->SetBackgroundColour(*wxWHITE);
+    m_plater->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
     m_plater->Hide();
 
     wxGetApp().plater_ = m_plater;
@@ -1996,6 +2002,50 @@ bool MainFrame::can_slice() const
 #endif
 }
 
+bool MainFrame::can_slice_plate() const
+{
+    if (!m_plater || m_plater->model().objects.empty() ||
+        m_plater->is_background_process_slicing() || m_plater->only_gcode_mode() ||
+        m_plater->using_exported_file())
+        return false;
+
+    PartPlateList& plates = m_plater->get_partplate_list();
+    PartPlate* plate = plates.get_curr_plate();
+    return plate && !plate->is_slice_result_valid() && plate->can_slice() &&
+           !m_plater->sidebar().has_incompatible_filament(plate) &&
+           !m_plater->sidebar().has_broken_mixed_filament();
+}
+
+void MainFrame::slice_plate()
+{
+    if (prepare_slice(false))
+        wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_SLICE_PLATE));
+}
+
+bool MainFrame::can_print_plate() const
+{
+    if (!m_plater || m_plater->is_export_gcode_scheduled())
+        return false;
+    if (m_plater->only_gcode_mode())
+        return true;
+
+    PartPlate* plate = m_plater->get_partplate_list().get_curr_plate();
+    return plate && plate->is_slice_result_ready_for_print() &&
+           !m_plater->get_preview_canvas3D()->is_all_plates_selected();
+}
+
+void MainFrame::print_plate()
+{
+    if (!m_plater)
+        return;
+    if (!m_plater->only_gcode_mode())
+        m_plater->apply_background_progress();
+    m_print_enable = can_print_plate();
+    m_print_btn->Enable(m_print_enable);
+    if (m_print_enable)
+        wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_PRINT_PLATE));
+}
+
 bool MainFrame::can_change_view() const
 {
     switch (m_layout)
@@ -2168,101 +2218,20 @@ wxBoxSizer* MainFrame::create_side_tools()
         });
 #endif
 
-    m_slice_btn->Bind(wxEVT_BUTTON, [this](wxCommandEvent &event) {
-            if (!wxGetApp().check_slice_version_policy()) return;
-
-            if (m_plater->is_background_process_update_scheduled())
-                m_plater->update(false, true);
-
-            m_plater->reset_check_status();
-            if (!m_plater->check_ams_status(m_slice_select == eSliceAll))
-                return;
-            m_plater->set_slice_from_slice_btn(true);
-
-            //this->m_plater->select_view_3D("Preview");
-            m_plater->exit_gizmo();
-            m_plater->update(true, true);
-
-            bool slice = true;
-
-            auto curr_plate = m_plater->get_partplate_list().get_curr_plate();
-            #ifdef __linux__
-                slice = try_pop_up_before_slice(m_slice_select == eSliceAll, m_plater, curr_plate, true);
-            #else
-                slice = try_pop_up_before_slice(m_slice_select == eSliceAll, m_plater, curr_plate, false);
-            #endif
-
-            bool model_fits     = false;
-            bool validate_error = false;
-            m_plater->validate_current_plate(model_fits, validate_error);
-
-            if (slice && model_fits && !validate_error) {
-                std::string printer_model = wxGetApp().preset_bundle->printers.get_edited_preset().config.opt_string("printer_model");
-                std::unordered_set<std::string> printer_models = {"Bambu Lab H2D", "Bambu Lab H2D Pro", "Bambu Lab H2C"};
-                int extruder_count = wxGetApp().preset_bundle->get_printer_extruder_count();
-                if (extruder_count > 1 && printer_models.count(printer_model)) {
-                    const std::string slice_video_key = dual_extruder_first_slice_video_app_config_key(printer_model);
-                    const std::string slice_video_val = wxGetApp().app_config->get(slice_video_key);
-                    if (slice_video_val.empty() || slice_video_val == "true" || slice_video_val == "1") {
-                        MessageDialog dlg(this, _L("This is your first time slicing with the dual extruder machine.\nWould you like to watch a quick tutorial video?"), _L("First Guide"), wxYES_NO);
-                        auto  res = dlg.ShowModal();
-                        if (res == wxID_YES) {
-                            play_dual_extruder_slice_video();
-                            slice = false;
-                        }
-                        wxGetApp().app_config->set(slice_video_key, "false");
-                    }
-
-                    if ((wxGetApp().app_config->get("play_tpu_printing_video") == "true")) {
-                        auto used_filaments = curr_plate->get_extruders();
-                        std::transform(used_filaments.begin(), used_filaments.end(), used_filaments.begin(), [](auto i) {return i - 1; });
-                        auto full_config = wxGetApp().preset_bundle->full_config();
-                        auto filament_types = full_config.option<ConfigOptionStrings>("filament_type")->values;
-                        if (std::any_of(used_filaments.begin(), used_filaments.end(), [filament_types](int idx) { return filament_types[idx] == "TPU"; })) {
-                            MessageDialog dlg(this, _L("This is your first time printing tpu filaments with the dual extruder machine.\nWould you like to watch a quick tutorial video?"), _L("First Guide"), wxYES_NO);
-                            auto  res = dlg.ShowModal();
-                            if (res == wxID_YES) {
-                                play_dual_extruder_print_tpu_video();
-                                slice = false;
-                            }
-                            wxGetApp().app_config->set("play_tpu_printing_video", "false");
-                        }
-                    }
-                }
-
-                if (printer_model == "Bambu Lab H2S") {
-                    if ((wxGetApp().app_config->get("prompt_for_brittle_filaments") == "true") ) {
-                        auto used_filaments = curr_plate->get_extruders();
-                        std::transform(used_filaments.begin(), used_filaments.end(), used_filaments.begin(), [](auto i) {return i - 1; });
-                        auto full_config = wxGetApp().preset_bundle->full_config();
-                        auto filament_types = full_config.option<ConfigOptionStrings>("filament_type")->values;
-                        if (std::any_of(used_filaments.begin(), used_filaments.end(), [filament_types](int idx) { return filament_types[idx] == "PPA-CF" || filament_types[idx] == "PPS-CF"; })) {
-                            MessageDialog dlg(this, _L("PPS-CF/PPA-CF is brittle and could break in bended PTFE tube above Toolhead. Please refer to Wiki before use. "), _L("Tips"), wxYES_NO);
-                            auto  res = dlg.ShowModal();
-                            if (res == wxID_YES) {
-                                wxLaunchDefaultBrowser("https://e.bambulab.com/t?c=UC64kdlpHxN3Mb15");
-                                slice = false;
-                            }
-                            wxGetApp().app_config->set("prompt_for_brittle_filaments", "false");
-                        }
-                    }
-                }
-
-
-                if (slice) {
-                    if (m_slice_select == eSliceAll)
-                        wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_SLICE_ALL));
-                    else if (m_slice_select == eSlicePlate)
-                        wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_SLICE_PLATE));
-                    this->m_tabpanel->SetSelection(tpPreview);
-                }
-            }
-        });
+    m_slice_btn->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
+        const bool all_plates = m_slice_select == eSliceAll;
+        if (prepare_slice(all_plates)) {
+            wxPostEvent(m_plater, SimpleEvent(all_plates ? EVT_GLTOOLBAR_SLICE_ALL : EVT_GLTOOLBAR_SLICE_PLATE));
+        }
+    });
 
     m_print_btn->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
         {
             //this->m_plater->select_view_3D("Preview");
-            if (m_print_select == ePrintAll || m_print_select == ePrintPlate || m_print_select == ePrintMultiMachine)
+            if (m_print_select == ePrintPlate) {
+                print_plate();
+            }
+            else if (m_print_select == ePrintAll || m_print_select == ePrintMultiMachine)
             {
                 if (!m_plater->only_gcode_mode())
                     m_plater->apply_background_progress();
@@ -2272,8 +2241,6 @@ wxBoxSizer* MainFrame::create_side_tools()
                 if (m_print_enable) {
                     if (m_print_select == ePrintAll)
                         wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_PRINT_ALL));
-                    if (m_print_select == ePrintPlate)
-                        wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_PRINT_PLATE));
                     if(m_print_select == ePrintMultiMachine)
                          wxPostEvent(m_plater, SimpleEvent(EVT_GLTOOLBAR_PRINT_MULTI_MACHINE));
                 }
@@ -2514,6 +2481,94 @@ wxBoxSizer* MainFrame::create_side_tools()
     return sizer;
 }
 
+bool MainFrame::prepare_slice(bool all_plates)
+{
+    if (!m_plater || m_plater->model().objects.empty() ||
+        m_plater->is_background_process_slicing() || m_plater->only_gcode_mode() ||
+        m_plater->using_exported_file())
+        return false;
+    if (!all_plates && !can_slice_plate())
+        return false;
+    if (all_plates && m_plater->sidebar().has_broken_mixed_filament())
+        return false;
+    if (!wxGetApp().check_slice_version_policy())
+        return false;
+
+    if (m_plater->is_background_process_update_scheduled())
+        m_plater->update(false, true);
+
+    m_plater->reset_check_status();
+    if (!m_plater->check_ams_status(all_plates))
+        return false;
+    m_plater->set_slice_from_slice_btn(true);
+    m_plater->exit_gizmo();
+    m_plater->update(true, true);
+
+    PartPlate* curr_plate = m_plater->get_partplate_list().get_curr_plate();
+#ifdef __linux__
+    bool slice = try_pop_up_before_slice(all_plates, m_plater, curr_plate, true);
+#else
+    bool slice = try_pop_up_before_slice(all_plates, m_plater, curr_plate, false);
+#endif
+
+    bool model_fits = false;
+    bool validate_error = false;
+    m_plater->validate_current_plate(model_fits, validate_error);
+    if (!slice || !model_fits || validate_error)
+        return false;
+
+    std::string printer_model = wxGetApp().preset_bundle->printers.get_edited_preset().config.opt_string("printer_model");
+    std::unordered_set<std::string> printer_models = {"Bambu Lab H2D", "Bambu Lab H2D Pro", "Bambu Lab H2C"};
+    int extruder_count = wxGetApp().preset_bundle->get_printer_extruder_count();
+    if (extruder_count > 1 && printer_models.count(printer_model)) {
+        const std::string slice_video_key = dual_extruder_first_slice_video_app_config_key(printer_model);
+        const std::string slice_video_val = wxGetApp().app_config->get(slice_video_key);
+        if (slice_video_val.empty() || slice_video_val == "true" || slice_video_val == "1") {
+            MessageDialog dlg(this, _L("This is your first time slicing with the dual extruder machine.\nWould you like to watch a quick tutorial video?"), _L("First Guide"), wxYES_NO);
+            auto res = dlg.ShowModal();
+            if (res == wxID_YES) {
+                play_dual_extruder_slice_video();
+                slice = false;
+            }
+            wxGetApp().app_config->set(slice_video_key, "false");
+        }
+
+        if (wxGetApp().app_config->get("play_tpu_printing_video") == "true") {
+            auto used_filaments = curr_plate->get_extruders();
+            std::transform(used_filaments.begin(), used_filaments.end(), used_filaments.begin(), [](auto i) { return i - 1; });
+            auto full_config = wxGetApp().preset_bundle->full_config();
+            auto filament_types = full_config.option<ConfigOptionStrings>("filament_type")->values;
+            if (std::any_of(used_filaments.begin(), used_filaments.end(), [filament_types](int idx) { return filament_types[idx] == "TPU"; })) {
+                MessageDialog dlg(this, _L("This is your first time printing tpu filaments with the dual extruder machine.\nWould you like to watch a quick tutorial video?"), _L("First Guide"), wxYES_NO);
+                auto res = dlg.ShowModal();
+                if (res == wxID_YES) {
+                    play_dual_extruder_print_tpu_video();
+                    slice = false;
+                }
+                wxGetApp().app_config->set("play_tpu_printing_video", "false");
+            }
+        }
+    }
+
+    if (printer_model == "Bambu Lab H2S" && wxGetApp().app_config->get("prompt_for_brittle_filaments") == "true") {
+        auto used_filaments = curr_plate->get_extruders();
+        std::transform(used_filaments.begin(), used_filaments.end(), used_filaments.begin(), [](auto i) { return i - 1; });
+        auto full_config = wxGetApp().preset_bundle->full_config();
+        auto filament_types = full_config.option<ConfigOptionStrings>("filament_type")->values;
+        if (std::any_of(used_filaments.begin(), used_filaments.end(), [filament_types](int idx) { return filament_types[idx] == "PPA-CF" || filament_types[idx] == "PPS-CF"; })) {
+            MessageDialog dlg(this, _L("PPS-CF/PPA-CF is brittle and could break in bended PTFE tube above Toolhead. Please refer to Wiki before use. "), _L("Tips"), wxYES_NO);
+            auto res = dlg.ShowModal();
+            if (res == wxID_YES) {
+                Slic3r::GUI::zh_open_external_browser("https://e.bambulab.com/t?c=UC64kdlpHxN3Mb15");
+                slice = false;
+            }
+            wxGetApp().app_config->set("prompt_for_brittle_filaments", "false");
+        }
+    }
+
+    return slice;
+}
+
 bool MainFrame::get_enable_slice_status()
 {
     bool enable = true;
@@ -2527,9 +2582,6 @@ bool MainFrame::get_enable_slice_status()
         BOOST_LOG_TRIVIAL(info) << boost::format("in gcode/exported 3mf mode, return false directly!");
         return false;
     }
-
-    PartPlateList &part_plate_list = m_plater->get_partplate_list();
-    PartPlate *current_plate = part_plate_list.get_curr_plate();
 
     if (m_slice_select == eSliceAll)
     {
@@ -2546,20 +2598,7 @@ bool MainFrame::get_enable_slice_status()
     }
     else if (m_slice_select == eSlicePlate)
     {
-        if (current_plate->is_slice_result_valid())
-        {
-            enable = false;
-        }
-        else if (!current_plate->can_slice())
-        {
-            enable = false;
-        }
-        // Not applied to eSliceAll: that run walks the plates in order and stops once it reaches a
-        // plate it cannot slice, so the plates before the offending one still get sliced.
-        else if (m_plater->sidebar().has_incompatible_filament(current_plate))
-        {
-            enable = false;
-        }
+        enable = can_slice_plate();
     }
 
     if (enable && m_plater->sidebar().has_broken_mixed_filament())
@@ -2587,13 +2626,7 @@ bool MainFrame::get_enable_print_status()
     }
     else if (m_print_select == ePrintPlate)
     {
-        if (m_plater->only_gcode_mode())
-            return true;
-        if (!current_plate->is_slice_result_ready_for_print())
-        {
-            enable = false;
-        }
-        enable = enable && !is_all_plates;
+        enable = can_print_plate();
     }
     else if (m_print_select == eExportGcode)
     {
@@ -2674,36 +2707,35 @@ bool MainFrame::get_enable_print_status()
 
 void MainFrame::update_side_button_style()
 {
-    // BBS
-    int em = em_unit();
+    const bool dark = wxGetApp().dark_mode();
+    const wxColour navigation_bg = dark ? wxColour("#101E31") : ZHStyle::workspace_surface(false);
 
-    StateColor m_btn_bg_enable = StateColor(
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(48, 221, 112), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal)
-    );
+    for (SideButton* button : {m_slice_btn, m_slice_option_btn, m_print_btn, m_print_option_btn}) {
+        button->SetBottomColour(navigation_bg);
+        button->Refresh();
+    }
 
     m_slice_btn->SetTextLayout(SideButton::EHorizontalOrientation::HO_Left, FromDIP(15));
     m_slice_btn->SetCornerRadius(FromDIP(12));
     m_slice_btn->SetExtraSize(wxSize(FromDIP(38), FromDIP(10)));
-    m_slice_btn->SetMinSize(wxSize(-1, FromDIP(24)));
+    m_slice_btn->SetMinSize(wxSize(-1, FromDIP(36)));
 
     m_slice_option_btn->SetTextLayout(SideButton::EHorizontalOrientation::HO_Center);
     m_slice_option_btn->SetCornerRadius(FromDIP(12));
-    m_slice_option_btn->SetExtraSize(wxSize(FromDIP(10), FromDIP(10)));
+    m_slice_option_btn->SetExtraSize(wxSize(FromDIP(12), FromDIP(12)));
     m_slice_option_btn->SetIconOffset(FromDIP(2));
-    m_slice_option_btn->SetMinSize(wxSize(FromDIP(24), FromDIP(24)));
+    m_slice_option_btn->SetMinSize(wxSize(FromDIP(36), FromDIP(36)));
 
     m_print_btn->SetTextLayout(SideButton::EHorizontalOrientation::HO_Left, FromDIP(15));
     m_print_btn->SetCornerRadius(FromDIP(12));
     m_print_btn->SetExtraSize(wxSize(FromDIP(38), FromDIP(10)));
-    m_print_btn->SetMinSize(wxSize(-1, FromDIP(24)));
+    m_print_btn->SetMinSize(wxSize(-1, FromDIP(36)));
 
     m_print_option_btn->SetTextLayout(SideButton::EHorizontalOrientation::HO_Center);
     m_print_option_btn->SetCornerRadius(FromDIP(12));
-    m_print_option_btn->SetExtraSize(wxSize(FromDIP(10), FromDIP(10)));
+    m_print_option_btn->SetExtraSize(wxSize(FromDIP(12), FromDIP(12)));
     m_print_option_btn->SetIconOffset(FromDIP(2));
-    m_print_option_btn->SetMinSize(wxSize(FromDIP(24), FromDIP(24)));
+    m_print_option_btn->SetMinSize(wxSize(FromDIP(36), FromDIP(36)));
 }
 
 void MainFrame::update_slice_print_status(SlicePrintEventType event, bool can_slice, bool can_print)
@@ -2857,6 +2889,9 @@ void MainFrame::on_sys_color_changed()
 #endif
 
     // BBS
+    m_tabpanel->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
+    m_plater->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
+    update_side_button_style();
     m_tabpanel->Rescale();
     m_param_panel->msw_rescale();
 
@@ -2922,7 +2957,7 @@ static wxMenu* generate_help_menu()
 
     append_menu_item(helpMenu, wxID_ANY, _L("Report issue"), _L("Report issue"), [](wxCommandEvent &) {
         std::string url = "https://github.com/bambulab/BambuStudio/issues/new/choose";
-        wxLaunchDefaultBrowser(url);
+        Slic3r::GUI::zh_open_external_browser(url);
     });
 
     // Report a bug
@@ -3041,6 +3076,11 @@ void MainFrame::init_menubar_as_editor()
     // File menu
     wxMenu* fileMenu = new wxMenu;
     {
+        append_menu_item(fileMenu, wxID_ANY, _L("Command Palette") + "\t" + ctrl + "K",
+            _L("Search and run commands"),
+            [this](wxCommandEvent&) { show_zh_command_palette(this); }, "", nullptr,
+            [this]() { return m_loaded; }, this);
+        fileMenu->AppendSeparator();
 #ifdef __APPLE__
         // New Window
         append_menu_item(fileMenu, wxID_ANY, _L("New Window"), _L("Start a new window"),
@@ -3796,7 +3836,7 @@ void MainFrame::init_menubar_as_editor()
                 } catch (...) {
                     BOOST_LOG_TRIVIAL(warning) << current_exception_message();
                 }
-                wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/bambu-studio/Calibration", wxBROWSER_NEW_WINDOW);
+                Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/bambu-studio/Calibration", wxBROWSER_NEW_WINDOW);
             }, "", nullptr,
             [this]() {return m_plater->is_view3D_shown();; }, this);
 
@@ -3928,7 +3968,7 @@ void MainFrame::init_menubar_as_editor()
             } catch (...) {
                 BOOST_LOG_TRIVIAL(warning) << current_exception_message();
             }
-            wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/bambu-studio/Calibration", wxBROWSER_NEW_WINDOW);
+            Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/bambu-studio/Calibration", wxBROWSER_NEW_WINDOW);
         }, "", nullptr,
         [this]() {
             return m_plater->is_view3D_shown();
@@ -4324,6 +4364,8 @@ void MainFrame::select_tab(wxPanel* panel)
         return;
     }
     int page_idx = m_tabpanel->FindPage(panel);
+    if (page_idx == wxNOT_FOUND)
+        return;
     if (page_idx == tp3DEditor && m_tabpanel->GetSelection() == tpPreview)
         return;
     //BBS GUI refactor: remove unused layout new/dlg
@@ -4425,7 +4467,7 @@ void MainFrame::select_view(const std::string& direction)
 
 void MainFrame::view_zoom_to_fit() const
 {
-    if (GLCanvas3D *canvas = m_plater ? m_plater->canvas3D() : nullptr)
+    if (GLCanvas3D* canvas = m_plater ? m_plater->get_current_canvas3D() : nullptr)
         canvas->zoom_to_fit();
 }
 

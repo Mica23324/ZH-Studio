@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "SelectMachine.hpp"
 #include "MaterialItemHotend.hpp"
 #include "QueuePrintContext.hpp"
@@ -581,7 +583,7 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     m_sizer_autorefill = new wxBoxSizer(wxHORIZONTAL);
     m_ams_backup_tip = new Label(m_scroll_area, _L("Auto Refill"));
     m_ams_backup_tip->SetFont(::Label::Head_13);
-    m_ams_backup_tip->SetForegroundColour(wxColour("#00AE42"));
+    m_ams_backup_tip->SetForegroundColour(ZHTheme::accent());
     m_ams_backup_tip->SetBackgroundColour(*wxWHITE);
     img_ams_backup = new wxStaticBitmap(m_scroll_area, wxID_ANY, create_scaled_bitmap("automatic_material_renewal", this, 16), wxDefaultPosition, wxSize(FromDIP(16), FromDIP(16)), 0);
     img_ams_backup->SetBackgroundColour(*wxWHITE);
@@ -833,7 +835,7 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
             region = "zh";
         }
         wxString url = wxString::Format("https://wiki.bambulab.com/%s/software/bambu-studio/calibration_pa", region);
-        wxLaunchDefaultBrowser(url);
+        Slic3r::GUI::zh_open_external_browser(url);
         e.Skip();
     });
 
@@ -933,8 +935,8 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     wxBoxSizer *m_sizer_prepare = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *m_sizer_pcont   = new wxBoxSizer(wxVERTICAL);
 
-    m_btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    m_btn_bg_enable = StateColor(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     m_button_ensure = new Button(m_panel_prepare, _L("Send"));
     m_button_ensure->SetBackgroundColor(m_btn_bg_enable);
     m_button_ensure->SetBorderColor(m_btn_bg_enable);
@@ -993,7 +995,7 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
 
     m_statictext_finish = new wxStaticText(m_panel_finish, wxID_ANY, L("send completed"), wxDefaultPosition, wxDefaultSize, 0);
     m_statictext_finish->Wrap(-1);
-    m_statictext_finish->SetForegroundColour(wxColour(0, 174, 66));
+    m_statictext_finish->SetForegroundColour(ZHTheme::accent());
     m_sizer_finish_h->Add(m_statictext_finish, 0, wxALIGN_CENTER | wxALL, FromDIP(5));
 
     m_sizer_finish_v->Add(m_sizer_finish_h, 1, wxALIGN_CENTER, 0);
@@ -3230,7 +3232,7 @@ void SelectMachineDialog::show_timelapse_storage_dialog(MachineObject* obj)
     // use int id to distinguish choices: wxID_OK=confirm, wxID_NO=cancel_tl, wxID_CANCEL=cleanup
     if (show_confirm_btn) {
         auto* btn_confirm = new Button(&dlg, _L("Confirm & Print"));
-        StateColor confirm_bg(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        StateColor confirm_bg(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
         btn_confirm->SetBackgroundColor(confirm_bg);
         btn_confirm->SetTextColor(StateColor(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal)));
         btn_confirm->Bind(wxEVT_BUTTON, [&dlg](wxCommandEvent&) { dlg.EndModal(wxID_OK); });
@@ -3239,7 +3241,7 @@ void SelectMachineDialog::show_timelapse_storage_dialog(MachineObject* obj)
 
     auto* btn_cancel_tl = new Button(&dlg, _L("Cancel Timelapse & Print"));
     if (!show_confirm_btn) {
-        StateColor cancel_bg(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        StateColor cancel_bg(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
         btn_cancel_tl->SetBackgroundColor(cancel_bg);
         btn_cancel_tl->SetTextColor(StateColor(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal)));
     }
@@ -3513,7 +3515,7 @@ void SelectMachineDialog::check_tpu_aero_flow_cali(MachineObject* obj)
 void SelectMachineDialog::Enable_Auto_Refill(bool enable)
 {
     if (enable) {
-        m_ams_backup_tip->SetForegroundColour(wxColour("#00AE42"));
+        m_ams_backup_tip->SetForegroundColour(ZHTheme::accent());
     }
     else {
         m_ams_backup_tip->SetForegroundColour(wxColour(0x90, 0x90, 0x90));
@@ -9271,7 +9273,7 @@ void PrintOptionItem::doRender(wxDC& dc)
 
         if (text_key == selected_key)
         {
-            const wxColour& clr = m_enable ? StateColor::darkModeColorFor("#00AE42") : StateColor::darkModeColorFor(wxColour(144, 144, 144));
+            const wxColour& clr = m_enable ? StateColor::darkModeColorFor("#0EA5E9") : StateColor::darkModeColorFor(wxColour(144, 144, 144));
             dc.SetPen(wxPen(clr));
             dc.SetTextForeground(clr);
 
@@ -9663,7 +9665,7 @@ void PrinterInfoBox::Create()
 
 void PrinterInfoBox::OnBtnQuestionClicked(wxCommandEvent& event)
 {
-    wxLaunchDefaultBrowser(wxT("https://wiki.bambulab.com/en/software/bambu-studio/failed-to-connect-printer"));
+    Slic3r::GUI::zh_open_external_browser(wxT("https://wiki.bambulab.com/en/software/bambu-studio/failed-to-connect-printer"));
 }
 
 

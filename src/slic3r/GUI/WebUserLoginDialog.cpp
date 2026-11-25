@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "WebUserLoginDialog.hpp"
 
 #include <string.h>
@@ -42,7 +43,7 @@ END_EVENT_TABLE()
 
 int ZUserLogin::web_sequence_id = 20000;
 
-ZUserLogin::ZUserLogin() : wxDialog((wxWindow *) (wxGetApp().mainframe), wxID_ANY, "BambuStudio")
+ZUserLogin::ZUserLogin() : wxDialog((wxWindow *) (wxGetApp().mainframe), wxID_ANY, SLIC3R_APP_FULL_NAME)
 {
     SetBackgroundColour(*wxWHITE);
     // Url
@@ -333,7 +334,7 @@ void ZUserLogin::OnScriptMessage(wxWebViewEvent &evt)
                 std::string jump_url = j["data"]["url"].get<std::string>();
                 CallAfter([this, jump_url] {
                     wxString url = wxString::FromUTF8(jump_url);
-                    wxLaunchDefaultBrowser(url);
+                    Slic3r::GUI::zh_open_external_browser(url);
                     });
             }
         }
@@ -342,7 +343,7 @@ void ZUserLogin::OnScriptMessage(wxWebViewEvent &evt)
                 std::string jump_url = j["data"]["url"].get<std::string>();
                 CallAfter([this, jump_url] {
                     wxString url = wxString::FromUTF8(jump_url);
-                    wxLaunchDefaultBrowser(url);
+                    Slic3r::GUI::zh_open_external_browser(url);
                     });
             }
             return;

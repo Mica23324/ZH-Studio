@@ -61,7 +61,7 @@ public:
 
     void SetTextColorNormal(wxColor const &color);
 
-    void SetSelected(bool selected = true) { m_selected = selected; }
+    void SetSelected(bool selected = true) { if (m_selected != selected) m_selected = selected; }
 
     bool Enable(bool enable = true) override;
     void EnableTooltipEvenDisabled();// The tip will be shown even if the button is disabled

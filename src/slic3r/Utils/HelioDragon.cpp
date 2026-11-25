@@ -31,6 +31,7 @@
 #include <sstream>
 #include <thread>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r {
 
@@ -69,6 +70,10 @@ public:
 
     bool start(Task task)
     {
+        if (NetworkPolicy::is_offline()) {
+            BOOST_LOG_TRIVIAL(info) << "Skipping Helio worker in offline mode";
+            return false;
+        }
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_stopping.load(std::memory_order_acquire)) {
             return false;
@@ -758,6 +763,12 @@ void HelioQuery::set_helio_pat(std::string pat)
 
 void HelioQuery::request_pat_token(std::function<void(std::string)> func)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Helio PAT request skipped in offline mode";
+        if (func)
+            func("error");
+        return;
+    }
     std::string url_copy = "";
 
     if (GUI::wxGetApp().app_config->get("region") == "China") {
@@ -806,6 +817,10 @@ void HelioQuery::request_pat_token(std::function<void(std::string)> func)
 
 void HelioQuery::optimization_feedback(const std::string helio_api_url, const std::string helio_api_key, std::string optimization_id, float rating, std::string comment)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Helio feedback request skipped in offline mode";
+        return;
+    }
     CNumericLocalesSetter locales_setter;
     std::string query_body = R"({
         "query": "mutation AddOptimizationFeedback($input: OptimizationFeedbackInput!) { addOptimizationFeedback(input: $input) { id } }",
@@ -1764,6 +1779,10 @@ HelioQuery::CreateSimulationResult HelioQuery::create_simulation(const std::stri
 
 void HelioQuery::stop_simulation(const std::string helio_api_url, const std::string helio_api_key, const std::string simulation_id)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Helio simulation stop skipped in offline mode";
+        return;
+    }
     std::string query_body_template = R"( {
         "query": "mutation StopSimulation($id: ID!) { stopSimulation(id: $id) }",
         "variables": {
@@ -2179,6 +2198,10 @@ Slic3r::HelioQuery::CreateOptimizationResult HelioQuery::create_optimization(con
 
 void HelioQuery::stop_optimization(const std::string helio_api_url, const std::string helio_api_key, const std::string optimization_id)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Helio optimization stop skipped in offline mode";
+        return;
+    }
     std::string query_body_template = R"( {
         "query": "mutation StopOptimization($id: ID!) { stopOptimization(id: $id) }",
         "variables": {
@@ -2387,6 +2410,10 @@ bool HelioBackgroundProcess::helio_thread_start(std::mutex&                     
                                                  BackgroundSlicingProcess::State&           slicing_state,
                                                  std::unique_ptr<GUI::NotificationManager>& notification_manager)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping Helio background worker in offline mode";
+        return false;
+    }
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_thread.joinable())
         return false;

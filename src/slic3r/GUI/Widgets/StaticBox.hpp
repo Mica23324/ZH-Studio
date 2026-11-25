@@ -4,6 +4,7 @@
 #include "../wxExtensions.hpp"
 #include "StateHandler.hpp"
 
+#include <wx/timer.h>
 #include <wx/window.h>
 
 class StaticBox : public wxWindow
@@ -74,6 +75,24 @@ protected:
     StateColor   background_color2;
     ScalableBitmap badge;
     std::string    badge_icon_name = "badge";
+
+    // Smooth state colours for every derived control. Hover, focus, press and
+    // checked transitions are interpolated instead of snapping, which makes the
+    // whole native UI feel continuous without per-widget animation code.
+    void on_motion_timer(wxTimerEvent&evt);
+    void begin_motion(const wxColour &bg, const wxColour &bg2, bool gradient, const wxColour &border);
+    wxColour motion_tick();
+
+    wxTimer      m_motion_timer;
+    bool         m_motion_animating = false;
+    bool         m_motion_has_gradient = false;
+    bool         m_motion_target_gradient = false;
+    int          m_motion_last_states = -1;
+    long long    m_motion_started_ms = 0;
+    wxColour     m_motion_from_bg, m_motion_to_bg;
+    wxColour     m_motion_from_bg2, m_motion_to_bg2;
+    wxColour     m_motion_from_border, m_motion_to_border;
+    wxColour     m_motion_bg, m_motion_bg2, m_motion_border;
 
     DECLARE_EVENT_TABLE()
 };

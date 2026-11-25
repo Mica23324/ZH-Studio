@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "CalibrationWizardPage.hpp"
 #include "I18N.hpp"
 #include "Widgets/Label.hpp"
@@ -157,9 +159,9 @@ CaliPageButton::CaliPageButton(wxWindow* parent, CaliPageActionType type, wxStri
     Button(parent, text)
 {
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
@@ -167,7 +169,7 @@ CaliPageButton::CaliPageButton(wxWindow* parent, CaliPageActionType type, wxStri
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
 
     StateColor btn_bd_green(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Enabled));
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Enabled));
 
     StateColor btn_bd_white(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Disabled),
         std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
@@ -947,7 +949,7 @@ void CaliPageCaption::create_wiki(wxWindow* parent)
         });
     m_wiki_text->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& e) {
         if (!m_wiki_url.empty())
-            wxLaunchDefaultBrowser(m_wiki_url);
+            Slic3r::GUI::zh_open_external_browser(m_wiki_url);
         });
 }
 

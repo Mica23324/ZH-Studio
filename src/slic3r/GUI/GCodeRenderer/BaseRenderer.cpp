@@ -808,8 +808,8 @@ namespace Slic3r
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0, 10.0 * m_scale));
                 ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 1.0f, 1.0f, 0.6f));
-                ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::accent());
+                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent());
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.42f, 0.42f, 0.42f, 1.00f));
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
@@ -1468,19 +1468,21 @@ namespace Slic3r
                 bool is_support_dynamic_nozzle_map = group_result && group_result->is_support_dynamic_nozzle_map();
                 bool is_show_left_right_result = is_support_dynamic_nozzle_map && wxGetApp().sidebar().is_fila_switch_ready();
                 ImGuiWrapper& imgui = *wxGetApp().imgui();
-                //BBS: GUI refactor: move to the right
-                imgui.set_next_window_pos(float(canvas_width - right_margin * m_scale), 0.0f, ImGuiCond_Always, 1.0f, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+                const float card_gap = 8.0f * m_scale;
+                imgui.set_next_window_pos(float(canvas_width - right_margin * m_scale) - card_gap, card_gap, ImGuiCond_Always, 1.0f, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f * m_scale);
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0, 0.0));
-                ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 1.0f, 1.0f, 0.6f));
-                ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f * m_scale);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, m_is_dark ? ImVec4(17.f / 255.f, 28.f / 255.f, 45.f / 255.f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f));
+                ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(231.f / 255.f, 238.f / 255.f, 248.f / 255.f, 1.f) : ImVec4(38.f / 255.f, 46.f / 255.f, 58.f / 255.f, 1.f));
+                ImGui::PushStyleColor(ImGuiCol_Separator, m_is_dark ? ImVec4(45.f / 255.f, 65.f / 255.f, 92.f / 255.f, 1.f) : ImVec4(220.f / 255.f, 228.f / 255.f, 237.f / 255.f, 1.f));
+                ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::accent());
+                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent());
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.42f, 0.42f, 0.42f, 1.00f));
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
                 ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
-                //ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.f, 1.f, 1.f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_Border, { 1, 0, 0, 0 });
-                ImGui::SetNextWindowBgAlpha(0.8f);
+                ImGui::PushStyleColor(ImGuiCol_Border, m_is_dark ? ImVec4(45.f / 255.f, 65.f / 255.f, 92.f / 255.f, 1.f) : ImVec4(220.f / 255.f, 228.f / 255.f, 237.f / 255.f, 1.f));
+                ImGui::SetNextWindowBgAlpha(0.97f);
                 const float max_height = 0.75f * static_cast<float>(cnv_size.get_height());
                 const float child_height = 0.3333f * max_height;
                 ImGui::SetNextWindowSizeConstraints({ 0.0f, 0.0f }, { -1.0f, max_height });
@@ -1507,9 +1509,10 @@ namespace Slic3r
                 ImVec2 pos_rect = ImGui::GetCursorScreenPos();
                 float window_padding = 4.0f * m_scale;
                 float checkbox_offset = 0.0f;
-                draw_list->AddRectFilled(ImVec2(pos_rect.x, pos_rect.y - ImGui::GetStyle().WindowPadding.y),
-                    ImVec2(pos_rect.x + ImGui::GetWindowWidth() + ImGui::GetFrameHeight(), pos_rect.y + ImGui::GetFrameHeight() + window_padding * 2.5),
-                    ImGui::GetColorU32(ImVec4(0, 0, 0, 0.3)));
+                draw_list->AddRectFilled(pos_rect,
+                    ImVec2(pos_rect.x + ImGui::GetWindowWidth(), pos_rect.y + ImGui::GetFrameHeight() + window_padding * 2.5f),
+                    ImGui::GetColorU32(m_is_dark ? ImVec4(22.f / 255.f, 34.f / 255.f, 55.f / 255.f, 1.f) : ImVec4(242.f / 255.f, 247.f / 255.f, 252.f / 255.f, 1.f)),
+                    10.0f * m_scale, ImDrawFlags_RoundCornersTop);
                 auto append_item = [icon_size, &imgui, imperial_units, &window_padding, &draw_list, &checkbox_offset, this](
                     EItemType type,
                     const Color& color,
@@ -1559,7 +1562,7 @@ namespace Slic3r
                             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0 * m_scale, 0.0));
                             ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1.00f, 0.68f, 0.26f, 0.0f));
                             ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.00f, 0.68f, 0.26f, 0.0f));
-                            ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
                             float max_height = 0.f;
                             for (auto column_offset : columns_offsets) {
                                 if (ImGui::CalcTextSize(column_offset.first.c_str()).y > max_height)
@@ -1573,7 +1576,7 @@ namespace Slic3r
                             if (checkbox) {
                                 ImGui::SameLine(checkbox_offset);
                                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0, 0.0));
-                                ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+                                ImGui::PushStyleColor(ImGuiCol_CheckMark, ImGuiWrapper::accent(1.00f));
                                 ImGui::Checkbox(("##" + columns_offsets[0].first).c_str(), &visible);
                                 ImGui::PopStyleColor(1);
                                 ImGui::PopStyleVar(1);
@@ -1806,8 +1809,8 @@ namespace Slic3r
                 else
                     btn_name = ImGui::FoldButtonIcon + boost::nowide::widen(std::string(""));
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.68f, 0.26f, 1.00f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.68f, 0.26f, 0.78f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::accent(1.00f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::accent(0.78f));
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
                 float button_width = ImGui::CalcTextSize(into_u8(btn_name).c_str()).x;
                 ImGui::SetCursorPosY(8.f);
@@ -1815,10 +1818,10 @@ namespace Slic3r
                 ImGui::PopStyleColor(3);
                 ImGui::PopStyleVar(1);
                 if (m_fold) {
-                    legend_height = ImGui::GetStyle().WindowPadding.y + ImGui::GetFrameHeight() + window_padding * 2.5;
+                    legend_height = card_gap + ImGui::GetStyle().WindowPadding.y + ImGui::GetFrameHeight() + window_padding * 2.5f;
                     imgui.end();
-                    ImGui::PopStyleColor(7);
-                    ImGui::PopStyleVar(2);
+                    ImGui::PopStyleColor(9);
+                    ImGui::PopStyleVar(3);
                     return;
                 }
                 //BBS display Color Scheme
@@ -2827,10 +2830,10 @@ namespace Slic3r
                 // AMS（m_ams_nozzle_idx >= 0）时有意义；无外接 AMS 时无可分组，隐藏。
                 if (m_nozzle_nums > 1 || (m_single_ext_multi_nozzle && m_ams_nozzle_idx >= 0))
                     render_legend_color_arr_recommen(window_padding, is_show_left_right_result);
-                legend_height = ImGui::GetCurrentWindow()->Size.y;
+                legend_height = card_gap + ImGui::GetCurrentWindow()->Size.y;
                 imgui.end();
-                ImGui::PopStyleColor(7);
-                ImGui::PopStyleVar(2);
+                ImGui::PopStyleColor(9);
+                ImGui::PopStyleVar(3);
             }
 
             void BaseRenderer::delete_wipe_tower()
@@ -3287,17 +3290,19 @@ namespace Slic3r
 
             void BaseRenderer::push_combo_style()
             {
-                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f * m_scale);
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0, 8.0));
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.3f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.3f));
-                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.0f, 0.0f, 0.0f, 0.3f));
-                ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.3f));
-                ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-                ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 0.0f));
-                ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
+                const ImVec4 field = m_is_dark ? ImVec4(22.f / 255.f, 34.f / 255.f, 55.f / 255.f, 1.f) : ImVec4(242.f / 255.f, 247.f / 255.f, 252.f / 255.f, 1.f);
+                const ImVec4 field_hover = m_is_dark ? ImVec4(27.f / 255.f, 42.f / 255.f, 67.f / 255.f, 1.f) : ImVec4(228.f / 255.f, 237.f / 255.f, 247.f / 255.f, 1.f);
+                ImGui::PushStyleColor(ImGuiCol_Button, field);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, field_hover);
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, field);
+                ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, field_hover);
+                ImGui::PushStyleColor(ImGuiCol_PopupBg, m_is_dark ? ImVec4(17.f / 255.f, 28.f / 255.f, 45.f / 255.f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f));
+                ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
+                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent(0.0f));
+                ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::accent());
             }
             void BaseRenderer::pop_combo_style()
             {

@@ -17,16 +17,19 @@ else ()
     set(_wx_edge "-DwxUSE_WEBVIEW_EDGE=OFF")
 endif ()
 
-# if (MSVC)
-#     set(_patch_cmd ${PATCH_CMD} ${CMAKE_CURRENT_LIST_DIR}/0001-wxWidget-fix.patch)
-# else ()
-#     set(_patch_cmd test -f WXWIDGETS_PATCHED || ${PATCH_CMD} ${CMAKE_CURRENT_LIST_DIR}/0001-wxWidget-fix.patch && touch WXWIDGETS_PATCHED)
-# endif ()
+# Keep the WebView2 environment-argument extension reproducible for fresh
+# dependency checkouts. The remaining upstream wxWidgets fixes are maintained
+# separately in 0001-wxWidget-fix.patch.
+set(_wx_patch PATCH_COMMAND ${CMAKE_COMMAND}
+    "-DGIT_EXECUTABLE=${GIT_EXECUTABLE}"
+    "-DPATCH_FILE=${CMAKE_CURRENT_LIST_DIR}/0002-webview2-browser-arguments.patch"
+    -P "${CMAKE_CURRENT_LIST_DIR}/apply_webview2_patch.cmake")
 
 bambustudio_add_cmake_project(wxWidgets
     GIT_REPOSITORY "https://github.com/bambulab/wxWidgets"
     GIT_TAG master
     DEPENDS ${PNG_PKG} ${ZLIB_PKG} ${EXPAT_PKG} ${TIFF_PKG} ${JPEG_PKG}
+    ${_wx_patch}
     CMAKE_ARGS
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         -DwxBUILD_PRECOMP=OFF

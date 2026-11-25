@@ -6432,7 +6432,7 @@ std::pair<PresetsConfigSubstitutions, size_t> PresetBundle::load_vendor_configs_
                             }
                         }
                     } catch (const std::exception &e) {
-                        BOOST_LOG_TRIVIAL(error) << "Failed to parse includes array: " << include;
+                        BOOST_LOG_TRIVIAL(error) << "Failed to parse includes array: " << include << " (" << e.what() << ")";
                     }
                 }
                 else
@@ -6682,7 +6682,7 @@ std::pair<PresetsConfigSubstitutions, size_t> PresetBundle::load_vendor_configs_
                             }
                         }
                     } catch (const std::exception &e) {
-                        BOOST_LOG_TRIVIAL(error) << "Failed to parse includes array: " << include;
+                        BOOST_LOG_TRIVIAL(error) << "Failed to parse includes array: " << include << " (" << e.what() << ")";
                     }
                 }
                 else

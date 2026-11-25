@@ -14,6 +14,7 @@
 
 #include <curl/curl.h>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 #ifdef OPENSSL_CERT_OVERRIDE
 #include <openssl/x509.h>
@@ -390,6 +391,16 @@ std::string Http::priv::body_size_error()
 
 void Http::priv::http_perform()
 {
+	// Keep this guard before every libcurl operation. In particular, do not
+	// resolve DNS, read upload files or invoke progress/header/completion
+	// callbacks while the process-wide offline policy is active.
+	if (NetworkPolicy::is_offline()) {
+		if (errorfn) {
+			errorfn(std::string{}, "Network access is disabled by offline mode", 0);
+		}
+		return;
+	}
+
 	::curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	::curl_easy_setopt(curl, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL);
 	::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writecb);

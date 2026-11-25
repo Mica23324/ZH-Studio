@@ -92,7 +92,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_BUILD_DIR="$PROJECT_DIR/build/$ARCH"
 DEPS_DIR="$PROJECT_DIR/deps"
 DEPS_BUILD_DIR="$DEPS_DIR/build/$ARCH"
-DEPS="$DEPS_BUILD_DIR/BambuStudio_deps"
+DEPS="$DEPS_BUILD_DIR/ZH-Studio_deps"
 
 if [ "$SLICER_CMAKE_GENERATOR" == "Xcode" ]; then
     export BUILD_DIR_CONFIG_SUBDIR="/$BUILD_CONFIG"
@@ -108,7 +108,7 @@ function build_deps() {
 
             PROJECT_BUILD_DIR="$PROJECT_DIR/build/$_ARCH"
             DEPS_BUILD_DIR="$DEPS_DIR/build/$_ARCH"
-            DEPS="$DEPS_BUILD_DIR/BambuStudio_deps"
+            DEPS="$DEPS_BUILD_DIR/ZH-Studio_deps"
 
             echo "Building deps..."
             (
@@ -135,7 +135,7 @@ function pack_deps() {
     (
         set -x
         cd "$DEPS_DIR"
-        tar -zcvf "BambuStudio_dep_mac_${ARCH}_$(date +"%Y%m%d").tar.gz" "build"
+        tar -zcvf "ZH-Studio_dep_mac_${ARCH}_$(date +"%Y%m%d").tar.gz" "build"
     )
 }
 
@@ -147,7 +147,7 @@ function build_slicer() {
 
             PROJECT_BUILD_DIR="$PROJECT_DIR/build/$_ARCH"
             DEPS_BUILD_DIR="$DEPS_DIR/build/$_ARCH"
-            DEPS="$DEPS_BUILD_DIR/BambuStudio_deps"
+            DEPS="$DEPS_BUILD_DIR/ZH-Studio_deps"
 
             echo "Building slicer for $_ARCH..."
             (
@@ -175,21 +175,21 @@ function build_slicer() {
         echo "Fix macOS app package..."
         (
             cd "$PROJECT_BUILD_DIR"
-            mkdir -p BambuStudio
-            cd BambuStudio
+            mkdir -p "$PROJECT_BUILD_DIR/ZH-Studio"
+            cd "$PROJECT_BUILD_DIR/ZH-Studio"
             # remove previously built app
-            rm -rf ./BambuStudio.app
+            rm -rf ./ZH-Studio.app
             # fully copy newly built app
-            cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/BambuStudio.app" ./BambuStudio.app
+            cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/ZH-Studio.app" ./ZH-Studio.app
             # copy standalone dSYM symbol bundle if present (Release only)
-            rm -rf ./BambuStudio.app.dSYM
-            cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/BambuStudio.app.dSYM" ./BambuStudio.app.dSYM 2>/dev/null || true
+            rm -rf ./ZH-Studio.app.dSYM
+            cp -pR "../src$BUILD_DIR_CONFIG_SUBDIR/ZH-Studio.app.dSYM" ./ZH-Studio.app.dSYM 2>/dev/null || true
             # fix resources
-            resources_path=$(readlink ./BambuStudio.app/Contents/Resources)
-            rm ./BambuStudio.app/Contents/Resources
-            cp -R "$resources_path" ./BambuStudio.app/Contents/Resources
+            resources_path=$(readlink ./ZH-Studio.app/Contents/Resources)
+            rm ./ZH-Studio.app/Contents/Resources
+            cp -R "$resources_path" ./ZH-Studio.app/Contents/Resources
             # delete .DS_Store file
-            find ./BambuStudio.app/ -name '.DS_Store' -delete
+            find ./ZH-Studio.app/ -name '.DS_Store' -delete
         )
 
     fi
@@ -204,27 +204,27 @@ function build_universal() {
     # Create universal binary
     echo "Creating universal binary..."
     # PROJECT_BUILD_DIR="$PROJECT_DIR/build_Universal"
-    mkdir -p "$PROJECT_BUILD_DIR/BambuStudio"
-    UNIVERSAL_APP="$PROJECT_BUILD_DIR/BambuStudio/BambuStudio.app"
+    mkdir -p "$PROJECT_BUILD_DIR/ZH-Studio"
+    UNIVERSAL_APP="$PROJECT_BUILD_DIR/ZH-Studio/ZH-Studio.app"
     rm -rf "$UNIVERSAL_APP"
-    cp -R "$PROJECT_DIR/build/arm64/BambuStudio/BambuStudio.app" "$UNIVERSAL_APP"
+    cp -R "$PROJECT_DIR/build/arm64/ZH-Studio/ZH-Studio.app" "$UNIVERSAL_APP"
     
     # Get the binary path inside the .app bundle
-    BINARY_PATH="Contents/MacOS/BambuStudio"
+    BINARY_PATH="Contents/MacOS/ZH-Studio"
     
     # Create universal binary using lipo
     lipo -create \
-        "$PROJECT_DIR/build/x86_64/BambuStudio/BambuStudio.app/$BINARY_PATH" \
-        "$PROJECT_DIR/build/arm64/BambuStudio/BambuStudio.app/$BINARY_PATH" \
+        "$PROJECT_DIR/build/x86_64/ZH-Studio/ZH-Studio.app/$BINARY_PATH" \
+        "$PROJECT_DIR/build/arm64/ZH-Studio/ZH-Studio.app/$BINARY_PATH" \
         -output "$UNIVERSAL_APP/$BINARY_PATH"
 
     echo "Universal binary created at $UNIVERSAL_APP"
 
     # Create universal dSYM by merging the per-arch DWARF (Release only)
-    UNIVERSAL_DSYM="$PROJECT_BUILD_DIR/BambuStudio/BambuStudio.app.dSYM"
-    ARM64_DSYM="$PROJECT_DIR/build/arm64/BambuStudio/BambuStudio.app.dSYM"
-    X86_64_DSYM="$PROJECT_DIR/build/x86_64/BambuStudio/BambuStudio.app.dSYM"
-    DWARF_PATH="Contents/Resources/DWARF/BambuStudio"
+    UNIVERSAL_DSYM="$PROJECT_BUILD_DIR/ZH-Studio/ZH-Studio.app.dSYM"
+    ARM64_DSYM="$PROJECT_DIR/build/arm64/ZH-Studio/ZH-Studio.app.dSYM"
+    X86_64_DSYM="$PROJECT_DIR/build/x86_64/ZH-Studio/ZH-Studio.app.dSYM"
+    DWARF_PATH="Contents/Resources/DWARF/ZH-Studio"
     if [ -d "$ARM64_DSYM" ] && [ -d "$X86_64_DSYM" ]; then
         echo "Creating universal dSYM..."
         rm -rf "$UNIVERSAL_DSYM"

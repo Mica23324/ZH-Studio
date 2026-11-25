@@ -14,6 +14,7 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/format.hpp>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 using boost::optional;
 using boost::system::error_code;
@@ -620,6 +621,12 @@ void Bonjour::priv::udp_receive(udp::endpoint from, size_t bytes)
 
 void Bonjour::priv::lookup_perform()
 {
+	if (NetworkPolicy::is_offline()) {
+		BOOST_LOG_TRIVIAL(info) << "Skipping Bonjour multicast discovery in offline mode";
+		if (completefn)
+			completefn();
+		return;
+	}
 	service_dn = (boost::format("_%1%._%2%.local") % service % protocol).str();
 
 	const auto brq = BonjourRequest::make(service, protocol);
@@ -793,6 +800,12 @@ Bonjour& Bonjour::on_complete(CompleteFn fn)
 Bonjour::Ptr Bonjour::lookup()
 {
 	auto self = std::make_shared<Bonjour>(std::move(*this));
+
+	if (NetworkPolicy::is_offline()) {
+		if (self->p)
+			self->p->lookup_perform();
+		return self;
+	}
 
 	if (self->p) {
 		auto io_thread = std::thread([self]() {

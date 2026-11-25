@@ -39,7 +39,9 @@ body
 .MakerlabImg img
 {
 	width: 100%;
-	aspect-radio: 16/9;
+	aspect-ratio: 16/9;
+	object-fit: cover;
+	display: block;
 }
 
 .MakerlabTextBlock
@@ -221,7 +223,7 @@ body
 
 .PH_Status_Success
 {
-	color: #00AE42;
+	color: #0EA5E9;
 }
 
 .PH_Gcode_Icon

@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "TabButton.hpp"
 #include "Widgets/Label.hpp"
 
@@ -16,7 +17,7 @@ EVT_PAINT(TabButton::paintEvent)
 
 END_EVENT_TABLE()
 
-static wxColour BORDER_HOVER_COL = wxColour(0, 174, 66);
+static wxColour BORDER_HOVER_COL = ZHTheme::accent();
 
 const static wxColour TAB_BUTTON_BG    = wxColour("#FEFFFF");
 const static wxColour TAB_BUTTON_SEL   = wxColour(219, 253, 213, 255);
@@ -142,7 +143,10 @@ void TabButton::render(wxDC &dc)
 
     dc.SetPen(wxPen(border_color.colorForStates(states)));
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.DrawRectangle(0, 0, size.x, size.y);
+    if (radius > 0)
+        dc.DrawRoundedRectangle(0, 0, size.x - 1, size.y - 1, radius);
+    else
+        dc.DrawRectangle(0, 0, size.x, size.y);
 
     // calc content size
     wxSize szIcon;

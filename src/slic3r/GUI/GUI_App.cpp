@@ -66,6 +66,9 @@
 #include <wx/dialog.h>
 #include <wx/textctrl.h>
 #include <wx/splash.h>
+#include "ZHSplash.hpp"
+#include "ZHRounded.hpp"
+#include "ZHBrowser.hpp"
 #include <wx/fontutil.h>
 #include <wx/glcanvas.h>
 
@@ -74,6 +77,7 @@
 #include "libslic3r/Model.hpp"
 #include "libslic3r/I18N.hpp"
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 #include "libslic3r/PresetBundle.hpp"
 #include "libslic3r/Thread.hpp"
 #include "libslic3r/miniz_extension.hpp"
@@ -83,6 +87,7 @@
 #include "GUI_Utils.hpp"
 #include "3DScene.hpp"
 #include "MainFrame.hpp"
+#include "ZHStudioTools.hpp"
 #include "slic3r/GUI/Widgets/WebView.hpp"
 #include "Plater.hpp"
 #include "GLCanvas3D.hpp"
@@ -300,217 +305,6 @@ bool is_associate_files(std::wstring extend)
 }
 #endif
 
-class BBLSplashScreen : public wxSplashScreen
-{
-public:
-    BBLSplashScreen(const wxBitmap& bitmap, long splashStyle, int milliseconds, wxPoint pos = wxDefaultPosition)
-        : wxSplashScreen(bitmap, splashStyle, milliseconds, static_cast<wxWindow*>(wxGetApp().mainframe), wxID_ANY, wxDefaultPosition, wxDefaultSize,
-#ifdef __APPLE__
-            wxBORDER_NONE | wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP
-#else
-            wxBORDER_NONE | wxFRAME_NO_TASKBAR
-#endif // !__APPLE__
-        )
-    {
-        int init_dpi = get_dpi_for_window(this);
-        this->SetPosition(pos);
-        this->CenterOnScreen();
-        int new_dpi = get_dpi_for_window(this);
-
-        m_scale = (float)(new_dpi) / (float)(init_dpi);
-
-        m_main_bitmap = bitmap;
-
-        scale_bitmap(m_main_bitmap, m_scale);
-
-        // init constant texts and scale fonts
-        m_constant_text.init(Label::Body_16);
-        scale_font(m_constant_text.title_font, 2.0f);
-        scale_font(m_constant_text.version_font, 1.2f);
-
-        // this font will be used for the action string
-        m_action_font = m_constant_text.credits_font;
-
-        // draw logo and constant info text
-        Decorate(m_main_bitmap);
-        wxGetApp().UpdateFrameDarkUI(this);
-    }
-
-    void SetText(const wxString& text)
-    {
-        set_bitmap(m_main_bitmap);
-        if (!text.empty()) {
-            wxBitmap bitmap(m_main_bitmap);
-
-            wxMemoryDC memDC;
-            memDC.SelectObject(bitmap);
-            memDC.SetFont(m_action_font);
-            memDC.SetTextForeground(StateColor::darkModeColorFor(wxColour(144, 144, 144)));
-            int width = bitmap.GetWidth();
-            int text_height = memDC.GetTextExtent(text).GetHeight();
-            int text_width = memDC.GetTextExtent(text).GetWidth();
-            wxRect text_rect(wxPoint(0, m_action_line_y_position), wxPoint(width, m_action_line_y_position + text_height));
-            memDC.DrawLabel(text, text_rect, wxALIGN_CENTER);
-
-            memDC.SelectObject(wxNullBitmap);
-            set_bitmap(bitmap);
-#ifdef __WXOSX__
-            // without this code splash screen wouldn't be updated under OSX
-            wxYield();
-#endif
-        }
-    }
-
-    void Decorate(wxBitmap& bmp)
-    {
-        if (!bmp.IsOk())
-            return;
-
-        // use a memory DC to draw directly onto the bitmap
-        wxMemoryDC memDc(bmp);
-
-        int top_margin = FromDIP(75 * m_scale);
-        int width = bmp.GetWidth();
-
-        // draw title and version
-        int text_padding = FromDIP(3 * m_scale);
-        memDc.SetFont(m_constant_text.title_font);
-        int title_height = memDc.GetTextExtent(m_constant_text.title).GetHeight();
-        int title_width = memDc.GetTextExtent(m_constant_text.title).GetWidth();
-        memDc.SetFont(m_constant_text.version_font);
-        int version_height = memDc.GetTextExtent(m_constant_text.version).GetHeight();
-        int version_width = memDc.GetTextExtent(m_constant_text.version).GetWidth();
-        int split_width = (width + title_width - version_width) / 2;
-        wxRect title_rect(wxPoint(0, top_margin), wxPoint(split_width - text_padding, top_margin + title_height));
-        memDc.SetTextForeground(StateColor::darkModeColorFor(wxColour(38, 46, 48)));
-        memDc.SetFont(m_constant_text.title_font);
-        memDc.DrawLabel(m_constant_text.title, title_rect, wxALIGN_RIGHT | wxALIGN_BOTTOM);
-        //BBS align bottom of title and version text
-        wxRect version_rect(wxPoint(split_width + text_padding, top_margin), wxPoint(width, top_margin + title_height - text_padding));
-        memDc.SetFont(m_constant_text.version_font);
-        memDc.SetTextForeground(StateColor::darkModeColorFor(wxColor(134, 134, 134)));
-        memDc.DrawLabel(m_constant_text.version, version_rect, wxALIGN_LEFT | wxALIGN_BOTTOM);
-
-#if BBL_INTERNAL_TESTING
-        wxString versionText = BBL_INTERNAL_TESTING == 1 ? _L("Internal Version") : _L("Beta Version");
-        wxSize text_rect = memDc.GetTextExtent(versionText);
-        int start_x = (title_rect.GetLeft() + version_rect.GetRight()) / 2 - text_rect.GetWidth();
-        int start_y = version_rect.GetBottom() + 10;
-        wxRect internal_sign_rect(wxPoint(start_x, start_y), wxSize(text_rect));
-        memDc.SetFont(m_constant_text.title_font);
-        memDc.DrawLabel(versionText, internal_sign_rect, wxALIGN_TOP | wxALIGN_LEFT);
-#endif
-
-        // load bitmap for logo
-        BitmapCache bmp_cache;
-        int logo_margin = FromDIP(72 * m_scale);
-        int logo_size = FromDIP(122 * m_scale);
-        int logo_width = FromDIP(94 * m_scale);
-        wxBitmap logo_bmp = *bmp_cache.load_svg("splash_logo", logo_size, logo_size);
-        int logo_y = top_margin + title_rect.GetHeight() + logo_margin;
-        memDc.DrawBitmap(logo_bmp, (width - logo_width) / 2, logo_y, true);
-
-        // calculate position for the dynamic text
-        int text_margin = FromDIP(80 * m_scale);
-        m_action_line_y_position = logo_y + logo_size + text_margin;
-    }
-
-    static wxBitmap MakeBitmap()
-    {
-        int width = FromDIP(480, nullptr);
-        int height = FromDIP(480, nullptr);
-
-        wxImage image(width, height);
-        wxBitmap new_bmp(image);
-
-        wxMemoryDC memDC;
-        memDC.SelectObject(new_bmp);
-        memDC.SetBrush(StateColor::darkModeColorFor(*wxWHITE));
-        memDC.DrawRectangle(-1, -1, width + 2, height + 2);
-        memDC.DrawBitmap(new_bmp, 0, 0, true);
-        return new_bmp;
-    }
-
-    void set_bitmap(wxBitmap& bmp)
-    {
-        m_window->SetBitmap(bmp);
-        m_window->Refresh();
-        m_window->Update();
-    }
-
-    void scale_bitmap(wxBitmap& bmp, float scale)
-    {
-        if (scale == 1.0)
-            return;
-
-        wxImage image = bmp.ConvertToImage();
-        if (!image.IsOk() || image.GetWidth() == 0 || image.GetHeight() == 0)
-            return;
-
-        int width   = int(scale * image.GetWidth());
-        int height  = int(scale * image.GetHeight());
-        image.Rescale(width, height, wxIMAGE_QUALITY_BILINEAR);
-
-        bmp = wxBitmap(std::move(image));
-    }
-
-    void scale_font(wxFont& font, float scale)
-    {
-#ifdef __WXMSW__
-        // Workaround for the font scaling in respect to the current active display,
-        // not for the primary display, as it's implemented in Font.cpp
-        // See https://github.com/wxWidgets/wxWidgets/blob/master/src/msw/font.cpp
-        // void wxNativeFontInfo::SetFractionalPointSize(float pointSizeNew)
-        wxNativeFontInfo nfi= *font.GetNativeFontInfo();
-        float pointSizeNew  = scale * font.GetPointSize();
-        nfi.lf.lfHeight     = nfi.GetLogFontHeightAtPPI(pointSizeNew, get_dpi_for_window(this));
-        nfi.pointSize       = pointSizeNew;
-        font = wxFont(nfi);
-#else
-        font.Scale(scale);
-#endif //__WXMSW__
-    }
-
-
-private:
-    wxStaticText* m_staticText_slicer_name;
-    wxStaticText* m_staticText_slicer_version;
-    wxStaticBitmap* m_bitmap;
-    wxStaticText* m_staticText_loading;
-
-    wxBitmap    m_main_bitmap;
-    wxFont      m_action_font;
-    int         m_action_line_y_position;
-    float       m_scale {1.0};
-
-    struct ConstantText
-    {
-        wxString title;
-        wxString version;
-        wxString credits;
-
-        wxFont   title_font;
-        wxFont   version_font;
-        wxFont   credits_font;
-
-        void init(wxFont init_font)
-        {
-            // title
-            title = wxGetApp().is_editor() ? SLIC3R_APP_FULL_NAME : GCODEVIEWER_APP_NAME;
-
-            // dynamically get the version to display
-            version = _L("V") + " " + GUI_App::format_display_version();
-
-            // credits infornation
-            credits = "";
-
-            title_font = Label::Head_16;
-            version_font = Label::Body_16;
-            credits_font = init_font;
-        }
-    }
-    m_constant_text;
-};
 
 class SplashScreen : public wxSplashScreen
 {
@@ -905,7 +699,7 @@ wxString file_wildcards(FileType file_type, const std::string &custom_extension)
     return GUI::format_wxstr("%s (%s)|%s", data.title, title, mask);
 }
 
-static std::string libslic3r_translate_callback(const char *s) { return wxGetTranslation(wxString(s, wxConvUTF8)).utf8_str().data(); }
+static std::string libslic3r_translate_callback(const char *s) { return Slic3r::GUI::I18N::zh_brand(wxGetTranslation(wxString(s, wxConvUTF8))).utf8_str().data(); }
 
 #ifdef WIN32
 #if !wxVERSION_EQUAL_OR_GREATER_THAN(3,1,3)
@@ -1178,6 +972,33 @@ std::string extract_model_download_url_from_mac(const std::string &protocol_url)
         return {};
     return Http::url_decode(protocol_url.substr(key.size()));
 }
+
+/// Homepage commands that only touch local state and stay available when the
+/// network is disabled. Every other command needs the cloud, the model mall or
+/// the account and is therefore rejected before it reaches the handler.
+bool is_offline_local_web_command(const std::string &command)
+{
+    static const char *local_commands[] = {
+        "get_login_info",
+        "get_recent_projects",
+        "get_web_shortcut",
+        "homepage_newproject",
+        "homepage_openproject",
+        "homepage_open_recentfile",
+        "homepage_delete_recentfile",
+        "homepage_delete_all_recentfile",
+        "homepage_explore_recentfile",
+        "zh_print_costs",
+        "zh_workspace",
+        "zh_commands",
+        "zh_set_language",
+    };
+    for (const char *local : local_commands) {
+        if (command == local)
+            return true;
+    }
+    return false;
+}
 } // namespace
 
 void GUI_App::post_init()
@@ -1186,7 +1007,7 @@ void GUI_App::post_init()
     if (! this->initialized())
         throw Slic3r::RuntimeError("Calling post_init() while not yet initialized");
 
-    if (app_config->get("sync_user_preset") == "true") {
+    if (!NetworkPolicy::is_offline() && app_config->get("sync_user_preset") == "true") {
         if (m_agent) { start_sync_user_preset(); }
         BOOST_LOG_TRIVIAL(info) << "sync_user_preset: true";
     } else {
@@ -1195,10 +1016,11 @@ void GUI_App::post_init()
 
 
 
-    wxGetApp().report_consent_common(app_config->get("firstguide", "privacyuse") == "true"? true : false, "studio_improvement_policy_enable", "StudioImprovementPolicy");
+    if (!NetworkPolicy::is_offline())
+        wxGetApp().report_consent_common(app_config->get("firstguide", "privacyuse") == "true"? true : false, "studio_improvement_policy_enable", "StudioImprovementPolicy");
 
     /*request helio config*/
-    if (app_config->get("helio_enable") == "true") {
+    if (!NetworkPolicy::is_offline() && app_config->get("helio_enable") == "true") {
         if (!Slic3r::HelioQuery::get_helio_api_url().empty() && !Slic3r::HelioQuery::get_helio_pat().empty()) {
             wxGetApp().request_helio_supported_data();
         }
@@ -1214,32 +1036,36 @@ void GUI_App::post_init()
         if (this->init_params->input_files.size() == 1 &&
             boost::starts_with(this->init_params->input_files.front(), "bambustudio://open")) {
 
-            std::string input_str = extract_model_download_url_from_open(this->init_params->input_files.front());
+            if (NetworkPolicy::is_offline()) {
+                BOOST_LOG_TRIVIAL(warning) << "Remote model open rejected in offline mode";
+                show_dialog(_L("Downloading models is unavailable in offline mode."));
+            } else {
+                std::string input_str = extract_model_download_url_from_open(this->init_params->input_files.front());
 
-            std::string download_url;
+                std::string download_url;
 #if BBL_RELEASE_TO_PUBLIC
-            if (is_trusted_model_download_url(input_str)) {
-                download_url = input_str;
-            }
-            else {
-                MessageDialog msg_dlg(nullptr,
-                                      _L("This file is not from a trusted site, do you want to open it anyway?"), "",
-                                      wxAPPLY | wxYES_NO);
-                if (msg_dlg.ShowModal() == wxID_YES) {
+                if (is_trusted_model_download_url(input_str)) {
                     download_url = input_str;
                 }
-            }
+                else {
+                    MessageDialog msg_dlg(nullptr,
+                                          _L("This file is not from a trusted site, do you want to open it anyway?"), "",
+                                          wxAPPLY | wxYES_NO);
+                    if (msg_dlg.ShowModal() == wxID_YES) {
+                        download_url = input_str;
+                    }
+                }
 #else
-            download_url = input_str;
+                download_url = input_str;
 #endif
-            download_url = sanitize_download_url(download_url);
+                download_url = sanitize_download_url(download_url);
 
-            BOOST_LOG_TRIVIAL(info) << boost::format("download_url %1%") % PathSanitizer::sanitize(download_url);
+                BOOST_LOG_TRIVIAL(info) << boost::format("download_url %1%") % PathSanitizer::sanitize(download_url);
 
-            if (!download_url.empty()) {
-                m_download_file_url = from_u8(download_url);
+                if (!download_url.empty()) {
+                    m_download_file_url = from_u8(download_url);
+                }
             }
-
             m_open_method = "makerworld";
         }
         else {
@@ -1394,7 +1220,7 @@ void GUI_App::post_init()
         }
     }*/
 
-    if (m_networking_need_update) {
+    if (!NetworkPolicy::is_offline() && m_networking_need_update) {
         //updating networking
         int ret = updating_bambu_networking();
         if (!ret) {
@@ -1416,6 +1242,8 @@ void GUI_App::post_init()
         //BOOST_LOG_TRIVIAL(info) << "after check_updates";
         CallAfter([this] {
             bool cw_showed = this->config_wizard_startup();
+            if (NetworkPolicy::is_offline())
+                return;
 
             std::string http_url = get_http_url(app_config->get_country_code());
             std::string language = GUI::into_u8(current_language_code());
@@ -1443,7 +1271,7 @@ void GUI_App::post_init()
         });
     }
 
-    if(!m_networking_need_update && m_agent) {
+    if(!NetworkPolicy::is_offline() && !m_networking_need_update && m_agent) {
         m_agent->set_on_ssdp_msg_fn(
             [this](std::string json_str) {
                 if (is_closing()) {
@@ -1683,6 +1511,15 @@ static std::string decode(std::string const& extra, std::string const& path = {}
 
 int GUI_App::download_plugin(std::string name, std::string package_name, InstallProgressFn pro_fn, WasCancelledFn cancel_fn)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Network plugin download rejected in offline mode";
+        if (pro_fn) {
+            bool canceled = false;
+            pro_fn(InstallStatusDownloadFailed, 0, canceled);
+        }
+        show_dialog(_L("Downloading plugins is unavailable in offline mode."));
+        return -1;
+    }
     int result = 0;
     json j;
     std::string err_msg;
@@ -1873,6 +1710,15 @@ int GUI_App::download_plugin(std::string name, std::string package_name, Install
 
 int GUI_App::install_plugin(std::string name, std::string package_name, InstallProgressFn pro_fn, WasCancelledFn cancel_fn)
 {
+    if (NetworkPolicy::is_offline() && name == "plugins") {
+        BOOST_LOG_TRIVIAL(warning) << "Networking plugin installation rejected in offline mode";
+        if (pro_fn) {
+            bool canceled = false;
+            pro_fn(InstallStatusDownloadFailed, 0, canceled);
+        }
+        show_dialog(_L("Installing the networking plugin is unavailable in offline mode."));
+        return -1;
+    }
     bool cancel = false;
     std::string target_file_path = (fs::temp_directory_path() / package_name).string();
 
@@ -2024,6 +1870,10 @@ int GUI_App::install_plugin(std::string name, std::string package_name, InstallP
 
 void GUI_App::restart_networking()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping networking restart in offline mode";
+        return;
+    }
     BOOST_LOG_TRIVIAL(info) << boost::format("enter, mainframe %1%")%mainframe;
     on_init_network(true);
     StaticBambuLib::reset();
@@ -2538,10 +2388,11 @@ static boost::optional<Semver> parse_semver_from_ini(std::string path)
     std::stringstream buffer;
     buffer << stream.rdbuf();
     std::string body = buffer.str();
-    size_t start = body.find("BambuStudio ");
+    const std::string app_tag = std::string(SLIC3R_APP_NAME) + " ";
+    size_t start = body.find(app_tag);
     if (start == std::string::npos)
         return boost::none;
-    body = body.substr(start + 12);
+    body = body.substr(start + app_tag.size());
     size_t end = body.find_first_of(" \n");
     if (end < body.size())
         body.resize(end);
@@ -2616,6 +2467,11 @@ static LogEncOptions s_get_log_enc_opts()
         enc_options.enc_key_host_env = enc_key_host_env;
     }
 
+    // Offline logging keeps the bundled/default encryption key. Never fetch a
+    // replacement key from the cloud in this process.
+    if (NetworkPolicy::is_offline())
+        enc_options.enc_key_url.clear();
+
 #else
     enc_options.enc_type = LogEncOptions::LOG_ENC_NONE;
 #endif
@@ -2684,16 +2540,8 @@ void GUI_App::init_app_config()
         m_datadir_redefined = true;
     }
 
-    // start log here
-    const auto& enc_opts = s_get_log_enc_opts();
-    const std::string log_dir = (boost::filesystem::path(data_dir()) / "log").string();
-
-#if !BBL_RELEASE_TO_PUBLIC  && defined(__WINDOWS__)
-    set_log_path_and_level(log_dir, 5, enc_opts);
-#else
-    set_log_path_and_level(log_dir, 3, enc_opts);
-#endif
-
+    // Load application settings before initializing logging: logging may need
+    // a remote encryption key, and offline_mode must be known first.
     //BBS: remove GCodeViewer as seperate APP logic
 	if (!app_config)
         app_config = new AppConfig();
@@ -2714,8 +2562,8 @@ void GUI_App::init_app_config()
         // Save orig_version here, so its empty if no app_config existed before this run.
         m_last_config_version = app_config->orig_version();//parse_semver_from_ini(app_config->config_path());
 
-        auto loglevel = wxGetApp().app_config->get("severity_level");
-        Slic3r::set_logging_level(Slic3r::level_string_to_boost(loglevel));
+        if (app_config->get_bool("offline_mode"))
+            NetworkPolicy::enable_config_offline();
     }
     else {
 #ifdef _WIN32
@@ -2730,6 +2578,21 @@ void GUI_App::init_app_config()
             app_config->set("associate_step", "true");
         }
 #endif // _WIN32
+    }
+
+    // Start log only after the offline policy and persisted region are known.
+    const auto& enc_opts = s_get_log_enc_opts();
+    const std::string log_dir = (boost::filesystem::path(data_dir()) / "log").string();
+
+#if !BBL_RELEASE_TO_PUBLIC  && defined(__WINDOWS__)
+    set_log_path_and_level(log_dir, 5, enc_opts);
+#else
+    set_log_path_and_level(log_dir, 3, enc_opts);
+#endif
+
+    if (m_app_conf_exists) {
+        const auto loglevel = app_config->get("severity_level");
+        Slic3r::set_logging_level(Slic3r::level_string_to_boost(loglevel));
     }
 }
 
@@ -2988,9 +2851,11 @@ int GUI_App::OnExit()
 
     if (m_agent) {
         // BBS avoid a crash on mac platform
+        if (!NetworkPolicy::is_offline()) {
 #ifdef __WINDOWS__
-        m_agent->start_discovery(false, false);
+            m_agent->start_discovery(false, false);
 #endif
+        }
         delete m_agent;
         m_agent = nullptr;
     }
@@ -3278,6 +3143,7 @@ bool GUI_App::on_init_inner()
     if (app_config) {
         ::Label::initSysFont(app_config->get_language_code(), false);
     }
+    ZHTheme::select(app_config->get("zh_theme"));
     init_label_colours();
     init_fonts();
     wxGetApp().Update_dark_mode_flag();
@@ -3324,7 +3190,7 @@ bool GUI_App::on_init_inner()
             RichMessageDialog
                 dlg(nullptr,
                     wxString::Format(_L("%s\nDo you want to continue?"), msg),
-                    "BambuStudio", wxICON_QUESTION | wxYES_NO);
+                    SLIC3R_APP_FULL_NAME, wxICON_QUESTION | wxYES_NO);
             dlg.ShowCheckBox(_L("Remember my choice"));
             if (dlg.ShowModal() != wxID_YES) return false;
 
@@ -3414,41 +3280,46 @@ bool GUI_App::on_init_inner()
         p_ogl_manager->set_advanced_gcode_viewer_enabled(b_advanced_gcode_viewer_enabled);
     }
 
-    wxWeakRef<BBLSplashScreen> scrn;
+    wxWeakRef<ZHSplashScreen> scrn;
 
-    // BBS: ensure the splash screen is torn down on every exit path safely
-    ScopeGuard delete_scrn([&scrn]() {
-        if (scrn) scrn->Destroy();
+    // Ensure the animated splash is torn down on every exit path safely. Once the
+    // main window is up the splash is handed over to the event loop instead, so it
+    // keeps animating until it fades out.
+    bool splash_handed_over = false;
+    ScopeGuard delete_scrn([&scrn, &splash_handed_over]() {
+        if (scrn && !splash_handed_over) scrn->Destroy();
     });
     const bool show_splash_screen = true;
     if (show_splash_screen) {
-        // make a bitmap with dark grey banner on the left side
-        //BBS make BBL splash screen bitmap
-        wxBitmap bmp = BBLSplashScreen::MakeBitmap();
-        // Detect position (display) to show the splash screen
-        // Now this position is equal to the mainframe position
+        // The point only selects the display the splash is shown on; the splash itself
+        // is centred there.
         wxPoint splashscreen_pos = wxDefaultPosition;
         if (app_config->has("window_mainframe")) {
             auto metrics = WindowMetrics::deserialize(app_config->get("window_mainframe"));
-            if (metrics)
-                splashscreen_pos = metrics->get_rect().GetPosition();
+            if (metrics) {
+                const wxRect frame_rect = metrics->get_rect();
+                splashscreen_pos = wxPoint(frame_rect.x + frame_rect.width / 2,
+                                           frame_rect.y + frame_rect.height / 2);
+            }
         }
 
         BOOST_LOG_TRIVIAL(info) << "begin to show the splash screen...";
-        //BBS use BBL splashScreen
-        scrn = new BBLSplashScreen(bmp, wxSPLASH_CENTRE_ON_SCREEN, 0, splashscreen_pos);
-        // Process pending paint events so the splash is drawn immediately on all
-        // platforms. Without this, GTK never paints the window before the heavy
-        // loading work begins, leaving a black window until the app is ready.
+        scrn = new ZHSplashScreen(splashscreen_pos);
+        // Process pending paint events so the first frame is drawn before the
+        // heavy loading work begins. Re-check the weak window reference: wxYield
+        // may process application code that closes the splash re-entrantly.
         wxYield();
-        scrn->Raise();
-        scrn->Update();
-        scrn->SetText(_L("Loading configuration")+ dots);
-        // BBLSplashScreen::SetText() does not force a repaint on non-macOS.
-        // Refresh() + Update() ensure the first status line is visible before
-        // the heavy startup work begins.
-        scrn->Refresh();
-        scrn->Update();
+        if (scrn) {
+            scrn->Raise();
+            scrn->Update();
+            scrn->SetText(_L("Loading configuration"));
+            scrn->Refresh();
+            scrn->Update();
+        }
+        // Finish the compact intro before blocking startup work begins. The scene is
+        // time-based, so the complete composition is ready after half a second.
+        if (scrn)
+            scrn->PumpAnimation(520);
     }
 
     BOOST_LOG_TRIVIAL(info) << "loading systen presets...";
@@ -3461,6 +3332,10 @@ bool GUI_App::on_init_inner()
 
     if (m_init_app_config_from_older)
         copy_older_config();
+
+    // Keep the startup animation alive while the presets and the workspace are built.
+    if (scrn)
+        scrn->SetText(_L("Loading presets"));
 
     if (is_editor()) {
 #ifdef __WXMSW__
@@ -3513,7 +3388,7 @@ bool GUI_App::on_init_inner()
                     switch (dialog.ShowModal())
                     {
                     case wxID_YES:
-                        wxLaunchDefaultBrowser(version_info.url);
+                        open_browser_with_warning_dialog(version_info.url);
                         break;
                     case wxID_NO:
                         break;
@@ -3540,7 +3415,7 @@ bool GUI_App::on_init_inner()
                 switch (result)
                 {
                  case wxID_YES:
-                     wxLaunchDefaultBrowser(download_url);
+                     open_browser_with_warning_dialog(download_url);
                      break;
                  case wxID_NO:
                      wxGetApp().mainframe->Close(true);
@@ -3646,24 +3521,36 @@ bool GUI_App::on_init_inner()
             BOOST_LOG_TRIVIAL(info) << "Filament Manager sync initialized";
         }
         // Cloud layer — owns HTTP client, high-level sync and the serialization dispatcher.
-        if (!m_fila_manager_cloud_client) {
-            m_fila_manager_cloud_client = new wgtFilaManagerCloudClient();
-            BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud client initialized";
-        }
-        if (!m_fila_manager_cloud_sync) {
-            m_fila_manager_cloud_sync = new wgtFilaManagerCloudSync(m_fila_manager_store,
-                                                                    m_fila_manager_cloud_client);
-            BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud sync initialized";
-        }
-        if (!m_fila_manager_cloud_disp) {
-            m_fila_manager_cloud_disp = new wgtFilaManagerCloudDispatcher(m_fila_manager_cloud_sync,
-                                                                         m_fila_manager_cloud_client);
-            BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud dispatcher initialized";
+        if (!NetworkPolicy::is_offline()) {
+            if (!m_fila_manager_cloud_client) {
+                m_fila_manager_cloud_client = new wgtFilaManagerCloudClient();
+                BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud client initialized";
+            }
+            if (!m_fila_manager_cloud_sync) {
+                m_fila_manager_cloud_sync = new wgtFilaManagerCloudSync(m_fila_manager_store,
+                                                                        m_fila_manager_cloud_client);
+                BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud sync initialized";
+            }
+            if (!m_fila_manager_cloud_disp) {
+                m_fila_manager_cloud_disp = new wgtFilaManagerCloudDispatcher(m_fila_manager_cloud_sync,
+                                                                             m_fila_manager_cloud_client);
+                BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud dispatcher initialized";
+            }
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "Filament Manager cloud layer disabled in offline mode";
         }
     }
 
     BOOST_LOG_TRIVIAL(info) << "create the main window";
+    if (scrn)
+        scrn->SetText(_L("Preparing workspace"));
     mainframe = new MainFrame();
+    // ZH-Studio: rounded window corners and a border in the workspace colour.
+    ZHRounded::Apply(mainframe, 2, RGB(45, 65, 92));
+    if (scrn) {
+        scrn->SetText(_L("Starting up"));
+        scrn->PumpAnimation(80);
+    }
     // hide settings tabs after first Layout
     if (is_editor()) {
         mainframe->select_tab(size_t(0));
@@ -3699,6 +3586,12 @@ bool GUI_App::on_init_inner()
 #ifdef __WINDOWS__
     mainframe->topbar()->SaveNormalRect();
 #endif
+    if (scrn) {
+        // Arm the transition before Show(): the target's first completed paint,
+        // not a generic queued callback, releases the splash into the workspace.
+        scrn->ScheduleOutroAfterPaint(mainframe, 120);
+        splash_handed_over = true;
+    }
     mainframe->Show(true);
     BOOST_LOG_TRIVIAL(info) << "main frame firstly shown";
     perf_mark("Main window shown");
@@ -3712,6 +3605,10 @@ bool GUI_App::on_init_inner()
     //BBS init the opengl resource here
     Size canvas_size = plater_->canvas3D()->get_canvas_size();
     wxGetApp().imgui()->set_display_size(static_cast<float>(canvas_size.get_width()), static_cast<float>(canvas_size.get_height()));
+    if (scrn) {
+        scrn->SetText(_L("Loading OpenGL resources..."));
+        scrn->PumpAnimation(300);
+    }
     wxGetApp().init_opengl();
     plater_->canvas3D()->init();
     wxGetApp().imgui()->new_frame();
@@ -3737,7 +3634,7 @@ bool GUI_App::on_init_inner()
     Bind(wxEVT_IDLE, [this](wxIdleEvent& event)
     {
         bool curr_studio_active = this->is_studio_active();
-        if (m_studio_active != curr_studio_active) {
+        if (!NetworkPolicy::is_offline() && m_studio_active != curr_studio_active) {
             if (curr_studio_active) {
                 BOOST_LOG_TRIVIAL(info) << "studio is active, start to subscribe";
                 if (m_agent) {
@@ -3787,7 +3684,7 @@ bool GUI_App::on_init_inner()
 #endif
             this->post_init();
 
-            if (!m_download_file_url.empty()) {
+            if (!NetworkPolicy::is_offline() && !m_download_file_url.empty()) {
                 request_model_download(m_download_file_url);
                 m_download_file_url = "";
             }
@@ -3825,6 +3722,10 @@ void GUI_App::open_new_official_filament_hint(const std::string& ams_id, const s
 
 void GUI_App::copy_network_if_available()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping networking plugin copy in offline mode";
+        return;
+    }
     if (app_config->get("update_network_plugin") != "true")
         return;
     std::string data_dir_str = data_dir();
@@ -3887,6 +3788,22 @@ void GUI_App::copy_network_if_available()
 
 bool GUI_App::on_init_network(bool try_backup)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping native networking initialization in offline mode";
+        if (!m_device_manager)
+            m_device_manager = new Slic3r::DeviceManager();
+        else
+            m_device_manager->set_agent(nullptr);
+        if (!m_user_manager)
+            m_user_manager = new Slic3r::UserManager();
+        else
+            m_user_manager->set_agent(nullptr);
+        m_networking_compatible = false;
+        m_networking_need_update = false;
+        if (auto dev = getDeviceManager())
+            dev->restore_local_machines_from_user_access_config();
+        return false;
+    }
     int  load_agent_dll       = Slic3r::NetworkAgent::initialize_network_module(false, !app_config->get_bool("ignore_module_cert"));
     bool create_network_agent = false;
 __retry:
@@ -4361,7 +4278,7 @@ void GUI_App::link_to_network_check()
     else {
         url = "https://status.bambulab.com";
     }
-    wxLaunchDefaultBrowser(url);
+    open_browser_with_warning_dialog(url);
 }
 
 void GUI_App::link_to_lan_only_wiki()
@@ -4378,7 +4295,7 @@ void GUI_App::link_to_lan_only_wiki()
     else {
         url = "https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode";
     }
-    wxLaunchDefaultBrowser(url);
+    open_browser_with_warning_dialog(url);
 }
 
 bool GUI_App::tabs_as_menu() const
@@ -4671,6 +4588,10 @@ void GUI_App::request_helio_pat(std::function<void(std::string)> func)
 
 void GUI_App::request_helio_supported_data(bool force_refresh)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping Helio supported-data request in offline mode";
+        return;
+    }
     std::string helio_api_url = Slic3r::HelioQuery::get_helio_api_url();
     std::string helio_api_key = Slic3r::HelioQuery::get_helio_pat();
 
@@ -4919,6 +4840,11 @@ wxString GUI_App::transition_tridid_rack(int trid_id, MachineObject* obj) const
 //BBS
 void GUI_App::request_login(bool show_user_info)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Login rejected in offline mode";
+        show_dialog(_L("Signing in is unavailable in offline mode."));
+        return;
+    }
     ShowUserLogin();
 
     if (show_user_info) {
@@ -4928,6 +4854,10 @@ void GUI_App::request_login(bool show_user_info)
 
 void GUI_App::get_login_info()
 {
+    if (NetworkPolicy::is_offline()) {
+        sync_left_server_connect_status();
+        return;
+    }
     if (m_agent) {
         if (m_agent->is_user_login()) {
             std::string login_cmd = m_agent->build_login_cmd();
@@ -4958,6 +4888,8 @@ void GUI_App::sync_left_server_connect_status()
 
 bool GUI_App::is_user_login()
 {
+    if (NetworkPolicy::is_offline())
+        return false;
     if (m_agent) {
         return m_agent->is_user_login();
     }
@@ -5068,6 +5000,10 @@ void GUI_App::refresh_homepage_access_ui()
 
 void GUI_App::fetch_minors_decisions()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Minors decisions check skipped in offline mode";
+        return;
+    }
 #if !BBL_ENABLE_MINORS_DECISION
     check_track_enable();            // feature off: enable telemetry per config, as before
     return;
@@ -5185,6 +5121,8 @@ bool GUI_App::apply_uep_gate(UepFamilyGate new_gate, bool force)
 
 std::string GUI_App::fetch_family_hub_signin_url()
 {
+    if (NetworkPolicy::is_offline())
+        return {};
 #if BBL_ENABLE_MINORS_DECISION
     if (!m_agent) return {};
     std::string body;
@@ -5228,6 +5166,10 @@ void GUI_App::force_logout_uep_login_invalid(const std::string& signin_url)
 
 void GUI_App::fetch_uep_decision()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "UEP decision check skipped in offline mode";
+        return;
+    }
 #if !BBL_ENABLE_MINORS_DECISION
     return;
 #else
@@ -5273,6 +5215,11 @@ void GUI_App::fetch_uep_decision()
 
 bool GUI_App::check_login()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Cloud operation requires login, unavailable in offline mode";
+        show_dialog(_L("Cloud services are unavailable in offline mode."));
+        return false;
+    }
     bool result = false;
     if (m_agent) {
         result = m_agent->is_user_login();
@@ -5300,6 +5247,11 @@ void GUI_App::request_user_login(int online_login)
 
 void GUI_App::request_user_logout()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "User logout rejected in offline mode";
+        show_dialog(_L("Account operations are unavailable in offline mode."));
+        return;
+    }
     m_homepage_server_connect_failed = false;
     sync_left_server_connect_status();
 
@@ -5353,6 +5305,11 @@ void GUI_App::request_user_logout()
 
 int GUI_App::request_user_unbind(std::string dev_id)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Printer unbind rejected in offline mode";
+        show_dialog(_L("Printer account changes are unavailable in offline mode."));
+        return -1;
+    }
     int result = -1;
     if (m_agent) {
         result = m_agent->unbind(dev_id);
@@ -5378,6 +5335,19 @@ std::string GUI_App::handle_web_request(std::string cmd)
         if (command.has_value()) {
             std::string command_str = command.value();
             BOOST_LOG_TRIVIAL(info) << command_str;
+            if (NetworkPolicy::is_offline() && !is_offline_local_web_command(command_str)) {
+                BOOST_LOG_TRIVIAL(warning) << "[WebView] Blocked offline homepage command: " << command_str;
+                // Answer instead of staying silent so the page can finish its
+                // pending request cleanly.
+                pt::ptree reply;
+                if (sequence_id)
+                    reply.put("sequence_id", sequence_id.value());
+                reply.put("command", command_str);
+                reply.put("result", "offline");
+                std::ostringstream reply_stream;
+                pt::write_json(reply_stream, reply, false);
+                return reply_stream.str();
+            }
             if (command_str.compare("request_project_download") == 0) {
                 if (root.get_child_optional("data") != boost::none) {
                     pt::ptree data_node = root.get_child("data");
@@ -5443,6 +5413,25 @@ std::string GUI_App::handle_web_request(std::string cmd)
                 CallAfter([this] {
                     wxGetApp().open_mall_page_dialog();
                 });
+            }
+            else if (command_str == "zh_print_costs") {
+                CallAfter([this] { if (mainframe) show_zh_print_costs(mainframe); });
+            }
+            else if (command_str == "zh_workspace") {
+                CallAfter([this] { if (mainframe) show_zh_workspace_settings(mainframe); });
+            }
+            else if (command_str == "zh_commands") {
+                CallAfter([this] { if (mainframe) show_zh_command_palette(mainframe); });
+            }
+            else if (command_str == "zh_set_language") {
+                boost::optional<std::string> lang = root.get_optional<std::string>("lang");
+                if (lang.has_value() && (lang.value() == "en_US" || lang.value() == "de_DE")) {
+                    CallAfter([this, lang] {
+                        app_config->set("language", lang.value());
+                        app_config->set("language_user_set", "1");
+                        app_config->save();
+                    });
+                }
             }
             else if (command_str.compare("homepage_newproject") == 0) {
                 this->request_open_project("<new>");
@@ -5566,7 +5555,7 @@ std::string GUI_App::handle_web_request(std::string cmd)
                         // local schemes (file://, ms-msdt:, custom protocol handlers) must never reach the shell.
                         const std::string &url = path.value();
                         if (boost::istarts_with(url, "http://") || boost::istarts_with(url, "https://")) {
-                            wxLaunchDefaultBrowser(url);
+                            open_browser_with_warning_dialog(url);
                             if (m_agent) {
                                 json j;
                                 j["user_guide"] = url;
@@ -5585,7 +5574,7 @@ std::string GUI_App::handle_web_request(std::string cmd)
                     // local schemes (file://, ms-msdt:, custom protocol handlers) must never reach the shell.
                     const std::string &url = path.value();
                     if (boost::istarts_with(url, "http://") || boost::istarts_with(url, "https://")) {
-                        wxLaunchDefaultBrowser(url);
+                        open_browser_with_warning_dialog(url);
                     } else {
                         BOOST_LOG_TRIVIAL(warning) << "common_openurl: refused non-http(s) url";
                     }
@@ -5768,6 +5757,10 @@ void GUI_App::handle_script_message(std::string msg)
         if (j.contains("command")) {
             wxString cmd = j["command"];
             if (cmd == "user_login") {
+                if (NetworkPolicy::is_offline()) {
+                    show_dialog(_L("Signing in is unavailable in offline mode."));
+                    return;
+                }
                 if (m_agent) {
                     m_agent->change_user(j.dump());
                     if (m_agent->is_user_login()) {
@@ -5776,6 +5769,10 @@ void GUI_App::handle_script_message(std::string msg)
                 }
             }
             if (cmd == "user_ticket_login") {
+                if (NetworkPolicy::is_offline()) {
+                    show_dialog(_L("Signing in is unavailable in offline mode."));
+                    return;
+                }
                 std::string ticket = j["data"]["ticket"];
                 TicketLoginTask::perform_async(ticket, [this](std::string login_info) {
                     if (m_agent && !login_info.empty()) {
@@ -5794,6 +5791,11 @@ void GUI_App::handle_script_message(std::string msg)
 
 void GUI_App::request_model_download(wxString url)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Model download rejected in offline mode";
+        show_dialog(_L("Downloading models is unavailable in offline mode."));
+        return;
+    }
     if (plater_) {
         plater_->request_model_download(url);
     }
@@ -5813,6 +5815,11 @@ std::string GUI_App::sanitize_download_url(const std::string &url)
 //BBS download project by project id
 void GUI_App::download_project(std::string project_id)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Project download rejected in offline mode";
+        show_dialog(_L("Downloading projects is unavailable in offline mode."));
+        return;
+    }
     if (plater_) {
         plater_->request_download_project(project_id);
     }
@@ -5935,6 +5942,9 @@ void GUI_App::on_http_error(wxCommandEvent &evt)
 
 void GUI_App::enable_user_preset_folder(bool enable)
 {
+    if (enable && (NetworkPolicy::is_offline() || !m_agent)) {
+        enable = false;
+    }
     if (enable) {
         std::string user_id = m_agent->get_user_id();
         app_config->set("preset_folder", user_id);
@@ -5966,7 +5976,7 @@ void GUI_App::save_privacy_policy_history(bool agree, std::string source)
         j["uuid"] = app_config->get("slicer_uuid");
     j["time"] = time_str.str();
     j["user_id"] = "default_user";
-    if (m_agent && agree) {
+    if (!NetworkPolicy::is_offline() && m_agent && agree) {
         //if (!m_agent->get_user_id().empty() && m_agent->is_user_login())
             //j["user_id"] = m_agent->get_user_id();
         m_agent->track_event("privacy_policy", j.dump());
@@ -5997,6 +6007,10 @@ void GUI_App::on_update_machine_list(wxCommandEvent &evt)
 
 void GUI_App::on_user_login_handle(wxCommandEvent &evt)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Login handling skipped in offline mode";
+        return;
+    }
     if (!m_agent || !m_agent->is_user_login()) { return; }
 
     int online_login = evt.GetInt();
@@ -6039,6 +6053,10 @@ void GUI_App::on_user_login_handle(wxCommandEvent &evt)
 
 void GUI_App::check_track_enable()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Native telemetry skipped in offline mode";
+        return;
+    }
     if (app_config && app_config->get("firstguide", "privacyuse") == "true") {
         //enable track event
         json header_json;
@@ -6070,6 +6088,10 @@ void GUI_App::check_track_enable()
 
 void GUI_App::on_user_login(wxCommandEvent &evt)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Login privacy checks skipped in offline mode";
+        return;
+    }
     if (!m_agent) { return; }
     int online_login = evt.GetInt();
     // check privacy before handle
@@ -6094,6 +6116,10 @@ void GUI_App::reset_to_active()
 
 void GUI_App::check_update(bool show_tips, int by_user)
 {
+    // ZH-Studio: the online version feed belongs to Bambu Studio. Never offer to "upgrade"
+    // ZH-Studio to a Bambu Studio release.
+    BOOST_LOG_TRIVIAL(info) << "ZH-Studio: application update check is disabled";
+    return;
     if (version_info.version_str.empty() || version_info.url.empty()) {
         check_beta_version();
         return;
@@ -6221,6 +6247,12 @@ bool GUI_App::check_send_print_version_policy()
 
 void GUI_App::check_new_version(bool show_tips, int by_user)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Version check skipped in offline mode";
+        if (by_user)
+            show_dialog(_L("Checking for updates is unavailable in offline mode."));
+        return;
+    }
     std::string platform = "windows";
 
 #ifdef __WINDOWS__
@@ -6293,6 +6325,8 @@ void GUI_App::check_new_version(bool show_tips, int by_user)
 
 void GUI_App::check_beta_version(bool show_tips_when_no_beta)
 {
+    // ZH-Studio: no beta channel (the GitHub feed belongs to Bambu Studio)
+    return;
     // When the beta channel is off the stable callers have already shown the toast
     // (see check_update / check_new_version), so we just bail out here.
     if (app_config->get("enable_beta_version_update") != "true") {
@@ -6427,6 +6461,10 @@ void GUI_App::check_beta_version(bool show_tips_when_no_beta)
 
 void GUI_App::check_cert()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Certificate and device-region checks skipped in offline mode";
+        return;
+    }
     m_check_cert_thread = Slic3r::create_thread(
         [this]{
             if (m_agent)
@@ -6445,6 +6483,10 @@ void GUI_App::check_cert()
 // Runs on m_check_cert_thread; OnExit() joins that thread before m_agent is deleted.
 void GUI_App::post_device_region()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Device-region query skipped in offline mode";
+        return;
+    }
     if (!m_agent)
         return;
 
@@ -6458,6 +6500,8 @@ void GUI_App::post_device_region()
 // return true if handled
 bool GUI_App::process_network_msg(std::string dev_id, std::string msg)
 {
+    if (NetworkPolicy::is_offline())
+        return false;
     if (dev_id.empty()) {
         if (msg == "wait_info") {
             BOOST_LOG_TRIVIAL(info) << "wait_info";
@@ -6465,7 +6509,7 @@ bool GUI_App::process_network_msg(std::string dev_id, std::string msg)
             if (!dev)
                 return true;
             MachineObject* obj = dev->get_selected_machine();
-            if (obj)
+            if (obj && m_agent)
                 m_agent->install_device_cert(obj->get_dev_id(), obj->is_lan_mode_printer());
             if (!m_show_error_msgdlg) {
                 MessageDialog msg_dlg(nullptr, _L("Retrieving printer information, please try again later."), "", wxAPPLY | wxOK);
@@ -6651,6 +6695,11 @@ void GUI_App::on_check_privacy_update(wxCommandEvent& evt)
 
 void GUI_App::check_privacy_version(int online_login)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping privacy version check in offline mode";
+        request_user_handle(online_login);
+        return;
+    }
     update_http_extra_header();
     std::string query_params = "?policy/privacy=00.00.00.00";
     std::string url = get_http_url(app_config->get_country_code()) + query_params;
@@ -6702,6 +6751,10 @@ void GUI_App::check_privacy_version(int online_login)
 
 void GUI_App::report_consent(std::string expand)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping consent report in offline mode";
+        return;
+    }
     if(expand.empty()) return;
     update_http_extra_header();
     std::string query_params = "v1/user-service/user/consent";
@@ -6810,6 +6863,8 @@ void  GUI_App::push_notification(const MachineObject* obj, wxString msg, wxStrin
 
 void GUI_App::reload_settings()
 {
+    if (NetworkPolicy::is_offline())
+        return;
     if (preset_bundle && m_agent) {
         std::map<std::string, std::map<std::string, std::string>> user_presets;
         m_agent->get_user_presets(&user_presets);
@@ -6837,6 +6892,10 @@ void GUI_App::remove_user_presets()
 
 void GUI_App::sync_preset(Preset* preset)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "[sync_preset] skipped in offline mode";
+        return;
+    }
     int result = -1;
     unsigned int http_code = 200;
     std::string updated_info;
@@ -6978,6 +7037,12 @@ void GUI_App::sync_preset(Preset* preset)
 
 void GUI_App::start_sync_user_preset(bool with_progress_dlg)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "User preset sync skipped in offline mode";
+        if (with_progress_dlg)
+            show_dialog(_L("Cloud preset sync is unavailable in offline mode."));
+        return;
+    }
     if (!m_agent || !m_agent->is_user_login()) return;
 
     // has already start sync
@@ -7308,7 +7373,7 @@ int GUI_App::GetSingleChoiceIndex(const wxString& message,
 // select language from the list of installed languages
 bool GUI_App::select_language()
 {
-	wxArrayString translations = wxTranslations::Get()->GetAvailableTranslations(SLIC3R_APP_KEY);
+	wxArrayString translations = wxTranslations::Get()->GetAvailableTranslations("BambuStudio");
     std::vector<const wxLanguageInfo*> language_infos;
     language_infos.emplace_back(wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH));
     for (size_t i = 0; i < translations.GetCount(); ++ i) {
@@ -7357,11 +7422,12 @@ bool GUI_App::select_language()
             // Which language to save as the selected dictionary language?
             // 1) Hopefully the language set to wxTranslations by this->load_language(), but that API is weird and we don't want to rely on its
             //    stability in the future:
-            //    wxTranslations::Get()->GetBestTranslation(SLIC3R_APP_KEY, wxLANGUAGE_ENGLISH);
+            //    wxTranslations::Get()->GetBestTranslation("BambuStudio", wxLANGUAGE_ENGLISH);
             // 2) Current locale language may not match the dictionary name, see GH issue #3901
             //    m_wxLocale->GetCanonicalName()
             // 3) new_language_info->CanonicalName is a safe bet. It points to a valid dictionary name.
 			app_config->set("language", new_language_info->CanonicalName.ToUTF8().data());
+			app_config->set("language_user_set", "1");
 			app_config->save();
     		return true;
     	}
@@ -7382,6 +7448,14 @@ bool GUI_App::load_language(wxString language, bool initial)
 
         language = app_config->get("language");
 
+        // ZH-Studio ships with an English interface. Only a language the user picked
+        // explicitly (Preferences or the ZH language switch) carries the
+        // "language_user_set" marker and wins over the English default.
+        if (!app_config->get_bool("language_user_set")) {
+            language = "en_US";
+            app_config->set("language", language.ToUTF8().data());
+        }
+
         /* erase the unsupported language in config files*/
         {
             wxLanguage cur_lang = wxLANGUAGE_UNKNOWN;
@@ -7389,6 +7463,9 @@ bool GUI_App::load_language(wxString language, bool initial)
             if (cur_lang_info) { cur_lang = static_cast<wxLanguage> (cur_lang_info->Language);}
             // all share zh_TW
             if(cur_lang == wxLANGUAGE_CHINESE || cur_lang==wxLANGUAGE_CHINESE_TAIWAN) cur_lang = wxLANGUAGE_CHINESE_TRADITIONAL;
+            // English needs no dictionary: every English variant is supported.
+            if (cur_lang == wxLANGUAGE_ENGLISH_US || cur_lang == wxLANGUAGE_ENGLISH_UK)
+                cur_lang = wxLANGUAGE_ENGLISH;
             if (std::find(s_supported_languages.begin(), s_supported_languages.end(), cur_lang) == s_supported_languages.end())
             {
                 app_config->set("language", "");
@@ -7427,7 +7504,7 @@ bool GUI_App::load_language(wxString language, bool initial)
                     // There seems to be a support for that on Windows and OSX, while on Linuxes the code just returns wxLocale::GetSystemLanguage().
                     // The last parameter gets added to the list of detected dictionaries. This is a workaround
                     // for not having the English dictionary. Let's hope wxWidgets of various versions process this call the same way.
-                    wxString best_language = wxTranslations::Get()->GetBestTranslation(SLIC3R_APP_KEY, wxLANGUAGE_ENGLISH);
+                    wxString best_language = wxTranslations::Get()->GetBestTranslation("BambuStudio", wxLANGUAGE_ENGLISH);
                     if (!best_language.IsEmpty()) {
                         m_language_info_best = wxLocale::FindLanguageInfo(best_language);
                         BOOST_LOG_TRIVIAL(info) << boost::format("Best translation language detected (may be different from user locales): %1%") %
@@ -7541,14 +7618,14 @@ bool GUI_App::load_language(wxString language, bool initial)
 
     if (! wxLocale::IsAvailable(language_info->Language)) {
     	// Loading the language dictionary failed.
-        wxString message = "Switching Bambu Studio to language " + language_info->CanonicalName + " failed, because your computer is missing the corresponding locale.";
+        wxString message = "Switching ZH-Studio to language " + language_info->CanonicalName + " failed, because your computer is missing the corresponding locale.";
 #if !defined(_WIN32) && !defined(__APPLE__)
         // likely some linux system
         message += "\nYou may need to reconfigure the missing locales, likely by running the \"locale-gen\" and \"dpkg-reconfigure locales\" commands.\n";
 #endif
         if (initial)
-        	message + "\n\nApplication will close.";
-        wxMessageBox(message, "Bambu Studio - Switching language failed", wxOK | wxICON_ERROR);
+            message += "\n\nApplication will close.";
+        wxMessageBox(message, "ZH-Studio - Switching language failed", wxOK | wxICON_ERROR);
         if (initial)
 			std::exit(EXIT_FAILURE);
         else {
@@ -7567,7 +7644,7 @@ bool GUI_App::load_language(wxString language, bool initial)
     // Override language at the active wxTranslations class (which is stored in the active m_wxLocale)
     // to load possibly different dictionary, for example, load Czech dictionary for Slovak language.
     wxTranslations::Get()->SetLanguage(language_dict);
-    m_wxLocale->AddCatalog(SLIC3R_APP_KEY);
+    m_wxLocale->AddCatalog("BambuStudio"); // ZH-Studio: translation catalogs keep their original file name
     m_imgui->set_language(into_u8(language_info->CanonicalName));
 
     // macOS 27 may crash while rendering NSStepper arrows when the numeric locale uses a comma.
@@ -8489,7 +8566,7 @@ void GUI_App::open_mall_page_dialog()
         link_url += "?from=bambustudio";
     }
 
-    wxLaunchDefaultBrowser(link_url);
+    open_browser_with_warning_dialog(link_url);
 }
 
 void GUI_App::open_publish_page_dialog()
@@ -8524,7 +8601,7 @@ void GUI_App::open_publish_page_dialog()
         link_url = host_url + model_url;
     }
 
-    wxLaunchDefaultBrowser(link_url);
+    open_browser_with_warning_dialog(link_url);
 }
 
 char GUI_App::from_hex(char ch) {
@@ -8937,6 +9014,12 @@ bool GUI_App::config_wizard_startup()
 
 void GUI_App::check_updates(const bool verbose)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Preset update check skipped in offline mode";
+        if (verbose)
+            show_dialog(_L("Checking for preset updates is unavailable in offline mode."));
+        return;
+    }
     PresetUpdater::UpdateResult updater_result;
     try {
         //updater_result = preset_updater->config_update(app_config->orig_version(), verbose ? PresetUpdater::UpdateParams::SHOW_TEXT_BOX : PresetUpdater::UpdateParams::SHOW_NOTIFICATION);
@@ -9018,11 +9101,20 @@ FilamentColorCodeQuery* GUI_App::get_filament_color_code_query()
 
 bool GUI_App::open_browser_with_warning_dialog(const wxString& url, int flags/* = 0*/)
 {
-    return wxLaunchDefaultBrowser(url, flags);
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(warning) << "Browser launch rejected in offline mode";
+        show_dialog(_L("Opening web pages is unavailable in offline mode."));
+        return false;
+    }
+    return Slic3r::GUI::zh_open_external_browser(url, flags);
 }
 
 void GUI_App::report_consent_common(bool agree, std::string scene, std::string formID)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Skipping consent network operation in offline mode";
+        return;
+    }
     json consentBody;
     json formItemArray = json::array();
     json formItem;
@@ -9150,7 +9242,7 @@ void GUI_App::associate_files(std::wstring extend)
 
     std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
     std::wstring prog_id = L" Bambu.Studio.1";
-    std::wstring prog_desc = L"BambuStudio";
+    std::wstring prog_desc = L"ZH-Studio";
     std::wstring prog_command = prog_path + L" \"%1\"";
     std::wstring reg_base = L"Software\\Classes";
     std::wstring reg_extension = reg_base + L"\\." + extend;
@@ -9173,7 +9265,7 @@ void GUI_App::disassociate_files(std::wstring extend)
 
     std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
     std::wstring prog_id = L" Bambu.Studio.1";
-    std::wstring prog_desc = L"BambuStudio";
+    std::wstring prog_desc = L"ZH-Studio";
     std::wstring prog_command = prog_path + L" \"%1\"";
     std::wstring reg_base = L"Software\\Classes";
     std::wstring reg_extension = reg_base + L"\\." + extend;
@@ -9339,6 +9431,10 @@ TryLoadLastMachine::~TryLoadLastMachine()
 
 void TryLoadLastMachine::InnerLoad(NetworkAgent* agent, DeviceManager* dev)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "Last-machine network loading skipped in offline mode";
+        return;
+    }
     if (!agent || !dev) {
         BOOST_LOG_TRIVIAL(error) << "invalid agent or device manager";
         return;

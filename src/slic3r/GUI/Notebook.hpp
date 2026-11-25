@@ -5,6 +5,8 @@
 
 #include <wx/bookctrl.h>
 #include <wx/sizer.h>
+#include <wx/timer.h>
+#include <chrono>
 
 class ModeSizer;
 class ScalableButton;
@@ -18,7 +20,7 @@ class ButtonsListCtrl : public wxControl
 public:
     // BBS
     ButtonsListCtrl(wxWindow* parent, wxBoxSizer* side_tools = NULL);
-    ~ButtonsListCtrl() {}
+    ~ButtonsListCtrl() override;
 
     void OnPaint(wxPaintEvent&);
     void SetSelection(int sel);
@@ -32,11 +34,30 @@ public:
     void SetPageToolTip(size_t n, const wxString& strToolTip);
 
 private:
+    struct TabMotion {
+        float selection = 0.f;
+        float hover = 0.f;
+    };
+    void start_animation();
+    void on_animation(wxTimerEvent& event);
+    void on_tab_enter(wxMouseEvent& event);
+    void on_tab_leave(wxMouseEvent& event);
+    void update_tab_style(size_t index, bool dark);
+    void snap_animation();
+
     // BBS: use a box sizer so tabs can shrink (Chrome-style) when space is tight
     wxBoxSizer*                     m_buttons_sizer;
     wxBoxSizer*                     m_sizer;
     // BBS: use Button
     std::vector<Button*>            m_pageButtons;
+    std::vector<TabMotion>          m_tab_motion;
+    Button*                         m_hovered_button {nullptr};
+    wxTimer                         m_animation_timer;
+    bool                            m_animation_enabled{true};
+    std::chrono::steady_clock::time_point m_last_animation_tick;
+    float                           m_marker_x {0.f};
+    float                           m_marker_width {0.f};
+    bool                            m_marker_valid {false};
     int                             m_selection {-1};
     int                             m_btn_margin;
     int                             m_line_margin;

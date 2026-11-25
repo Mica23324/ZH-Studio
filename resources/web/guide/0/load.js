@@ -24,6 +24,10 @@ function HandleStudio( pVal )
 function JumpToTarget()
 {
 	var url = '../'+TargetPage+'/index.html';
-	if (TargetCustom) url += '?custom='+TargetCustom;
+	var sep = '?';
+	// Keep the app language on the next setup step.
+	var lang = GetQueryString('lang');
+	if (lang) { url += sep + 'lang=' + encodeURIComponent(lang); sep = '&'; }
+	if (TargetCustom) { url += sep + 'custom=' + TargetCustom; }
 	window.open(url,'_self');
 }

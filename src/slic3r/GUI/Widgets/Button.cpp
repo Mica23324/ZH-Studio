@@ -132,6 +132,7 @@ void Button::SetAllowShrink(bool allow)
 
 void Button::SetTextColor(StateColor const& color)
 {
+    if (text_color == color) return;
     text_color = color;
     state_handler.update_binds();
     Refresh();

@@ -2598,7 +2598,7 @@ void GLGizmoAdvancedCut::render_part_job_progress()
     const float bar_width     = std::max(content_width - percent_width - text_padding, 50.0f);
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImGuiWrapper::accent(1.00f));
     ImGui::BBLProgressBar2(float(percent) / 100.0f, ImVec2(bar_width, 0.0f));
     ImGui::PopStyleColor(1);
     ImGui::PopStyleVar();

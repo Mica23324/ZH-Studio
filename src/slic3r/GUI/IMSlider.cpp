@@ -24,11 +24,10 @@ static const float  GROOVE_WIDTH      = 12.0f;
 static const ImVec2 ONE_LAYER_MARGIN  = ImVec2(20.0f, 20.0f);
 static const ImVec2 ONE_LAYER_BUTTON_SIZE  = ImVec2(28.0f, 28.0f);
 
-static const ImU32 BACKGROUND_COLOR_DARK  = IM_COL32(65, 65, 71, 255);
+static const ImU32 BACKGROUND_COLOR_DARK  = IM_COL32(22, 34, 55, 255);
 static const ImU32 BACKGROUND_COLOR_LIGHT = IM_COL32(255, 255, 255, 255);
-static const ImU32 GROOVE_COLOR_DARK      = IM_COL32(45, 45, 49, 255);
+static const ImU32 GROOVE_COLOR_DARK      = IM_COL32(45, 65, 92, 255);
 static const ImU32 GROOVE_COLOR_LIGHT     = IM_COL32(206, 206, 206, 255);
-static const ImU32 BRAND_COLOR            = IM_COL32(0, 174, 66, 255);
 
 
 static int m_tick_value = -1;
@@ -525,7 +524,7 @@ bool IMSlider::horizontal_slider(const char* str_id, int* value, int v_min, int 
     const float  triangle_offsets[3] = {-3.5f * m_scale, 3.5f * m_scale, -6.06f * m_scale};
 
     const ImU32 white_bg = m_is_dark ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT;
-    const ImU32 handle_clr = BRAND_COLOR;
+    const ImU32 handle_clr = ImGui::ColorConvertFloat4ToU32(ImGuiWrapper::accent());
     const ImU32 handle_border_clr = m_is_dark ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT;
 
     // calculate groove size
@@ -889,7 +888,7 @@ bool IMSlider::vertical_slider(const char* str_id, int* higher_value, int* lower
     ImVec2 text_size;
 
     const ImU32 white_bg = m_is_dark ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT;
-    const ImU32 handle_clr = BRAND_COLOR;
+    const ImU32 handle_clr = ImGui::ColorConvertFloat4ToU32(ImGuiWrapper::accent());
     const ImU32 handle_border_clr = m_is_dark ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT;
     // calculate slider groove size
     const ImVec2 groove_start = ImVec2(pos.x + size.x - ONE_LAYER_MARGIN.x * m_scale - ONE_LAYER_BUTTON_SIZE.x * m_scale * 0.5f - GROOVE_WIDTH * m_scale * 0.5f, pos.y + text_dummy_height);
@@ -1089,7 +1088,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
     ImGui::PushStyleVar(ImGuiStyleVar_::ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_::ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Text, ImVec4(0, 0.682f, 0.259f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Text, ImGuiWrapper::accent());
 
     int windows_flag = ImGuiWindowFlags_NoTitleBar
                        | ImGuiWindowFlags_NoCollapse

@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "UxProgramTermsDialog.hpp"
 
 #include "slic3r/GUI/GUI_App.hpp"
@@ -61,7 +62,7 @@ UxProgramTermsDialog::UxProgramTermsDialog(wxWindow* parent)
 
         if (url.StartsWith("http://") || url.StartsWith("https://")) {
             evt.Veto();
-            wxLaunchDefaultBrowser(url);
+            Slic3r::GUI::zh_open_external_browser(url);
             return;
         }
         evt.Skip();

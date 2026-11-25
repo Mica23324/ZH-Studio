@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "FilamentGroupPopup.hpp"
 #include "GUI_App.hpp"
 #include "libslic3r/AppConfig.hpp"
@@ -18,7 +20,7 @@ namespace Slic3r { namespace GUI {
 static const wxColour LabelEnableColor = wxColour("#262E30");
 static const wxColour LabelDisableColor = wxColour("#ACACAC");
 static const wxColour GreyColor = wxColour("#6B6B6B");
-static const wxColour GreenColor = wxColour("#00AE42");
+static const wxColour GreenColor = ZHTheme::accent();
 static const wxColour BackGroundColor = wxColour("#FFFFFF");
 
 
@@ -79,7 +81,7 @@ static void set_prefered_map_mode(FilamentMapMode mode)
 bool play_dual_extruder_slice_video()
 {
     const wxString video_url = "https://e.bambulab.com/t?c=HDB24RlwSmt77YFH";
-    if (wxLaunchDefaultBrowser(video_url)) {
+    if (Slic3r::GUI::zh_open_external_browser(video_url)) {
         BOOST_LOG_TRIVIAL(info) << boost::format("Video is being played using the system's default browser.");
         return true;
     }
@@ -90,7 +92,7 @@ bool play_dual_extruder_slice_video()
 bool play_dual_extruder_print_tpu_video()
 {
     const wxString video_url = "https://e.bambulab.com/t?c=fwWqpBg37Liel92N";
-    if (wxLaunchDefaultBrowser(video_url)){
+    if (Slic3r::GUI::zh_open_external_browser(video_url)){
         BOOST_LOG_TRIVIAL(info) << boost::format("Print Tpu Video is being played using the system's default browser.");
         return true;
     }
@@ -101,7 +103,7 @@ bool play_dual_extruder_print_tpu_video()
 bool open_filament_group_wiki()
 {
     const wxString wiki_url = "https://e.bambulab.com/t?c=mOkvsXkJ9pldGYp9";
-    if (wxLaunchDefaultBrowser(wiki_url)) {
+    if (Slic3r::GUI::zh_open_external_browser(wiki_url)) {
         BOOST_LOG_TRIVIAL(info) << boost::format("Wiki is being displayed using the system's default browser.");
         return true;
     }

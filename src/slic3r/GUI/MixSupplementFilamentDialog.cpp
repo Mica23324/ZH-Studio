@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "MixSupplementFilamentDialog.hpp"
 
 #include "GUI.hpp"
@@ -138,12 +139,12 @@ void MixSupplementFilamentDialog::build_ui(const std::vector<Row>& rows, bool fa
 
     StateColor ok_bg(
         std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     StateColor ok_bd(
         std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     StateColor ok_text(std::pair<wxColour, int>(wxColour("#FFFFFE"), StateColor::Normal));
 
     m_btn_ok = new Button(this, _L("OK"));

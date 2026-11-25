@@ -361,6 +361,9 @@ public:
     static const ImVec4 COL_TITLE_BG;
     static const ImVec4 COL_WINDOW_BG;
     static const ImVec4 COL_WINDOW_BG_DARK;
+    // ZH-Studio: the active colour of the canvas overlays (gizmos, gcode slider,
+    // tooltips) follows the selected accent palette.
+    static ImVec4 accent(float alpha = 1.0f);
     static const ImVec4 COL_SEPARATOR;
     static const ImVec4 COL_SEPARATOR_DARK;
     static const ImVec4 COL_BAMBU;

@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "GUI_App.hpp"
 #include "CapsuleButton.hpp"
 #include <wx/dcbuffer.h>
@@ -10,10 +11,10 @@ static const wxColour BgNormalColor  = wxColour("#FFFFFF");
 static const wxColour BgSelectColor  = wxColour("#EBF9F0");
 
 static const wxColour TextNormalColor = wxColour("#000000");
-static const wxColour TextSelectColor = wxColour("#00AE42");
+static const wxColour TextSelectColor = ZHTheme::accent();
 
 static const wxColour BorderNormalColor   = wxColour("#CECECE");
-static const wxColour BorderSelectColor = wxColour("#00AE42");
+static const wxColour BorderSelectColor = ZHTheme::accent();
 
 CapsuleButton::CapsuleButton(wxWindow *parent, wxWindowID id, const wxString &label, bool selected) : wxPanel(parent, id)
 {

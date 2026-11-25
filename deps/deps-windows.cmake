@@ -1,5 +1,10 @@
 # https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html
 message(STATUS "MSVC_VERSION: ${MSVC_VERSION}")
+# ZH-Studio: allow building the deps with the portable MSVC toolchain and Ninja
+if (CMAKE_GENERATOR MATCHES "Ninja")
+    set(DEP_USE_NINJA ON)
+    message(STATUS "ZH-Studio deps: using Ninja generator with portable MSVC")
+endif ()
 if (MSVC_VERSION EQUAL 1800)
 # 1800      = VS 12.0 (v120 toolset)
     set(DEP_VS_VER "12")

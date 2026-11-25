@@ -3,8 +3,14 @@ project(libslic3r)
 
 include(PrecompiledHeader)
 
-string(TIMESTAMP COMPILE_TIME %Y%m%d-%H%M%S)
-set(SLIC3R_BUILD_TIME ${COMPILE_TIME})
+# A per-configure timestamp here changes libslic3r_version.h, which is part of
+# the precompiled header: every build then recompiles the whole library. Keep
+# one timestamp per build directory instead so incremental builds stay fast.
+if (NOT DEFINED ZH_BUILD_TIME)
+    string(TIMESTAMP ZH_BUILD_TIME %Y%m%d-%H%M%S)
+    set(ZH_BUILD_TIME "${ZH_BUILD_TIME}" CACHE STRING "Stable build timestamp" FORCE)
+endif()
+set(SLIC3R_BUILD_TIME "${ZH_BUILD_TIME}")
 
 if("${BBL_RELEASE_TO_PUBLIC}" STREQUAL "0")
 execute_process(

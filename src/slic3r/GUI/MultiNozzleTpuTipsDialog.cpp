@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "MultiNozzleTpuTipsDialog.hpp"
 
 #include <algorithm>
@@ -38,7 +40,7 @@ static const int          TIPS_LINE_GAP_DIP     = 2;
 
 static const wxColour TextPrimaryColor   = wxColour("#262E30");
 static const wxColour TextSecondaryColor = wxColour("#6B6B6B");
-static const wxColour BrandGreenColor    = wxColour("#00AE42");
+static const wxColour BrandGreenColor    = ZHTheme::accent();
 
 // One label per wrapped line, with a small gap, because wxStaticText has no line-spacing control.
 static void layout_tips_text(wxWindow *parent, wxBoxSizer *sizer, const wxString &text, int wrap_width)
@@ -152,8 +154,8 @@ MultiNozzleTpuTipsDialog::MultiNozzleTpuTipsDialog(wxWindow *parent)
     main_sizer->Add(check_sizer, 0, wxLEFT | wxRIGHT | wxTOP, padding);
 
     auto *btn_sizer = new wxBoxSizer(wxHORIZONTAL);
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour("#1B8844"), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour("#3DCB73"), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                             std::pair<wxColour, int>(BrandGreenColor, StateColor::Normal));
     m_guide_btn = new Button(this, _L("View User Guide"));
     m_guide_btn->SetBackgroundColor(btn_bg_green);
@@ -165,7 +167,7 @@ MultiNozzleTpuTipsDialog::MultiNozzleTpuTipsDialog(wxWindow *parent)
     m_guide_btn->SetCornerRadius(FromDIP(BUTTON_HEIGHT_DIP / 2));
     m_guide_btn->Bind(wxEVT_BUTTON, [](wxCommandEvent &) {
         if (!TPU_GUIDE_URL.empty())
-            wxLaunchDefaultBrowser(wxString::FromUTF8(TPU_GUIDE_URL));
+            Slic3r::GUI::zh_open_external_browser(wxString::FromUTF8(TPU_GUIDE_URL));
     });
     btn_sizer->Add(m_guide_btn, 0, wxALIGN_CENTER_VERTICAL);
 

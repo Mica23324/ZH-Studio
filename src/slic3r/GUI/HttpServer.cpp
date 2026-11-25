@@ -4,6 +4,7 @@
 #include "slic3r/Utils/NetworkAgent.hpp"
 #include <algorithm>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 namespace Slic3r {
 
@@ -183,6 +184,10 @@ HttpServer::HttpServer()
 
 void HttpServer::start()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "HTTP listener disabled in offline mode";
+        return;
+    }
     BOOST_LOG_TRIVIAL(info) << "start_http_service...";
     if (running_.exchange(true)) return;
 
@@ -411,13 +416,19 @@ void session::send_text_response(const std::string& text_data)
 
 static void refresh_agora_url(char const* device, char const* dev_ver, char const* channel, std::shared_ptr<session> sess)
 {
+    auto* agent = wxGetApp().getAgent();
+    if (NetworkPolicy::is_offline() || !agent) {
+        BOOST_LOG_TRIVIAL(info) << "refresh_token request rejected in offline mode or without a network agent";
+        sess->send_text_response(std::string());
+        return;
+    }
     std::string device2 = device;
     device2 += "|";
     device2 += dev_ver;
     device2 += "|\"agora\"|";
     device2 += channel;
 
-    wxGetApp().getAgent()->get_camera_url_for_golive(device2, wxGetApp().app_config->get("slicer_uuid") + "-golive",
+    agent->get_camera_url_for_golive(device2, wxGetApp().app_config->get("slicer_uuid") + "-golive",
         [sess](std::string url) {
         sess->send_text_response(url);
     });
@@ -476,6 +487,11 @@ void session::handle_refresh_token()
 
 void session::handle_request()
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "HTTP request rejected in offline mode";
+        do_write_404();
+        return;
+    }
     HttpReqType req_type = parse_request_type(req_);
     switch (req_type) {
     case HttpReqType::RefreshToken:
@@ -502,6 +518,12 @@ std::string TicketLoginTask::perform_sync(const std::string &ticket)
 
 void TicketLoginTask::perform_async(const std::string &ticket, std::function<void(std::string)> cb)
 {
+    if (NetworkPolicy::is_offline()) {
+        BOOST_LOG_TRIVIAL(info) << "third_party_login: rejected in offline mode";
+        if (cb)
+            cb(std::string());
+        return;
+    }
     boost::thread([cb = std::move(cb), ticket]() {
         auto login_info = do_request_login_info(ticket);
         auto result     = login_info ? *login_info : std::string();
@@ -520,6 +542,10 @@ std::optional<std::string> TicketLoginTask::do_request_login_info(const std::str
         NetworkAgent *agent = wxGetApp().getAgent();
         unsigned int  http_code;
         std::string   http_body;
+        if (NetworkPolicy::is_offline() || !agent) {
+            BOOST_LOG_TRIVIAL(info) << "third_party_login: unavailable in offline mode or without a network agent";
+            return std::nullopt;
+        }
         if (agent->get_my_token(ticket, &http_code, &http_body) < 0) {
             BOOST_LOG_TRIVIAL(info) << "third_party_login: get_my_token failed " << KV(log_key::http_code, http_code);
             return std::nullopt;

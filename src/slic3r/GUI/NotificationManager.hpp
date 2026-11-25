@@ -1,6 +1,7 @@
 #ifndef slic3r_GUI_NotificationManager_hpp_
 #define slic3r_GUI_NotificationManager_hpp_
 
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "GUI_App.hpp"
 #include "GLCanvasType.hpp"
 #include "Event.hpp"
@@ -1014,7 +1015,7 @@ private:
 			_u8L("The number of user presets cached in the cloud has exceeded the upper limit, newly created user presets can only be used locally."),
 			_u8L("Wiki for details"),
                          [](wxEvtHandler* evnthndlr) {
-				wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/software/bambu-studio/3rd-party-printer-profile#cloud-user-presets-limit");
+				Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/software/bambu-studio/3rd-party-printer-profile#cloud-user-presets-limit");
 				return false;
              }},
 

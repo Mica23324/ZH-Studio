@@ -132,6 +132,8 @@ void AppConfig::set_defaults()
 
         if (get("single_instance").empty())
             set_bool("single_instance", false);
+        if (get("offline_mode").empty())
+            set_bool("offline_mode", false);
         if (get("import_3mf_as_project").empty())
             set_bool("import_3mf_as_project", true);
         if (get("show_bed_heat_soak_area").empty())
@@ -271,8 +273,9 @@ void AppConfig::set_defaults()
 //#endif
 
 #ifdef SUPPORT_DARK_MODE
+    // ZH-Studio ships dark-first: a fresh workspace starts in dark mode.
     if (get("dark_color_mode").empty())
-        set("dark_color_mode", "0");
+        set("dark_color_mode", "1");
 #endif
 
 //#ifdef SUPPORT_SYS_MENU

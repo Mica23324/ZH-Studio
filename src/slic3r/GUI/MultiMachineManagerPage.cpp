@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "MultiMachineManagerPage.hpp"
 #include "GUI_App.hpp"
 #include "MainFrame.hpp"
@@ -178,7 +179,7 @@ void MultiMachineItem::doRender(wxDC& dc)
             DrawTextWithEllipsis(dc, get_state_device(), FromDIP(DEVICE_LEFT_PRO_INFO), left);
         }
         else if (state_device == 1) {
-            dc.SetTextForeground(wxColour(0,174,66));
+            dc.SetTextForeground(ZHTheme::accent());
             DrawTextWithEllipsis(dc, get_state_device(), FromDIP(DEVICE_LEFT_PRO_INFO), left);
         }
         else if (state_device == 2)
@@ -188,7 +189,7 @@ void MultiMachineItem::doRender(wxDC& dc)
         }
         else if (state_device > 2 && state_device < 7) {
             dc.SetFont(Label::Body_12);
-            dc.SetTextForeground(wxColour(0, 174, 66));
+            dc.SetTextForeground(ZHTheme::accent());
             if (obj_->get_curr_stage() == _L("Printing") && obj_->subtask_) {
                 //wxString layer_info = wxString::Format(_L("Layer: %d/%d"), obj_->curr_layer, obj_->total_layers);
                 wxString progress_info = wxString::Format("%d", obj_->subtask_->task_progress);
@@ -201,8 +202,8 @@ void MultiMachineItem::doRender(wxDC& dc)
                 dc.SetBrush(wxBrush(wxColour(233,233,233)));
                 dc.DrawRoundedRectangle(left, FromDIP(30), FromDIP(DEVICE_LEFT_PRO_INFO), FromDIP(10), 2);
 
-                dc.SetPen(wxPen(wxColour(0, 174, 66)));
-                dc.SetBrush(wxBrush(wxColour(0, 174, 66)));
+                dc.SetPen(wxPen(ZHTheme::accent()));
+                dc.SetBrush(wxBrush(ZHTheme::accent()));
                 dc.DrawRoundedRectangle(left, FromDIP(30), FromDIP(DEVICE_LEFT_PRO_INFO) * (static_cast<float>(obj_->subtask_->task_progress) / 100.0f), FromDIP(10), 2);
             }
             else {
@@ -228,7 +229,7 @@ void MultiMachineItem::doRender(wxDC& dc)
     }
 
     if (m_hover) {
-        dc.SetPen(wxPen(wxColour(0, 174, 66)));
+        dc.SetPen(wxPen(ZHTheme::accent()));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRoundedRectangle(0, 0, size.x, size.y, 3);
     }
@@ -271,7 +272,7 @@ MultiMachineManagerPage::MultiMachineManagerPage(wxWindow* parent)
 #ifdef __WINDOWS__
     SetDoubleBuffered(true);
 #endif //__WINDOWS__
-    SetBackgroundColour(wxColour(0xEEEEEE));
+    SetBackgroundColour(wxColour("#EEEEEE"));
     m_main_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
     m_main_panel->SetBackgroundColour(*wxWHITE);
     m_main_sizer = new wxBoxSizer(wxVERTICAL);
@@ -283,9 +284,9 @@ MultiMachineManagerPage::MultiMachineManagerPage(wxWindow* parent)
 
     //edit prints
     auto m_btn_bg_enable = StateColor(
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal)
+        std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal)
     );
 
 

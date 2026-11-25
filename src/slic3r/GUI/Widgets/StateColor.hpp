@@ -2,6 +2,7 @@
 #define slic3r_GUI_StateColor_hpp_
 
 #include <wx/colour.h>
+#include "../ZHTheme.hpp"
 
 #include <map>
 
@@ -13,10 +14,10 @@
 namespace ThemeColor {
 
 // Brand
-inline const wxColour BrandGreen{"#00AE42"};        // primary accent — buttons, selected borders, focus rings
-inline const wxColour BrandGreenHovered{"#3DCB73"}; // BrandGreen button hover state (== rgb 61,203,115)
-inline const wxColour BrandGreenPressed{"#1B8844"}; // BrandGreen button pressed state (== rgb 27,136,68)
-inline const wxColour LightGreen{"#EDFAF2"};        // Light green success/tint background
+inline const wxColour BrandGreen{"#0EA5E9"};        // primary accent — buttons, selected borders, focus rings
+inline const wxColour BrandGreenHovered{"#38BDF8"}; // BrandGreen button hover state (== rgb 61,203,115)
+inline const wxColour BrandGreenPressed{"#0284C7"}; // BrandGreen button pressed state (== rgb 27,136,68)
+inline const wxColour LightGreen{"#E0F2FE"};        // Light green success/tint background
 
 // Feedback / status — pre-declared because their meaning is obvious.
 inline const wxColour Warning{"#FF6F00"}; // attention / needs-action — orange. 14+ raw-hex consumers.

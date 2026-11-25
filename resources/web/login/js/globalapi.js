@@ -273,7 +273,8 @@ function SendWXMessage( strMsg )
 	
 	if(bCheck!=null)
 	{
-		window.wx.postMessage(strMsg);
+		if(window.wx && typeof window.wx.postMessage==='function')
+			window.wx.postMessage(strMsg);
 	}
 }
 

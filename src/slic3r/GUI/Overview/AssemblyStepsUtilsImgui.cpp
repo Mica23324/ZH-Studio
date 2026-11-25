@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "AssemblyStepsUtils.hpp"
 #include "AssemblyStepsUtilsInternal.hpp"
 #include "AssemblyPdfExportDialog.hpp"
@@ -1043,10 +1044,10 @@ void AssemblyStepsUtils::render_assemble_play_bar(float canvas_w, float bottom_y
         ImGui::PushStyleColor(ImGuiCol_Text, text_col);
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
         ImGui::PushStyleColor(ImGuiCol_PopupBg, popup_bg);
-        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 0.50f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::accent(1.00f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent(0.50f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::accent(1.00f));
         // Arrow button must share the same dark mask as the text frame (not transparent).
         ImGui::PushStyleColor(ImGuiCol_Button, frame_bg);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, frame_hover);
@@ -3468,7 +3469,7 @@ void AssemblyStepsUtils::render_assembly_structure_panel(float canvas_w, float c
             ImGui::PushID("##asp_help");
             ImGui::InvisibleButton("##h", ImVec2(icon_sz_hdr, icon_sz_hdr));
             if (ImGui::IsItemClicked(0)) {
-                wxLaunchDefaultBrowser("https://e.bambulab.com/t?c=T0HuraoU2gH6ufRk");
+                Slic3r::GUI::zh_open_external_browser("https://e.bambulab.com/t?c=T0HuraoU2gH6ufRk");
             }
             if (ImGui::IsItemHovered()) {
                 dl->AddRectFilled(help_min, help_max, IM_COL32(38, 46, 48, 18), 3.0f * sc);

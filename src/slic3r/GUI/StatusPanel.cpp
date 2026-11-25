@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "StatusPanel.hpp"
 
 #include <algorithm>
@@ -111,7 +113,7 @@ static const wxColour STATIC_BOX_LINE_COL = wxColour(238, 238, 238);
 static const wxColour BUTTON_NORMAL1_COL = wxColour(238, 238, 238);
 static const wxColour BUTTON_NORMAL2_COL = wxColour(206, 206, 206);
 static const wxColour BUTTON_PRESS_COL   = wxColour(172, 172, 172);
-static const wxColour BUTTON_HOVER_COL   = wxColour(0, 174, 66);
+static const wxColour BUTTON_HOVER_COL   = ZHTheme::accent();
 
 static const wxColour DISCONNECT_TEXT_COL = wxColour(171, 172, 172);
 static const wxColour NORMAL_TEXT_COL     = wxColour(48, 58, 60);
@@ -624,7 +626,7 @@ static void market_model_scoring_page(int design_id)
         boost::algorithm::replace_first(url, std::to_string(design_id), "");
         url = sub_url + url;
         try {
-            if (!url.empty()) { wxLaunchDefaultBrowser(url); }
+            if (!url.empty()) { Slic3r::GUI::zh_open_external_browser(url); }
         } catch (...) {
             BOOST_LOG_TRIVIAL(warning) << current_exception_message();
             return;
@@ -1147,12 +1149,12 @@ void PrintingTaskPanel::create_panel(wxWindow *parent)
     m_staticText_progress_percent = new wxStaticText(penel_text, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize, 0);
     m_staticText_progress_percent->SetFont(::Label::Head_18);
     m_staticText_progress_percent->SetMaxSize(wxSize(-1, FromDIP(20)));
-    m_staticText_progress_percent->SetForegroundColour(wxColour(0, 174, 66));
+    m_staticText_progress_percent->SetForegroundColour(ZHTheme::accent());
 
     m_staticText_progress_percent_icon = new wxStaticText(penel_text, wxID_ANY, "%", wxDefaultPosition, wxDefaultSize, 0);
     m_staticText_progress_percent_icon->SetFont(::Label::Body_11);
     m_staticText_progress_percent_icon->SetMaxSize(wxSize(-1, FromDIP(13)));
-    m_staticText_progress_percent_icon->SetForegroundColour(wxColour(0, 174, 66));
+    m_staticText_progress_percent_icon->SetForegroundColour(ZHTheme::accent());
 
     sizer_percent->Add(m_staticText_progress_percent, 0, 0, 0);
 
@@ -1386,8 +1388,8 @@ void PrintingTaskPanel::create_panel(wxWindow *parent)
     m_request_failed_info->SetForegroundColour(*wxRED);
     m_request_failed_info->SetFont(::Label::Body_10);
     static_request_failed_panel_sizer->Add(m_request_failed_info, 0, wxEXPAND | wxALL, FromDIP(10));
-    StateColor btn_bg_green(std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
     StateColor btn_bd_green(std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Enabled));
     m_button_market_retry = new Button(m_request_failed_panel, _L("Retry"));
     m_button_market_retry->SetBackgroundColor(btn_bg_green);
@@ -2062,7 +2064,7 @@ StatusBasePanel::StatusBasePanel(wxWindow *parent, wxWindowID id, const wxPoint 
 
 static const char* MONITOR_CTRL_AGE_REQUIREMENTS_URL = "https://portal-qa.bambulab.net/zh/policies/page/age-requirements-for-bambulab-account";
 static const char* MONITOR_CTRL_PRIVACY_NOTICE_URL    = "https://bambulab.com/en/policies/privacy";
-static const char* MONITOR_CTRL_LINK_COLOR = "#00AE42";
+static const char* MONITOR_CTRL_LINK_COLOR = "#0EA5E9";
 
 class CtrlAreaMaskOverlay : public wxFrame
 {
@@ -2149,7 +2151,7 @@ public:
         m_html = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER);
         m_html->SetBorders(0);
         m_html->Bind(wxEVT_HTML_LINK_CLICKED, [](wxHtmlLinkEvent &event) {
-            wxLaunchDefaultBrowser(event.GetLinkInfo().GetHref());
+            Slic3r::GUI::zh_open_external_browser(event.GetLinkInfo().GetHref());
         });
         root->Add(m_html, 1, wxEXPAND | wxALL, FromDIP(12));
 
@@ -2574,8 +2576,8 @@ wxBoxSizer *StatusBasePanel::create_machine_control_page(wxWindow *parent)
     // m_staticText_control->SetFont(PAGE_TITLE_FONT);
     m_staticText_control->SetForegroundColour(PAGE_TITLE_FONT_COL);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
     StateColor btn_bd_green(std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Enabled));
 
     m_parts_btn = new Button(m_panel_control_title, _L("Printer Parts"));
@@ -3014,7 +3016,7 @@ wxBoxSizer *StatusBasePanel::create_misc_control(wxWindow *parent)
     m_switch_fan->UseTextFan();
     m_switch_fan->SetTextColor(StateColor(std::make_pair(DISCONNECT_TEXT_COL, (int) StateColor::Disabled), std::make_pair(NORMAL_FAN_TEXT_COL, (int) StateColor::Normal)));
 
-    m_switch_fan->Bind(wxEVT_ENTER_WINDOW, [this](auto &e) { m_fan_panel->SetBackgroundColor(wxColour(0, 174, 66)); });
+    m_switch_fan->Bind(wxEVT_ENTER_WINDOW, [this](auto &e) { m_fan_panel->SetBackgroundColor(ZHTheme::accent()); });
 
     m_switch_fan->Bind(wxEVT_LEAVE_WINDOW, [this, parent](auto &e) { m_fan_panel->SetBackgroundColor(parent->GetBackgroundColour()); });
 
@@ -3270,7 +3272,7 @@ wxBoxSizer *StatusBasePanel::create_filament_group(wxWindow *parent)
 
     auto m_title_filament_loading = new Label(m_scale_panel, _L("Filament loading..."));
     m_title_filament_loading->SetBackgroundColour(*wxWHITE);
-    m_title_filament_loading->SetForegroundColour(wxColour(27, 136, 68));
+    m_title_filament_loading->SetForegroundColour(ZHTheme::down());
     m_title_filament_loading->SetFont(::Label::Body_14);
 
     m_img_filament_loading = new wxStaticBitmap(m_scale_panel, wxID_ANY, create_scaled_bitmap("filament_load_fold", this, 24), wxDefaultPosition,
@@ -6467,7 +6469,7 @@ void StatusPanel::on_ams_guide(wxCommandEvent &event)
         ams_wiki_url = "https://wiki.bambulab.com/en/software/bambu-studio/use-ams-on-bambu-studio";
     }
 
-    wxLaunchDefaultBrowser(ams_wiki_url);
+    Slic3r::GUI::zh_open_external_browser(ams_wiki_url);
 }
 
 void StatusPanel::on_ams_retry(wxCommandEvent &event)
@@ -7758,7 +7760,7 @@ wxBoxSizer *ScoreDialog::get_button_sizer()
     wxBoxSizer *bSizer_button = new wxBoxSizer(wxHORIZONTAL);
     bSizer_button->Add(0, 0, 1, wxEXPAND, 0);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                             std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
     m_button_ok = new Button(this, _L("Submit"));
@@ -8057,8 +8059,8 @@ void RectTextPanel::OnPaint(wxPaintEvent &event)
     const auto &size = GetSize();
 
     wxPaintDC dc(this);
-    dc.SetBrush(wxBrush(wxColour("#00AE42")));
-    dc.SetPen(wxPen(wxColour("#00AE42")));
+    dc.SetBrush(wxBrush(ZHTheme::accent()));
+    dc.SetPen(wxPen(ZHTheme::accent()));
     dc.DrawRoundedRectangle(size, FromDIP(4));
     dc.SetTextForeground(wxColour(255, 255, 255));
     dc.DrawText(text, wxPoint(FromDIP(2), FromDIP(2)));

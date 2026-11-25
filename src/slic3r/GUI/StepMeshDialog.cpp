@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "StepMeshDialog.hpp"
 
 #include <thread>
@@ -125,10 +127,10 @@ StepMeshDialog::StepMeshDialog(wxWindow* parent, Slic3r::Step& file, double line
     wxStaticText *tips = new wxStaticText(this, wxID_ANY, _L("View Wiki for more information"));
     wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
     font.SetUnderlined(true);
-    tips->SetForegroundColour(StateColor::darkModeColorFor(wxColour(0, 174, 66)));
+    tips->SetForegroundColour(StateColor::darkModeColorFor(ZHTheme::accent()));
     tips->SetFont(font);
     tips->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& e) {
-        wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/software/bambu-studio/step");
+        Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/software/bambu-studio/step");
     });
     info->Wrap(FromDIP(400));
     tips_sizer->Add(info, 0, wxALIGN_LEFT);
@@ -267,8 +269,8 @@ StepMeshDialog::StepMeshDialog(wxWindow* parent, Slic3r::Step& file, double line
     bSizer_button->Add(m_checkbox, 0, wxALIGN_LEFT);
     bSizer_button->AddStretchSpacer(1);
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0x90, 0x90, 0x90), StateColor::Disabled),
-                            std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+                            std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                             std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
     StateColor btn_bd_ok(std::pair<wxColour, int>(wxColour(0x90, 0x90, 0x90), StateColor::Disabled),
                          std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));

@@ -20,6 +20,7 @@
 #include "ParamTooltip.hpp"
 #include "MsgDialog.hpp"
 #include "BitmapComboBox.hpp"
+#include "ZHStyle.hpp"
 
 // BBS
 #include "Notebook.hpp"
@@ -526,6 +527,23 @@ private:
 using MultilineTextCtrl = wxTextCtrl;
 #endif
 
+namespace {
+void zh_style_option_field(wxWindow* window)
+{
+    if (auto* box = dynamic_cast<StaticBox*>(window)) {
+        const bool dark = wxGetApp().dark_mode();
+        box->SetCornerRadius(box->FromDIP(6));
+        box->SetBackgroundColour(StaticBox::GetParentBackgroundColor(box->GetParent()));
+        box->SetBorderColorNormal(ZHStyle::outline(dark));
+        box->SetBackgroundColorNormal(ZHStyle::raised(dark));
+        if (auto* input = dynamic_cast<TextInput*>(box))
+            input->GetTextCtrl()->SetBackgroundColour(ZHStyle::raised(dark));
+    }
+    for (wxWindow* child : window->GetChildren())
+        zh_style_option_field(child);
+}
+} // namespace
+
 template<typename T>
 struct Builder
 {
@@ -688,6 +706,7 @@ void TextCtrl::BUILD() {
 
     temp->SetForegroundColour(StateColor::darkModeColorFor(*wxBLACK));
 	wxGetApp().UpdateDarkUI(temp);
+    zh_style_option_field(temp);
 
     if (! m_opt.multiline && !wxOSX)
 		// Only disable background refresh for single line input fields, as they are completely painted over by the edit control.
@@ -1039,6 +1058,8 @@ void SpinCtrl::BUILD() {
 	// temp->SetFont(Slic3r::GUI::wxGetApp().normal_font()); // BBS
     if (!wxOSX) temp->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	wxGetApp().UpdateDarkUI(temp);
+    zh_style_option_field(temp);
+    temp->GetTextCtrl()->SetBackgroundColour(ZHStyle::raised(wxGetApp().dark_mode()));
 
     if (m_opt.height < 0 && parent_is_custom_ctrl)
         opt_height = (double)temp->GetTextCtrl()->GetSize().GetHeight() / m_em_unit;
@@ -1227,6 +1248,7 @@ void Choice::BUILD()
         temp = builder2.build(m_parent, wxID_ANY, wxString(""), wxDefaultPosition, size, 0, nullptr, wxCB_READONLY);
 #endif //__WXOSX__
     }
+    zh_style_option_field(temp);
     temp->SetSize(size);
     temp->Clear();
     temp->GetDropDown().SetUseContentWidth(true);

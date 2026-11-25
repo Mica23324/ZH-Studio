@@ -32,6 +32,7 @@
 #include "slic3r/Utils/PresetUpdater.hpp"
 
 #include <nlohmann/json.hpp>
+#include <memory>
 
 namespace Slic3r { namespace GUI {
 
@@ -116,6 +117,9 @@ private:
     //First Load
     bool bFirstComplete{false};
     std::atomic_bool m_destroy{false};
+    // Shared with queued GUI callbacks. The worker cannot keep a wxWeakRef alive
+    // safely because wxWidgets tracker lists are not thread-safe.
+    std::shared_ptr<std::atomic_bool> m_callback_alive{std::make_shared<std::atomic_bool>(true)};
     boost::thread* m_load_task{ nullptr };
 
     // User Config

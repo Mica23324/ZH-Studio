@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' file:; style-src 'self' 'unsafe-inline' file:; img-src 'self' file: data: blob: https: http:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
 <meta http-equiv="Cache-Control" content="max-age=7200" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0,user-scalable=no">
-<title>homepage</title>
+<title>ZH-Studio Alpha · Navigation</title>
 <link rel="stylesheet" type="text/css" href="./css/common.css" />
 <link rel="stylesheet" type="text/css" href="./css/left.css" />
 <link rel="stylesheet" type="text/css" href="./css/left_mini.css" media="screen and (max-width: 168px)" />
@@ -21,9 +21,12 @@
 <script type="text/javascript" src="../data/text.js"></script>		
 	
 <script type="text/javascript" src="js/left.js"></script>
+<link rel="stylesheet" href="css/zh-studio.css" />
+<script src="js/zh-studio.js"></script>
 </head>
-<body class="ZScrol" onLoad="OnInit()">
+<body class="ZScrol zh-left" onLoad="OnInit()">
 <div id="LeftBoard">
+    <div id="zh-left-brand"><img src="../../images/ZH-Studio.svg" alt="ZH" /><div><strong>ZH-Studio</strong><small>ALPHA / STUDIO</small></div><button type="button" class="zh-langtoggle" data-zh-langtoggle aria-label="Switch language / Sprache wechseln">EN</button></div>
 	<div id="LoginArea">
 	<div id="ServerConnectFailTip">
 		<div id="ServerConnectFailText" class="trans" tid="t172">Unable to connect to the device server. Please check your network and firewall.</div>

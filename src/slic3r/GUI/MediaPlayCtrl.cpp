@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "MediaPlayCtrl.h"
 #include "Widgets/Button.hpp"
 #include "Widgets/CheckBox.hpp"
@@ -245,7 +246,7 @@ MediaPlayCtrl::MediaPlayCtrl(wxWindow *parent, wxMediaCtrl3 *media_ctrl, const w
 
     m_label_status->Bind(wxEVT_LEFT_UP, [this](auto &e) {
         auto url = wxString::Format(L"https://wiki.bambulab.com/%s/software/bambu-studio/faq/live-view", wxGetApp().current_language_code_safe() == "zh_CN" ? "zh" : "en");
-        wxLaunchDefaultBrowser(url);
+        Slic3r::GUI::zh_open_external_browser(url);
     });
 
     Bind(wxEVT_RIGHT_UP, [this](auto & e) {

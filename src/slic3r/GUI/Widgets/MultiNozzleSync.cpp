@@ -1,3 +1,4 @@
+#include "../ZHTheme.hpp"
 #include "MultiNozzleSync.hpp"
 #include "../GUI_App.hpp"
 #include "../Plater.hpp"
@@ -150,8 +151,8 @@ ManualNozzleCountDialog::ManualNozzleCountDialog(wxWindow *parent, NozzleVolumeT
     content_sizer->Add(nozzle_icon, 0, wxALL | wxALIGN_CENTER_VERTICAL, FromDIP(15));
     content_sizer->Add(choice_sizer, 0, wxALIGN_CENTRE_VERTICAL);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered), std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered), std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     m_confirm_btn = new Button(this, _L("Confirm"));
     m_confirm_btn->SetBackgroundColor(btn_bg_green);
@@ -451,7 +452,7 @@ void HotEndTable::MarkRelatedItems(const NozzleOption& option)
     );
 
     const static StateColor bd_green(
-        std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Normal)
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal)
     );
     auto filtered_nozzles = FilterHotEnds(option);
     for (auto nozzle_id : filtered_nozzles) {
@@ -799,9 +800,9 @@ Slic3r::GUI::MultiNozzleSyncDialog::MultiNozzleSyncDialog(wxWindow* parent,std::
 
     StateColor btn_bg_green(
         std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal)
+        std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal)
     );
 
     StateColor btn_text_green(

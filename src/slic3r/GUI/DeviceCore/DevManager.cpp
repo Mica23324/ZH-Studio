@@ -24,6 +24,7 @@
 
 #include <boost/thread.hpp>
 #include "libslic3r/Log.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 using namespace nlohmann;
 
@@ -65,16 +66,28 @@ namespace Slic3r
 
     void DeviceManager::EnableMultiMachine(bool enable)
     {
-        m_agent->enable_multi_machine(enable);
+        if (NetworkPolicy::is_offline())
+            return;
+        if (m_agent)
+            m_agent->enable_multi_machine(enable);
         m_enable_mutil_machine = enable;
     }
 
-    void DeviceManager::start_refresher() { m_refresher->Start(); }
-    void DeviceManager::stop_refresher() { m_refresher->Stop(); }
+    void DeviceManager::start_refresher()
+    {
+        if (NetworkPolicy::is_offline()) {
+            if (m_refresher) m_refresher->Stop();
+            return;
+        }
+        if (m_refresher) m_refresher->Start();
+    }
+    void DeviceManager::stop_refresher() { if (m_refresher) m_refresher->Stop(); }
 
 
     void DeviceManager::keep_alive()
     {
+        if (NetworkPolicy::is_offline())
+            return;
         MachineObject* obj = this->get_selected_machine();
         if (obj)
         {
@@ -102,13 +115,17 @@ namespace Slic3r
 
     void DeviceManager::check_pushing()
     {
+        if (NetworkPolicy::is_offline())
+            return;
         keep_alive();
         MachineObject* obj = this->get_selected_machine();
+        if (!obj)
+            return;
 
         std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
         auto internal = std::chrono::duration_cast<std::chrono::milliseconds>(start - obj->last_update_time);
 
-        if (obj && !obj->is_support_mqtt_alive)
+        if (!obj->is_support_mqtt_alive)
         {
             if (internal.count() > TIMEOUT_FOR_STRAT && internal.count() < 1000 * 60 * 60 * 300)
             {
@@ -120,6 +137,10 @@ namespace Slic3r
 
     void DeviceManager::on_machine_alive(std::string json_str)
     {
+        if (NetworkPolicy::is_offline()) {
+            BOOST_LOG_TRIVIAL(info) << "Ignoring discovered printer in offline mode";
+            return;
+        }
         try {
             json j = json::parse(json_str);
             std::string dev_name        = j["dev_name"].get<std::string>();
@@ -370,7 +391,7 @@ namespace Slic3r
 
     void DeviceManager::restore_local_machines_from_user_access_config()
     {
-        if (!m_agent || !GUI::wxGetApp().app_config) return;
+        if (!GUI::wxGetApp().app_config || (!NetworkPolicy::is_offline() && !m_agent)) return;
 
         AppConfig* config = GUI::wxGetApp().app_config;
         if (!config->has_section("user_access_code") || !config->has_section("user_access_dev_ip")) return;
@@ -403,6 +424,25 @@ namespace Slic3r
         }
 
         if (local_access_infos.empty()) return;
+
+        if (NetworkPolicy::is_offline()) {
+            BOOST_LOG_TRIVIAL(info) << "Restoring remembered printers from local configuration without probing";
+            GUI::wxGetApp().CallAfter([local_access_infos]() {
+                if (GUI::wxGetApp().is_closing()) return;
+                DeviceManager* dev = GUI::wxGetApp().getDeviceManager();
+                if (!dev) return;
+                for (const auto& info : local_access_infos) {
+                    if (dev->get_local_machine(info.dev_id)) continue;
+                    auto obj = dev->insert_local_device(info.dev_id, info.dev_id, info.dev_ip, "lan", "free", "",
+                                                        info.access_code, DevPrinterConfigUtil::get_model_id_by_dev_id(info.dev_id));
+                    if (obj) {
+                        obj->set_user_access_code(info.access_code);
+                        obj->m_is_online = false;
+                    }
+                }
+            });
+            return;
+        }
 
         NetworkAgent* agent = m_agent;
         boost::thread([agent, local_access_infos] {
@@ -469,6 +509,10 @@ namespace Slic3r
 
     int DeviceManager::query_bind_status(std::string& msg)
     {
+        if (NetworkPolicy::is_offline()) {
+            msg = "Printer binding is unavailable in offline mode";
+            return -1;
+        }
         if (!m_agent)
         {
             msg = "";
@@ -526,7 +570,7 @@ namespace Slic3r
 
     MachineObject* DeviceManager::get_user_machine(std::string dev_id)
     {
-        if (!m_agent || !m_agent->is_user_login())
+        if (NetworkPolicy::is_offline() || !m_agent || !m_agent->is_user_login())
         {
             return nullptr;
         }
@@ -573,11 +617,16 @@ namespace Slic3r
     {
         BOOST_LOG_TRIVIAL(info) << "set_selected_machine= " << KV(log_key::dev_id, dev_id) << "cur_selected= "
                                 << KV(log_key::dev_id, selected_machine);
+        if (NetworkPolicy::is_offline() && !dev_id.empty()) {
+            BOOST_LOG_TRIVIAL(warning) << "Printer selection rejected in offline mode";
+            GUI::wxGetApp().show_dialog(_L("Printer connections are unavailable in offline mode."));
+            return false;
+        }
         auto my_machine_list = get_my_machine_list();
         auto it = my_machine_list.find(dev_id);
 
         // Check the dev_id is in my_machine_list
-        if (!dev_id.empty() && it == my_machine_list.end()) {
+        if (!dev_id.empty() && (it == my_machine_list.end() || !it->second)) {
             BOOST_LOG_TRIVIAL(error) << KV(log_key::dev_id, dev_id) << "not in my_machine_list";
 
             static std::unordered_set<std::string> s_unknown_devs;
@@ -591,14 +640,14 @@ namespace Slic3r
 
         // disconnect last if dev_id difference from previous one
         auto last_selected = my_machine_list.find(selected_machine);
-        if (last_selected != my_machine_list.end() && selected_machine != dev_id)
+        if (last_selected != my_machine_list.end() && last_selected->second && selected_machine != dev_id)
         {
             if (last_selected->second->connection_type() == "lan")
             {
-                m_agent->disconnect_printer();
+                if (m_agent) m_agent->disconnect_printer();
             }
             else if (last_selected->second->connection_type() == "cloud") {
-                m_agent->set_user_selected_machine("");
+                if (m_agent) m_agent->set_user_selected_machine("");
             }
         }
 
@@ -696,6 +745,7 @@ namespace Slic3r
 
     void DeviceManager::add_user_subscribe()
     {
+        if (NetworkPolicy::is_offline() || !m_agent) return;
         /* user machine */
         std::vector<std::string> dev_list;
         for (auto it = userMachineList.begin(); it != userMachineList.end(); it++)
@@ -709,6 +759,7 @@ namespace Slic3r
 
     void DeviceManager::del_user_subscribe()
     {
+        if (NetworkPolicy::is_offline() || !m_agent) return;
         /* user machine */
         std::vector<std::string> dev_list;
         for (auto it = userMachineList.begin(); it != userMachineList.end(); it++)
@@ -721,6 +772,7 @@ namespace Slic3r
 
     void DeviceManager::subscribe_device_list(std::vector<std::string> dev_list)
     {
+        if (NetworkPolicy::is_offline() || !m_agent) return;
         std::vector<std::string> unsub_list;
         subscribe_list_cache.clear();
         for (auto& it : subscribe_list_cache)
@@ -800,6 +852,10 @@ namespace Slic3r
     void DeviceManager::modify_device_name(std::string dev_id, std::string dev_name)
     {
         BOOST_LOG_TRIVIAL(trace);
+        if (NetworkPolicy::is_offline()) {
+            GUI::wxGetApp().show_dialog(_L("Printer changes are unavailable in offline mode."));
+            return;
+        }
         if (m_agent)
         {
             int result = m_agent->modify_printer_name(dev_id, dev_name);
@@ -935,7 +991,7 @@ namespace Slic3r
 
     void DeviceManager::update_user_machine_list_info(std::function<void(bool)> on_completed)
     {
-        if (!m_agent || !m_agent->is_user_login()) {
+        if (NetworkPolicy::is_offline() || !m_agent || !m_agent->is_user_login()) {
             if (on_completed) {
                 Slic3r::GUI::wxGetApp().CallAfter([on_completed]() { on_completed(false); });
             }
@@ -972,7 +1028,7 @@ namespace Slic3r
             if (!user_last_machine.empty()) {
                 return  user_last_machine;
             } else {
-                return m_agent->get_user_selected_machine();
+                return m_agent ? m_agent->get_user_selected_machine() : std::string();
             }
         }
 
@@ -981,6 +1037,7 @@ namespace Slic3r
 
     void DeviceManager::load_last_machine()
     {
+        if (NetworkPolicy::is_offline()) return;
         const auto my_machine_list = get_my_machine_list();
         if (my_machine_list.empty()) return;
 
@@ -1046,7 +1103,7 @@ namespace Slic3r
 
     void DeviceManagerRefresher::on_timer(wxTimerEvent& event)
     {
-        if (!m_manager) { return; }
+        if (!m_manager || NetworkPolicy::is_offline()) { return; }
 
         NetworkAgent* agent = m_manager->get_agent();
         if (!agent) { return; }

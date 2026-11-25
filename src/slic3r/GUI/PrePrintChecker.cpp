@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "PrePrintChecker.hpp"
 
 #include "MainFrame.hpp"
@@ -51,7 +53,7 @@ public:
         });
         Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& event) {
             if (hit_link(event.GetPosition()))
-                wxLaunchDefaultBrowser(m_url);
+                Slic3r::GUI::zh_open_external_browser(m_url);
         });
     }
 
@@ -544,7 +546,7 @@ static Label* s_create_btn_label(PrinterMsgPanel* panel, const wxString& btn_nam
     font.SetUnderlined(true);
     btn->SetFont(font);
     btn->SetBackgroundColour(*wxWHITE);
-    btn->SetForegroundColour(wxColour("#00AE42"));
+    btn->SetForegroundColour(ZHTheme::accent());
 
     btn->Bind(wxEVT_ENTER_WINDOW, [panel](auto &e) { panel->SetCursor(wxCURSOR_HAND); });
     btn->Bind(wxEVT_LEAVE_WINDOW, [panel](auto &e) { panel->SetCursor(wxCURSOR_ARROW); });
@@ -579,7 +581,7 @@ void PrinterMsgPanel::AppendStyles(const prePrintInfo& info)
         if (info.testStyle(prePrintInfoStyle::BtnInstallFanF000)) {
             auto btn = s_create_btn_label(this, _L("How to install"));
             btn->Bind(wxEVT_LEFT_DOWN, [this, info](auto& e) {
-                wxLaunchDefaultBrowser("https://e.bambulab.com/t?c=l3T7caKGeNt3omA9");
+                Slic3r::GUI::zh_open_external_browser("https://e.bambulab.com/t?c=l3T7caKGeNt3omA9");
             });
 
             btn_sizer->Add(btn, 0, wxLEFT, FromDIP(16));

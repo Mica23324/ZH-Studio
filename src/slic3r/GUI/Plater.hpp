@@ -140,6 +140,7 @@ const wxString DEFAULT_PROJECT_NAME = "Untitled";
 
 class Sidebar : public wxPanel
 {
+    void apply_layout_theme(bool dark);
     ConfigOptionMode    m_mode;
     Button *         btn_sync{nullptr};
     ScalableButton *  ams_btn{nullptr};

@@ -3,6 +3,7 @@
 
 #include "bambu_networking.hpp"
 #include "libslic3r/ProjectTask.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 using namespace BBL;
 
@@ -273,7 +274,7 @@ public:
     int get_oss_config(std::string &config, std::string country_code, unsigned int &http_code, std::string &http_error);
     int put_rating_picture_oss(std::string &config, std::string &pic_oss_path, std::string model_id, int profile_id, unsigned int &http_code, std::string &http_error);
     int get_model_mall_rating_result(int job_id, std::string &rating_result, unsigned int &http_code, std::string &http_error);
-    bool get_track_enable() { return enable_track; }
+    bool get_track_enable() { return !NetworkPolicy::is_offline() && enable_track; }
 
     int get_mw_user_preference(std::function<void(std::string)> callback);
     int get_mw_user_4ulist(int seed, int limit, std::function<void(std::string)> callback);
@@ -285,7 +286,7 @@ public:
     int post_device_region(DeviceRegionParams params, std::string* http_body);
     int get_minors_decisions(const std::vector<std::string>& scene_codes, std::vector<MinorsDecisionResult>* decisions);
     int get_child_registration_key(std::string* http_body);
-    void *get_network_agent() { return network_agent; }
+    void *get_network_agent() { return NetworkPolicy::is_offline() ? nullptr : network_agent; }
 
 private:
     bool enable_track = false;

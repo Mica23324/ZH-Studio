@@ -2,6 +2,7 @@
 #include "GLCanvas3D.hpp"
 #include "Plater.hpp"
 #include "GCodeViewer.hpp"
+#include "ZHMotion.hpp"
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
@@ -71,6 +72,7 @@ bool NotificationManager::SlicingProgressNotification::set_progress_state(Notifi
 	case Slic3r::GUI::NotificationManager::SlicingProgressNotification::SlicingProgressState::SP_NO_SLICING:
         m_state = EState::Hidden;
         set_percentage(-1);
+        m_displayed_percentage = 0.f;
         m_has_print_info = false;
         set_export_possible(false);
         m_sp_state             = state;
@@ -78,6 +80,8 @@ bool NotificationManager::SlicingProgressNotification::set_progress_state(Notifi
 	case Slic3r::GUI::NotificationManager::SlicingProgressNotification::SlicingProgressState::SP_BEGAN:
 		m_state = EState::Hidden;
 		set_percentage(-1);
+		m_displayed_percentage = 0.f;
+		m_progress_tick = std::chrono::steady_clock::now();
 		m_has_print_info = false;
 		set_export_possible(false);
 		m_sp_state = state;
@@ -86,6 +90,8 @@ bool NotificationManager::SlicingProgressNotification::set_progress_state(Notifi
 	case Slic3r::GUI::NotificationManager::SlicingProgressNotification::SlicingProgressState::SP_PROGRESS:
 		if ((m_sp_state != SlicingProgressState::SP_BEGAN && m_sp_state != SlicingProgressState::SP_PROGRESS) || percent < m_percentage)
 			return false;
+		if (m_displayed_percentage >= m_percentage)
+			m_progress_tick = std::chrono::steady_clock::now();
 		set_percentage(percent);
 		m_sp_state = state;
         m_current_fade_opacity = 1;
@@ -199,6 +205,23 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 
 	ImGuiWrapper& imgui = *wxGetApp().imgui();
 	float scale = imgui.get_font_size() / 15.0f;
+	if (m_sp_state == SlicingProgressState::SP_PROGRESS) {
+		if (!ZHMotion::enabled()) {
+			m_displayed_percentage = m_percentage;
+		} else if (m_displayed_percentage < m_percentage) {
+			const auto now = std::chrono::steady_clock::now();
+			const float t = std::min(1.f, std::max(0.f, std::chrono::duration<float>(now - m_progress_tick).count() / 0.09f));
+			m_progress_tick = now;
+			const float eased = ZHMotion::ease_out(t);
+			m_displayed_percentage += (m_percentage - m_displayed_percentage) * eased;
+			if (m_percentage - m_displayed_percentage < 0.0001f)
+				m_displayed_percentage = m_percentage;
+			else {
+				canvas.set_as_dirty();
+				canvas.request_extra_frame();
+			}
+		}
+	}
 
 	bool fading_pop = false;
 	if (m_state == EState::FadingOut) {
@@ -212,8 +235,11 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 	// for debug
 	//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, m_WindowRadius / 4);
 	//m_is_dark ? push_style_color(ImGuiCol_Border, { 62 / 255.f, 62 / 255.f, 69 / 255.f, 1.f }, true, m_current_fade_opacity) : push_style_color(ImGuiCol_Border, m_CurrentColor, true, m_current_fade_opacity);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	push_style_color(ImGuiCol_Border, { 0, 0, 0, 0 }, true, m_current_fade_opacity);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f * scale);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f * scale);
+	push_style_color(ImGuiCol_Border, m_is_dark ? ImVec4(45.f / 255.f, 65.f / 255.f, 92.f / 255.f, 1.f) : ImVec4(220.f / 255.f, 228.f / 255.f, 237.f / 255.f, 1.f), true, m_current_fade_opacity);
+	push_style_color(ImGuiCol_WindowBg, m_is_dark ? ImVec4(17.f / 255.f, 28.f / 255.f, 45.f / 255.f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f), true, m_current_fade_opacity);
+	push_style_color(ImGuiCol_Text, m_is_dark ? ImVec4(231.f / 255.f, 238.f / 255.f, 248.f / 255.f, 1.f) : ImVec4(38.f / 255.f, 46.f / 255.f, 58.f / 255.f, 1.f), true, m_current_fade_opacity);
 
 	Size cnv_size = canvas.get_canvas_size();
 
@@ -224,7 +250,7 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 	const ImVec2 dailytips_child_window_padding = m_dailytips_panel->is_expanded() ? ImVec2(15.f, 10.f) * scale : ImVec2(15.f, 0.f) * scale;
 	const ImVec2 bottom_padding = ImVec2(0.f, 0.f) * scale;
 	const float  progress_panel_width = (m_window_width - 2 * progress_child_window_padding.x);
-	const float  progress_panel_height = (58.0f * scale);
+	const float  progress_panel_height = (68.0f * scale);
 	const float  dailytips_panel_width = (m_window_width - 2 * dailytips_child_window_padding.x);
 	const float  gcodeviewer_height = wxGetApp().plater()->get_preview_canvas3D()->get_gcode_viewer().get_legend_height();
 	//const float  dailytips_panel_height = std::min(380.0f * scale, std::max(90.0f, (cnv_size.get_height() - gcodeviewer_height - progress_panel_height - dailytips_child_window_padding.y - initial_y - m_line_height * 4)));
@@ -277,7 +303,7 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 				ImVec2 button_pos = child_window_pos + ImVec2(progress_panel_width - button_size.x, (progress_panel_height - button_size.y) / 2.0f);
 				float  margin_x = 8.0f * scale;
 				ImVec2 progress_bar_pos = child_window_pos + ImVec2(0, progress_panel_height / 2.0f);
-				ImVec2 progress_bar_size = ImVec2(progress_panel_width - button_size.x - margin_x, 4.0f * scale);
+				ImVec2 progress_bar_size = ImVec2(progress_panel_width - button_size.x - margin_x, 6.0f * scale);
 				ImVec2 text_pos = ImVec2(progress_bar_pos.x, progress_bar_pos.y - m_line_height * 1.2f);
 
 				render_text(text_pos);
@@ -292,7 +318,8 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 			// Separator Line
 			ImVec2 separator_min = ImVec2(ImGui::GetCursorScreenPos().x + progress_child_window_padding.x, ImGui::GetCursorScreenPos().y);
 			ImVec2 separator_max = ImVec2(ImGui::GetCursorScreenPos().x + progress_child_window_padding.x + progress_panel_width, ImGui::GetCursorScreenPos().y);
-			ImGui::GetCurrentWindow()->DrawList->AddLine(separator_min, separator_max, ImColor(238, 238, 238, (int)(255 * m_current_fade_opacity)));
+			ImGui::GetCurrentWindow()->DrawList->AddLine(separator_min, separator_max,
+				m_is_dark ? ImColor(45, 65, 92, (int)(255 * m_current_fade_opacity)) : ImColor(220, 228, 237, (int)(255 * m_current_fade_opacity)));
 
 			child_name = "##DailyTipsPanel" + std::to_string(parent_window->ID);
 			ImVec2 dailytips_pos = ImGui::GetCursorScreenPos() + dailytips_child_window_padding;
@@ -314,8 +341,8 @@ void NotificationManager::SlicingProgressNotification::render(GLCanvas3D& canvas
 	imgui.end();
 
 
-	ImGui::PopStyleVar(2);
-	ImGui::PopStyleColor(1);
+	ImGui::PopStyleVar(3);
+	ImGui::PopStyleColor(3);
 	restore_default_theme();
 	if (fading_pop)
 		ImGui::PopStyleColor(3);
@@ -368,20 +395,21 @@ void Slic3r::GUI::NotificationManager::SlicingProgressNotification::render_bar(c
 
 	ImGuiWrapper& imgui = *wxGetApp().imgui();
 
-	ImColor progress_color = ImColor(0, 174, 66, (int)(255 * m_current_fade_opacity));
-	ImColor bg_color = ImColor(217, 217, 217, (int)(255 * m_current_fade_opacity));
+	ImColor progress_color = ImColor(ImGuiWrapper::accent(m_current_fade_opacity));
+	ImColor bg_color = m_is_dark ? ImColor(45, 65, 92, (int)(255 * m_current_fade_opacity)) : ImColor(220, 228, 237, (int)(255 * m_current_fade_opacity));
 
 	ImVec2 lineStart = pos;
 	ImVec2 lineEnd = lineStart + size;
-	ImVec2 midPoint = ImVec2(lineStart.x + (lineEnd.x - lineStart.x) * m_percentage, lineEnd.y);
-	ImGui::GetWindowDrawList()->AddRectFilled(lineStart, lineEnd, bg_color);
-	ImGui::GetWindowDrawList()->AddRectFilled(lineStart, midPoint, progress_color);
+	ImVec2 midPoint = ImVec2(lineStart.x + (lineEnd.x - lineStart.x) * m_displayed_percentage, lineEnd.y);
+	ImGui::GetWindowDrawList()->AddRectFilled(lineStart, lineEnd, bg_color, size.y * 0.5f);
+	if (m_displayed_percentage > 0.0f)
+		ImGui::GetWindowDrawList()->AddRectFilled(lineStart, midPoint, progress_color, size.y * 0.5f);
 
 	// percentage text
 	ImVec2 text_pos = ImVec2(pos.x, pos.y + size.y + m_line_height * 0.2f);
 	std::string text;
 	std::stringstream stream;
-	stream << std::fixed << std::setprecision(2) << (int)(m_percentage * 100) << "%";
+	stream << std::fixed << std::setprecision(2) << (int)(m_displayed_percentage * 100) << "%";
 	text = stream.str();
 	ImGui::SetCursorScreenPos(text_pos);
 	imgui.text(text.c_str());

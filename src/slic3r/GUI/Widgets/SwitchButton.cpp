@@ -1,3 +1,4 @@
+#include "../ZHTheme.hpp"
 #include "SwitchButton.hpp"
 #include "Label.hpp"
 #include "StaticBox.hpp"
@@ -278,7 +279,7 @@ void SwitchBoard::doRender(wxDC &dc)
 
 	/*left*/
     if (switch_left) {
-        is_enable ? dc.SetBrush(wxBrush(wxColour(0, 174, 66))) : dc.SetBrush(disable_color);
+        is_enable ? dc.SetBrush(wxBrush(ZHTheme::accent())) : dc.SetBrush(disable_color);
         dc.DrawRoundedRectangle(0, 0, GetSize().x / 2, GetSize().y, 8);
 	}
 
@@ -298,7 +299,7 @@ void SwitchBoard::doRender(wxDC &dc)
 
 	/*right*/
     if (switch_right) {
-        if (is_enable) {dc.SetBrush(wxBrush(wxColour(0, 174, 66)));
+        if (is_enable) {dc.SetBrush(wxBrush(ZHTheme::accent()));
         } else {dc.SetBrush(disable_color);}
         dc.DrawRoundedRectangle(GetSize().x / 2, 0, GetSize().x / 2, GetSize().y, 8);
 	}

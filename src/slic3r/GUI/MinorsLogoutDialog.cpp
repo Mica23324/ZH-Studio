@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "MinorsLogoutDialog.hpp"
 #include "GUI_App.hpp"
 #include "Widgets/Label.hpp"
@@ -8,7 +10,7 @@
 namespace Slic3r { namespace GUI {
 
 static const wxColour TEXT_COLOUR = ThemeColor::TextPrimary; // #262E30, dark-mode mapped to #EFEFF0
-static const wxColour LINK_COLOUR = ThemeColor::BrandGreen;  // #00AE42, dark-mode mapped to #21A452
+static const wxColour LINK_COLOUR = ThemeColor::BrandGreen;  // #0EA5E9, dark-mode mapped to #0EA5E9
 
 // A run of mixed body text where some segments are bold and some are clickable links.
 struct RichSegment {
@@ -42,7 +44,7 @@ public:
         Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& event) {
             const wxString url = hit_link(event.GetPosition());
             if (!url.empty())
-                wxLaunchDefaultBrowser(url);
+                Slic3r::GUI::zh_open_external_browser(url);
         });
     }
 
@@ -205,9 +207,9 @@ MinorsLogoutDialog::MinorsLogoutDialog(wxWindow* parent, wxString signin_url)
     auto body = new RichTextLabel(this, std::move(segs), body_width);
     sizer_main->Add(body, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(20));
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                            std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     m_button_got_it = new Button(this, _L("Got it"));
     m_button_got_it->SetBackgroundColor(btn_bg_green);
@@ -218,7 +220,7 @@ MinorsLogoutDialog::MinorsLogoutDialog(wxWindow* parent, wxString signin_url)
     m_button_got_it->SetCornerRadius(FromDIP(12));
     m_button_got_it->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent&) {
         if (!m_signin_url.empty())
-            wxLaunchDefaultBrowser(m_signin_url);
+            Slic3r::GUI::zh_open_external_browser(m_signin_url);
         EndModal(wxID_OK);
     });
 

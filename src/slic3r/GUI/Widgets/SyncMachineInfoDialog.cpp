@@ -867,12 +867,12 @@ bool tryPopUpSyncMachineInfoDialog(MachineObject *obj)
         {4, true, {"#FF6B0080"}, false, "Translucent", 100, "0.4 mm", _L("Standard"), false, true, NozzleCardState::Abnormal}, // α≈50% → tinted checker (半透明)
 
         // multicolour (拼色): concentric bands, colors[0] innermost
-        {5, true, {"#FF6B00", "#2E7CF6", "#00AE42", "#E1007F"}, false, "Multi x4", 100, "0.6 mm", _L("Standard"), false, true, NozzleCardState::Unknown},          // 4 bands
-        {6, true, {"#FF6B00", "#2E7CF6", "#00AE42", "#E1007F", "#FFD400"}, false, "Multi x5", 40, "0.6 mm", _L("Standard"), false, true, NozzleCardState::Normal}, // N>4 + partial remain
+        {5, true, {"#FF6B00", "#2E7CF6", "#0EA5E9", "#E1007F"}, false, "Multi x4", 100, "0.6 mm", _L("Standard"), false, true, NozzleCardState::Unknown},          // 4 bands
+        {6, true, {"#FF6B00", "#2E7CF6", "#0EA5E9", "#E1007F", "#FFD400"}, false, "Multi x5", 40, "0.6 mm", _L("Standard"), false, true, NozzleCardState::Normal}, // N>4 + partial remain
         {7, true, {"#FF6B0080", "#2E7CF680"}, false, "Multi clear", 100, "0.6 mm", _L("Standard"), false, true, NozzleCardState::Lost},                          // translucent bands (拼色+透明)
 
         // gradient: smooth radial blend, hub → rim
-        {8, true, {"#FF0080", "#FFD400", "#00AE42"}, true, "Gradient x3", 100, "0.4 mm", _L("Standard"), false, true, NozzleCardState::Normal}, // 3 stops
+        {8, true, {"#FF0080", "#FFD400", "#0EA5E9"}, true, "Gradient x3", 100, "0.4 mm", _L("Standard"), false, true, NozzleCardState::Normal}, // 3 stops
         {9, true, {"#FF008080", "#FFD40080"}, true, "Gradient clear", 60, "0.4 mm", _L("Standard"), false, true, NozzleCardState::Normal},      // translucent + partial remain
     };
     // clang-format on

@@ -1,4 +1,5 @@
 #include "BitmapCache.hpp"
+#include "ZHTheme.hpp"
 
 #include "libslic3r/Utils.hpp"
 #include "../Utils/MacDarkMode.hpp"
@@ -338,7 +339,7 @@ wxBitmap* BitmapCache::load_svg(const std::string &light_bitmap_name, unsigned t
                                          + (m_scale != 1.0f ? "-s" + float_to_string_decimal_point(m_scale) : "")
                                          + (dark_mode ? "-dm" : "")
                                          + (grayscale ? "-gs" : "")
-                                         + new_color;
+                                         + new_color + "-zh-" + ZHTheme::hex();
 
     auto it = m_map.find(bitmap_key);
     if (it != m_map.end())
@@ -359,8 +360,11 @@ wxBitmap* BitmapCache::load_svg(const std::string &light_bitmap_name, unsigned t
         replaces["\"#F1F1F1\""] = "\"#36363B\"";
         replaces["\"#DBDBDB\""] = "\"#4A4A51\"";
     }
-    if (!new_color.empty())
-        replaces["\"#00AE42\""] = "\"" + new_color + "\"";
+    const std::string zh_accent = new_color.empty() ? ZHTheme::hex() : new_color;
+    for (const char* c : {"#00AE42", "#00ae42", "#0EA5E9", "#0ea5e9"})
+        replaces[std::string("\"") + c + "\""] = "\"" + zh_accent + "\"";
+    replaces["\"#38BDF8\""] = "\"" + std::string(ZHTheme::hover[ZHTheme::index()]) + "\"";
+    replaces["\"#0284C7\""] = "\"" + std::string(ZHTheme::pressed[ZHTheme::index()]) + "\"";
 
      NSVGimage *image = nullptr;
     if (strstr(bitmap_name.c_str(), "printer_thumbnail") == NULL) {

@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "HMS.hpp"
 #include "HMSPanel.hpp"
 #include "DeviceCore/DevHMSQuery.h"
@@ -109,10 +110,10 @@ HMSNotifyItem::HMSNotifyItem(const std::string& dev_id, wxWindow *parent, DevHMS
         }
         });
     m_panel_hms->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& e) {
-        if (!m_url.empty()) wxLaunchDefaultBrowser(m_url);
+        if (!m_url.empty()) Slic3r::GUI::zh_open_external_browser(m_url);
         });
     m_hms_content->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& e) {
-        if (!m_url.empty()) wxLaunchDefaultBrowser(m_url);
+        if (!m_url.empty()) Slic3r::GUI::zh_open_external_browser(m_url);
         });
 #else
     m_hms_content->Bind(wxEVT_ENTER_WINDOW, [this](wxMouseEvent& e) {
@@ -136,7 +137,7 @@ HMSNotifyItem::HMSNotifyItem(const std::string& dev_id, wxWindow *parent, DevHMS
         }
         });
     m_hms_content->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& e) {
-            if (!m_url.empty()) wxLaunchDefaultBrowser(m_url);
+            if (!m_url.empty()) Slic3r::GUI::zh_open_external_browser(m_url);
         });
 #endif
 }

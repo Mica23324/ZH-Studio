@@ -1435,7 +1435,7 @@ wxWindow *PreferencesDialog::create_general_tab()
     auto title_basic = create_item_title(_L("General Settings"), scrolled, _L("General Settings"));
 
     // Language list (same source as before).
-    auto available_translations = wxTranslations::Get()->GetAvailableTranslations(SLIC3R_APP_KEY);
+    auto available_translations = wxTranslations::Get()->GetAvailableTranslations("BambuStudio");
     std::vector<const wxLanguageInfo *> language_infos;
     language_infos.emplace_back(wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH));
     for (size_t i = 0; i < available_translations.GetCount(); ++i) {

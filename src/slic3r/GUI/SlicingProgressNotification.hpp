@@ -3,6 +3,7 @@
 
 #include "DailyTips.hpp"
 #include "NotificationManager.hpp"
+#include <chrono>
 
 namespace Slic3r { namespace GUI {
 
@@ -68,6 +69,8 @@ protected:
 protected:
     ImVec2                  m_window_pos;
     float                   m_percentage{ 0.0f };
+    float                   m_displayed_percentage{ 0.0f };
+    std::chrono::steady_clock::time_point m_progress_tick;
     int64_t                 m_before_complete_start;
     // if returns false, process was already canceled
     std::function<bool()>	m_cancel_callback;

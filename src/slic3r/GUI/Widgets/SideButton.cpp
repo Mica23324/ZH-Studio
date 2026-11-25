@@ -1,5 +1,7 @@
 #include "SideButton.hpp"
 #include "Label.hpp"
+#include "../ZHMotion.hpp"
+#include "libslic3r/Log.hpp"
 
 #include <wx/dcclient.h>
 #include <wx/dcgraph.h>
@@ -13,6 +15,7 @@ END_EVENT_TABLE()
 SideButton::SideButton(wxWindow* parent, wxString text, wxString icon, long stlye, int iconSize)
     : wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, stlye)
     , state_handler(this)
+    , m_hover_timer(this)
 {
     radius = 12;
 #ifdef __APPLE__
@@ -27,9 +30,9 @@ SideButton::SideButton(wxWindow* parent, wxString text, wxString icon, long stly
     text_orientation = HO_Left;
 
     border_color.append(0x6B6B6B, StateColor::Disabled);
-    border_color.append(wxColour(23, 129, 63), StateColor::Pressed);
-    border_color.append(wxColour(48,221,112), StateColor::Hovered);
-    border_color.append(0x00AE42, StateColor::Normal);
+    border_color.append(ZHTheme::down(), StateColor::Pressed);
+    border_color.append(ZHTheme::hovered(), StateColor::Hovered);
+    border_color.append(ZHTheme::accent(), StateColor::Normal);
     border_color.setTakeFocusedAsHovered(false);
 
     text_color.append(0xACACAC, StateColor::Disabled);
@@ -38,15 +41,20 @@ SideButton::SideButton(wxWindow* parent, wxString text, wxString icon, long stly
     text_color.append(0xFEFEFE, StateColor::Normal);
 
     background_color.append(0x6B6B6B, StateColor::Disabled);
-    background_color.append(wxColour(23, 129, 63), StateColor::Pressed);
-    background_color.append(wxColour(48, 221, 112), StateColor::Hovered);
-    background_color.append(0x00AE42, StateColor::Normal);
+    background_color.append(ZHTheme::down(), StateColor::Pressed);
+    background_color.append(ZHTheme::hovered(), StateColor::Hovered);
+    background_color.append(ZHTheme::accent(), StateColor::Normal);
     background_color.setTakeFocusedAsHovered(false);
 
     SetBottomColour(wxColour("#3B4446"));
 
     state_handler.attach({ &border_color, &text_color, &background_color });
     state_handler.update_binds();
+    Bind(wxEVT_TIMER, &SideButton::on_hover_timer, this, m_hover_timer.GetId());
+    Bind(wxEVT_ENTER_WINDOW, &SideButton::on_pointer_enter, this);
+    Bind(wxEVT_LEAVE_WINDOW, &SideButton::on_pointer_leave, this);
+    Bind(wxEVT_SET_FOCUS, &SideButton::on_focus_gained, this);
+    Bind(wxEVT_KILL_FOCUS, &SideButton::on_focus_lost, this);
 
     // icon only
     if (!icon.IsEmpty()) {
@@ -57,6 +65,43 @@ SideButton::SideButton(wxWindow* parent, wxString text, wxString icon, long stly
     wxWindow::SetLabel(text);
 
     messureSize();
+}
+
+SideButton::~SideButton()
+{
+    m_hover_timer.Stop();
+    Unbind(wxEVT_ENTER_WINDOW, &SideButton::on_pointer_enter, this);
+    Unbind(wxEVT_LEAVE_WINDOW, &SideButton::on_pointer_leave, this);
+    Unbind(wxEVT_SET_FOCUS, &SideButton::on_focus_gained, this);
+    Unbind(wxEVT_KILL_FOCUS, &SideButton::on_focus_lost, this);
+}
+
+void SideButton::on_pointer_enter(wxMouseEvent& event)
+{
+    m_pointer_inside = true;
+    start_hover_animation();
+    event.Skip();
+}
+
+void SideButton::on_pointer_leave(wxMouseEvent& event)
+{
+    m_pointer_inside = false;
+    start_hover_animation();
+    event.Skip();
+}
+
+void SideButton::on_focus_gained(wxFocusEvent& event)
+{
+    m_focused = true;
+    start_hover_animation();
+    event.Skip();
+}
+
+void SideButton::on_focus_lost(wxFocusEvent& event)
+{
+    m_focused = false;
+    start_hover_animation();
+    event.Skip();
 }
 
 void SideButton::SetCornerRadius(double radius)
@@ -150,7 +195,64 @@ bool SideButton::Enable(bool enable)
         e.SetEventObject(this);
         GetEventHandler()->ProcessEvent(e);
     }
+    if (!enable) {
+        m_hover_timer.Stop();
+        m_hover_progress = 0.f;
+    } else {
+        start_hover_animation();
+    }
     return result;
+}
+
+void SideButton::start_hover_animation()
+{
+    const float target = IsEnabled() && (m_pointer_inside || m_focused) ? 1.f : 0.f;
+    if (!ZHMotion::enabled() || !IsShownOnScreen()) {
+        m_hover_timer.Stop();
+        m_hover_progress = target;
+        m_hover_from = target;
+        m_hover_target = target;
+        m_hover_elapsed = 0.f;
+        Refresh(false);
+    } else if (m_hover_target != target || (!m_hover_timer.IsRunning() && m_hover_progress != target)) {
+        m_hover_from = m_hover_progress;
+        m_hover_target = target;
+        m_hover_elapsed = 0.f;
+        m_hover_tick = std::chrono::steady_clock::now();
+        if (!m_hover_timer.IsRunning() && !m_hover_timer.Start(16)) {
+            BOOST_LOG_TRIVIAL(warning) << "Could not start action button animation timer";
+            m_hover_progress = target;
+            Refresh(false);
+        }
+    }
+}
+
+void SideButton::on_hover_timer(wxTimerEvent&)
+{
+    const float target = IsEnabled() && (m_pointer_inside || m_focused) ? 1.f : 0.f;
+    if (!IsShownOnScreen() || !ZHMotion::enabled()) {
+        m_hover_progress = target;
+    } else {
+        const auto now = std::chrono::steady_clock::now();
+        const float elapsed = std::chrono::duration<float>(now - m_hover_tick).count();
+        m_hover_tick = now;
+        if (target != m_hover_target) {
+            m_hover_from = m_hover_progress;
+            m_hover_target = target;
+            m_hover_elapsed = 0.f;
+        }
+        m_hover_elapsed += std::max(0.f, elapsed);
+        const float t = std::min(1.f, m_hover_elapsed / 0.14f);
+        const float eased = ZHMotion::ease_out(t);
+        m_hover_progress = m_hover_from + (m_hover_target - m_hover_from) * eased;
+    }
+    Refresh(false);
+    if (m_hover_elapsed >= 0.14f || m_hover_progress == target) {
+        m_hover_progress = target;
+        m_hover_from = target;
+        m_hover_target = target;
+        m_hover_timer.Stop();
+    }
 }
 
 void SideButton::Rescale()
@@ -201,9 +303,13 @@ void SideButton::dorender(wxDC& dc, wxDC& text_dc)
     dc.DrawRectangle(0, 0, size.x, size.y);
 
     int states = state_handler.states();
-    dc.SetBrush(wxBrush(background_color.colorForStates(states)));
-
-    dc.SetPen(wxPen(border_color.colorForStates(states)));
+    const int base_states = states & ~(StateColor::Hovered | StateColor::Focused);
+    const int hover_states = base_states | StateColor::Hovered;
+    const bool animate = IsEnabled() && !(states & StateColor::Pressed);
+    dc.SetBrush(wxBrush(animate ? ZHMotion::blend(background_color.colorForStates(base_states), background_color.colorForStates(hover_states), m_hover_progress)
+                               : background_color.colorForStates(states)));
+    dc.SetPen(wxPen(animate ? ZHMotion::blend(border_color.colorForStates(base_states), border_color.colorForStates(hover_states), m_hover_progress)
+                            : border_color.colorForStates(states)));
     int pen_width = dc.GetPen().GetWidth();
 
 

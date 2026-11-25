@@ -1,6 +1,7 @@
 #include "GUI_Init.hpp"
 
 #include "libslic3r/AppConfig.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 
 #include "slic3r/GUI/GUI.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
@@ -26,6 +27,9 @@ namespace GUI {
 
 int GUI_Run(GUI_InitParams &params)
 {
+    if (params.offline)
+        NetworkPolicy::enable_cli_offline();
+
 #if __APPLE__
     // On OSX, we use boost::process::spawn() to launch new instances of PrusaSlicer from another PrusaSlicer.
     // boost::process::spawn() sets SIGCHLD to SIGIGN for the child process, thus if a child PrusaSlicer spawns another

@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "FilamentMapPanel.hpp"
 #include "Widgets/MultiNozzleSync.hpp"
 #include "GUI_App.hpp"
@@ -328,7 +329,7 @@ static const wxColour BgSelectColor  = wxColour("#EBF9F0");
 static const wxColour BgDisableColor = wxColour("#CECECE");
 
 static const wxColour BorderNormalColor   = wxColour("#CECECE");
-static const wxColour BorderSelectedColor = wxColour("#00AE42");
+static const wxColour BorderSelectedColor = ZHTheme::accent();
 static const wxColour BorderDisableColor  = wxColour("#EEEEEE");
 
 static const wxColour TextNormalBlackColor = wxColour("#262E30");

@@ -2,6 +2,8 @@
 #define slic3r_GUI_TabCtrl_hpp_
 
 #include "Button.hpp"
+#include <wx/timer.h>
+#include <chrono>
 
 wxDECLARE_EVENT( wxEVT_TAB_SEL_CHANGING, wxCommandEvent );
 wxDECLARE_EVENT( wxEVT_TAB_SEL_CHANGED, wxCommandEvent );
@@ -15,6 +17,11 @@ class TabCtrl : public StaticBox
     int sel = -1;
     wxFont bold;
     bool fit_all_items = false;
+    wxTimer m_animation_timer;
+    std::chrono::steady_clock::time_point m_animation_tick;
+    float m_indicator_x = 0.f;
+    float m_indicator_width = 0.f;
+    bool m_indicator_valid = false;
 
 public:
     TabCtrl(wxWindow *      parent,
@@ -83,6 +90,8 @@ private:
     void keyDown(wxKeyEvent &event);
 
     void doRender(wxDC & dc) override;
+    void start_indicator_animation();
+    void on_indicator_animation(wxTimerEvent& event);
 
     // some useful events
     bool sendTabCtrlEvent(bool changing = false);

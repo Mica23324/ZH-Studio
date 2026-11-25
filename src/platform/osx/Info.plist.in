@@ -11,9 +11,9 @@
   <key>CFBundleName</key>
   <string>@SLIC3R_APP_KEY@</string>
   <key>CFBundleShortVersionString</key>
-  <string>@SLIC3R_APP_NAME@ @SLIC3R_BUILD_ID@</string>
+  <string>@ZH_MACOS_BUNDLE_SHORT_VERSION@</string>
   <key>CFBundleIdentifier</key>
-  <string>com.bbl.slic3r/</string>
+  <string>com.zhstudio.app</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundlePackageType</key>
@@ -21,7 +21,7 @@
   <key>CFBundleSignature</key>
   <string>????</string>
   <key>CFBundleVersion</key>
-  <string>@SLIC3R_BUILD_ID@</string>
+  <string>@ZH_MACOS_BUNDLE_VERSION@</string>
   <key>NSAppTransportSecurity</key>
   <dict>
     <key>NSAllowsArbitraryLoads</key>
@@ -66,7 +66,7 @@
       <key>CFBundleTypeIconFile</key>
       <string>images/BambuStudio.icns</string>
       <key>CFBundleTypeName</key>
-      <string>STL</string>
+      <string>OBJ</string>
       <key>CFBundleTypeRole</key>
       <string>Viewer</string>
       <key>LISsAppleDefaultForType</key>

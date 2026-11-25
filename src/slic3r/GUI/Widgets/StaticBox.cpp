@@ -1,7 +1,22 @@
 #include "StaticBox.hpp"
 #include "../GUI.hpp"
+#include "../ZHMotion.hpp"
 #include <wx/dcclient.h>
 #include <wx/dcgraph.h>
+#include <chrono>
+
+namespace {
+
+long long motion_now_ms()
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
+constexpr int kMotionFrameMs = 16;
+constexpr int kMotionDurationMs = 150;
+
+} // namespace
 
 BEGIN_EVENT_TABLE(StaticBox, wxWindow)
 
@@ -24,6 +39,8 @@ StaticBox::StaticBox()
     border_color = StateColor(
         std::make_pair(0xF0F0F1, (int) StateColor::Disabled),
         std::make_pair(0xCECECE, (int) StateColor::Normal));
+    m_motion_timer.SetOwner(this);
+    Bind(wxEVT_TIMER, &StaticBox::on_motion_timer, this, m_motion_timer.GetId());
 }
 
 StaticBox::StaticBox(wxWindow* parent,
@@ -81,6 +98,7 @@ void StaticBox::SetBorderColorNormal(wxColor const &color)
 
 void StaticBox::SetBackgroundColor(StateColor const &color)
 {
+    if (background_color == color) return;
     background_color = color;
     state_handler.update_binds();
     Refresh();
@@ -94,6 +112,7 @@ void StaticBox::SetBackgroundColorNormal(wxColor const &color)
 
 void StaticBox::SetBackgroundColor2(StateColor const &color)
 {
+    if (background_color2 == color) return;
     background_color2 = color;
     state_handler.update_binds();
     Refresh();
@@ -185,11 +204,92 @@ void StaticBox::render(wxDC& dc)
 #endif
 }
 
+void StaticBox::begin_motion(const wxColour &bg, const wxColour &bg2, bool gradient, const wxColour &border)
+{
+    m_motion_from_bg     = m_motion_bg;
+    m_motion_from_bg2    = m_motion_bg2;
+    m_motion_from_border = m_motion_border;
+    m_motion_to_bg       = bg;
+    m_motion_to_bg2      = bg2;
+    m_motion_to_border   = border;
+    m_motion_target_gradient = gradient;
+    // Keep rendering a gradient while fading from or towards one, so the
+    // control never jumps between the two drawing paths mid-transition.
+    m_motion_has_gradient = m_motion_has_gradient || gradient;
+    m_motion_started_ms   = motion_now_ms();
+    m_motion_animating    = true;
+    if (!m_motion_timer.Start(kMotionFrameMs)) {
+        m_motion_animating = false;
+        m_motion_bg = bg;
+        m_motion_bg2 = bg2;
+        m_motion_border = border;
+        m_motion_has_gradient = gradient;
+    }
+}
+
+wxColour StaticBox::motion_tick()
+{
+    const float progress = std::min(1.f, static_cast<float>(motion_now_ms() - m_motion_started_ms) /
+                                              static_cast<float>(kMotionDurationMs));
+    const float eased = ZHMotion::ease_out(progress);
+    m_motion_bg     = ZHMotion::blend(m_motion_from_bg, m_motion_to_bg, eased);
+    m_motion_bg2    = ZHMotion::blend(m_motion_from_bg2, m_motion_to_bg2, eased);
+    m_motion_border = ZHMotion::blend(m_motion_from_border, m_motion_to_border, eased);
+    if (progress >= 1.f) {
+        m_motion_animating = false;
+        m_motion_timer.Stop();
+        m_motion_bg     = m_motion_to_bg;
+        m_motion_bg2    = m_motion_to_bg2;
+        m_motion_border = m_motion_to_border;
+        m_motion_has_gradient = m_motion_target_gradient;
+    }
+    return m_motion_bg;
+}
+
+void StaticBox::on_motion_timer(wxTimerEvent &)
+{
+    if (!m_motion_animating)
+        return;
+    motion_tick();
+    Refresh(false);
+}
+
 void StaticBox::doRender(wxDC& dc)
 {
     wxSize size = GetSize();
     int states = state_handler.states();
-    if (background_color2.count() == 0) {
+
+    const wxColour target_bg = background_color.count() > 0 ? background_color.colorForStates(states)
+                                                            : GetBackgroundColour();
+    const bool     target_gradient = background_color2.count() > 0;
+    const wxColour target_bg2 = target_gradient ? background_color2.colorForStates(states) : target_bg;
+    const wxColour target_border = border_color.count() > 0 ? border_color.colorForStates(states) : target_bg;
+
+    if (m_motion_last_states < 0) {
+        m_motion_bg      = m_motion_to_bg = target_bg;
+        m_motion_bg2     = m_motion_to_bg2 = target_bg2;
+        m_motion_border  = m_motion_to_border = target_border;
+        m_motion_has_gradient = target_gradient;
+        m_motion_target_gradient = target_gradient;
+        m_motion_last_states = states;
+    } else if (m_motion_last_states != states || m_motion_to_bg != target_bg ||
+               m_motion_to_bg2 != target_bg2 || m_motion_to_border != target_border ||
+               m_motion_target_gradient != target_gradient) {
+        m_motion_last_states = states;
+        if (ZHMotion::enabled()) {
+            begin_motion(target_bg, target_bg2, target_gradient, target_border);
+        } else {
+            m_motion_animating = false;
+            m_motion_timer.Stop();
+            m_motion_bg      = m_motion_to_bg = target_bg;
+            m_motion_bg2     = m_motion_to_bg2 = target_bg2;
+            m_motion_border  = m_motion_to_border = target_border;
+            m_motion_has_gradient = target_gradient;
+            m_motion_target_gradient = target_gradient;
+        }
+    }
+
+    if (!m_motion_has_gradient) {
         if ((border_width && border_color.count() > 0) || background_color.count() > 0) {
             wxRect rc(0, 0, size.x, size.y);
             if (border_width && border_color.count() > 0) {
@@ -207,12 +307,12 @@ void StaticBox::doRender(wxDC& dc)
                     rc.y += d;
                     rc.height -= d;
                 }
-                dc.SetPen(wxPen(border_color.colorForStates(states), border_width, border_style));
+                dc.SetPen(wxPen(m_motion_border, border_width, border_style));
             } else {
-                dc.SetPen(wxPen(background_color.colorForStates(states)));
+                dc.SetPen(wxPen(m_motion_bg));
             }
             if (background_color.count() > 0)
-                dc.SetBrush(wxBrush(background_color.colorForStates(states)));
+                dc.SetBrush(wxBrush(m_motion_bg));
             else
                 dc.SetBrush(wxBrush(GetBackgroundColour()));
             if (radius == 0) {
@@ -224,8 +324,8 @@ void StaticBox::doRender(wxDC& dc)
         }
     }
     else {
-        wxColor start = background_color.colorForStates(states);
-        wxColor stop = background_color2.colorForStates(states);
+        wxColor start = m_motion_bg;
+        wxColor stop  = m_motion_bg2;
         int r = start.Red(), g = start.Green(), b = start.Blue();
         int dr = (int) stop.Red() - r, dg = (int) stop.Green() - g, db = (int) stop.Blue() - b;
         int lr = 0, lg = 0, lb = 0;

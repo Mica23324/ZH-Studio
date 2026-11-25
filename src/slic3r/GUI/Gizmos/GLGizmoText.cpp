@@ -1,3 +1,4 @@
+#include "../ZHTheme.hpp"
 // Include GLGizmoBase.hpp before I18N.hpp as it includes some libigl code, which overrides our localization "L" macro.
 #include "GLGizmoText.hpp"
 #include <algorithm>
@@ -2348,10 +2349,10 @@ void GLGizmoText::push_combo_style(const float scale) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 1.0f * scale);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
         ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG_DARK);
-        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent(0.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::accent());
+        ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::accent());
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGuiWrapper::COL_WINDOW_BG_DARK);
         ImGui::PushStyleColor(ImGuiCol_Button, { 1.00f, 1.00f, 1.00f, 0.0f });
     }
@@ -2359,10 +2360,10 @@ void GLGizmoText::push_combo_style(const float scale) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 1.0f * scale);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
         ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG);
-        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.00f, 0.68f, 0.26f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.00f, 0.68f, 0.26f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_BorderActive, ImGuiWrapper::accent(1.00f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::accent(0.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::accent());
+        ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::accent());
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGuiWrapper::COL_WINDOW_BG);
         ImGui::PushStyleColor(ImGuiCol_Button, { 1.00f, 1.00f, 1.00f, 0.0f });
     }
@@ -4351,9 +4352,9 @@ EmbossShape &TextDataBase::create_shape()
     return shape;
 }
 
-StateColor ok_btn_bg(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                     std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                     std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+StateColor ok_btn_bg(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                     std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                     std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 StateColor ok_btn_disable_bg(std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Pressed),
                              std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Hovered),
                              std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Normal));
@@ -4401,7 +4402,7 @@ StyleNameEditDialog::StyleNameEditDialog(
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     StateColor       ok_btn_text(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Normal));
-    StateColor       ok_btn_bd(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor       ok_btn_bd(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     m_button_ok = new Button(this, _L("OK"));
     m_button_ok->Enable(true);
     m_button_ok->SetBackgroundColor(ok_btn_bg);

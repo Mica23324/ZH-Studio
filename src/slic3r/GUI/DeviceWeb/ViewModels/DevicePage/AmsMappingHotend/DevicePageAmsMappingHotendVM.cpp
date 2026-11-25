@@ -5,6 +5,7 @@
  * \author xin.zhang
  * \date   May 2026
  *********************************************************************/
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "DevicePageAmsMappingHotendVM.hpp"
 #include "DevicePageAmsMappingHotendSchema.hpp"
 
@@ -964,7 +965,7 @@ nlohmann::json DevicePageAmsMappingHotendVM::HandleAction(const std::string& act
         // Open the filament-matching-rules Wiki in the system browser. URL kept
         // identical to the wx popup (AmsMapingPopup::update_ams_tips).
         wxGetApp().CallAfter([]() {
-            wxLaunchDefaultBrowser("https://e.bambulab.com/t?c=v4Q4e7Rm2dR0dWkw");
+            Slic3r::GUI::zh_open_external_browser("https://e.bambulab.com/t?c=v4Q4e7Rm2dR0dWkw");
         });
     }
 

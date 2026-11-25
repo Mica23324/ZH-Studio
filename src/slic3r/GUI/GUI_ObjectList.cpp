@@ -1,3 +1,4 @@
+#include "ZHStyle.hpp"
 #include "libslic3r/libslic3r.h"
 #include "libslic3r/PresetBundle.hpp"
 #include "GUI_ObjectList.hpp"
@@ -100,6 +101,9 @@ ObjectList::ObjectList(wxWindow* parent) :
     wxDataViewCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE)
 {
     wxGetApp().UpdateDVCDarkUI(this, true);
+    const bool dark = wxGetApp().dark_mode();
+    SetBackgroundColour(ZHStyle::workspace_surface(dark));
+    SetAlternateRowColour(ZHStyle::panel(dark));
 #ifdef __linux__
 // ubuntu dark mode issue. https://github.com/bambulab/BambuStudio/issues/4943
     this->SetForegroundColour(*wxBLACK);
@@ -6933,6 +6937,9 @@ void ObjectList::msw_rescale()
 void ObjectList::sys_color_changed()
 {
     wxGetApp().UpdateDVCDarkUI(this, true);
+    const bool dark = wxGetApp().dark_mode();
+    SetBackgroundColour(ZHStyle::workspace_surface(dark));
+    SetAlternateRowColour(ZHStyle::panel(dark));
 
     msw_rescale();
 

@@ -360,7 +360,7 @@ function SendWXMessage( strMsg )
 		if( tMsg===null )
 			tMsg=strMsg;
 
-		setTimeout(function(){ window.wx.postMessage(tMsg); },1);
+		setTimeout(function(){ if(window.wx && typeof window.wx.postMessage==='function') window.wx.postMessage(tMsg); },1);
 	}
 }
 

@@ -21,7 +21,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' file:; style-src 'self' 'unsafe-inline' file:; img-src 'self' file: data: blob: https: http:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
 <meta http-equiv="Cache-Control" content="max-age=7200" />
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />	
-<title>homepage</title>
+<title>ZH-Studio Alpha · Workspace</title>
 <link rel="stylesheet" type="text/css" href="./css/common.css" />	
 <link rel="stylesheet" type="text/css" href="./css/rightcommon.css" />		
 <link rel="stylesheet" type="text/css" href="./css/recent.css" />
@@ -39,11 +39,57 @@
 <script type="text/javascript" src="js/home.js"></script>
 <!--<script type="text/javascript" src="js/test.js"></script>-->
 	
+<link rel="stylesheet" href="css/zh-studio.css" />
+<script src="js/zh-studio.js"></script>
 </head>
-<body class="ZScrol" onLoad="OnHomeInit()">
+<body class="ZScrol zh-home" onLoad="OnHomeInit()">
+    <section id="zh-intro">
+      <div id="zh-hero">
+        <button type="button" class="zh-langtoggle" data-zh-langtoggle aria-label="Switch language / Sprache wechseln">EN</button>
+        <div>
+          <div class="zh-eyebrow"><span class="zh-dot"></span><span data-zh-de="ZH-STUDIO ALPHA / DEIN WORKSPACE" data-zh-en="ZH-STUDIO ALPHA / YOUR WORKSPACE">ZH-STUDIO ALPHA / YOUR WORKSPACE</span></div>
+          <h1><span data-zh-de="Deine Ideen." data-zh-en="Your ideas.">Your ideas.</span> <span class="zh-grad" data-zh-de="Neue Dimensionen." data-zh-en="New dimensions.">New dimensions.</span></h1>
+          <p data-zh-de="Dein persönlicher 3D-Druck-Workspace. Modelle vorbereiten, präzise slicen und jeden Druck im Blick behalten." data-zh-en="Your personal 3D printing workspace. Prepare models, slice with precision and stay in control of every print.">Your personal 3D printing workspace. Prepare models, slice with precision and stay in control of every print.</p>
+          <div id="zh-hero-meta">
+            <span class="zh-chip zh-chip-accent"><svg class="zh-chip-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg><b id="zh-recent-count">0</b><span data-zh-de="Projekte" data-zh-en="projects">projects</span></span>
+            <span class="zh-chip"><span class="zh-swatch"></span><span id="zh-palette-name">Cyan</span></span>
+            <span class="zh-chip"><svg class="zh-chip-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><circle cx="12" cy="12" r="3"/></svg><span data-zh-de="Lokaler Workspace" data-zh-en="Local workspace">Local workspace</span></span>
+            <button type="button" id="zh-command-launcher" class="zh-chip zh-chip-accent zh-command-chip" onclick="ZHCommand('zh_commands')">
+              <svg class="zh-chip-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8M8 13h5"/><rect x="3" y="4" width="18" height="16" rx="4"/></svg>
+              <span data-zh-de="Befehle" data-zh-en="Commands">Commands</span><kbd id="zh-command-shortcut">Ctrl K</kbd>
+            </button>
+          </div>
+        </div>
+        <div id="zh-emblem">
+          <span class="zh-spark"></span><span class="zh-spark"></span><span class="zh-spark"></span>
+          <span class="zh-emblem-float"><img id="zh-hero-logo" src="../../images/ZH-Studio.svg" alt="ZH-Studio" /></span>
+        </div>
+      </div>
+      <div class="zh-toolgrid zh-reveal">
+        <button type="button" class="zh-tool" onclick="OnClickNewProject()">
+          <span class="zh-tool-num">01</span>
+          <div class="zh-tool-head"><span class="zh-tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span><span class="zh-tool-code">01 / CREATE</span></div>
+          <strong data-zh-de="Etwas Neues starten" data-zh-en="Start something new">Start something new</strong>
+          <span data-zh-de="Ein leeres Projekt für deine nächste Idee." data-zh-en="A clean project for your next idea.">A clean project for your next idea.</span>
+        </button>
+        <button type="button" class="zh-tool" onclick="ZHCommand('zh_print_costs')">
+          <span class="zh-tool-num">02</span>
+          <div class="zh-tool-head"><span class="zh-tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></span><span class="zh-tool-code">02 / ESTIMATE</span></div>
+          <strong data-zh-de="Druckkosten im Blick" data-zh-en="Know your print costs">Know your print costs</strong>
+          <span data-zh-de="Material, Energie und Verschleiß – transparent berechnet." data-zh-en="Material, energy and wear – estimated transparently.">Material, energy and wear – estimated transparently.</span>
+        </button>
+        <button type="button" class="zh-tool" onclick="ZHCommand('zh_workspace')">
+          <span class="zh-tool-num">03</span>
+          <div class="zh-tool-head"><span class="zh-tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="16" cy="17" r="2.5"/><path d="M12 2a10 10 0 1 0 10 10"/></svg></span><span class="zh-tool-code">03 / CUSTOMIZE</span></div>
+          <strong data-zh-de="Dein eigener Workspace" data-zh-en="Make it your workspace">Make it your workspace</strong>
+          <span data-zh-de="Themes wählen und Schnellaktionen anpassen." data-zh-en="Choose an accent palette and customize quick actions.">Choose an accent palette and customize quick actions.</span>
+        </button>
+      </div>
+      <div id="zh-native-note" role="status"></div>
+    </section>
 
 	<!----------Project Menu---------->
-	<div id="MenuArea">
+	<div id="MenuArea" class="zh-reveal">
 		<div id="MenuBtnBlock">
 			<div class="Menu_Btn Btn_White" onClick="OnClickOpenProject()">
 				<img src="img/project_open.svg" /><span class="trans" tid='t33'>Open Project</span>
@@ -66,13 +112,21 @@
 	<div id="HomeFullArea">
 	
 	<!----------Recent open---------->
-	<div id="MiniRecentFileArea">
+	<div id="MiniRecentFileArea" class="zh-reveal">
 		<div class="Title_Bar">
 		  <div class="Title_Left_Area">
 			<img class="TitleSmallIcon" src="./img/t2.svg" />
 		    <div id="HotModelTitle" class="Content-Title trans TextS1" tid="t35">Recent Files</div>
 		  </div>
 		  <div class="Right_Title_More TextS1" onClick="SwtichLeftMenu('recent')"><span class="trans" tid="t108">MORE</span> ></div>
+		</div>
+		<div id="zh-recent-tools">
+		  <div id="zh-recent-filter">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+			<input id="zh-recent-filter-input" type="text" autocomplete="off" spellcheck="false" aria-label="Filter projects" placeholder="Filter projects" />
+		  </div>
+		  <button type="button" id="zh-recent-sort" class="zh-sortbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16"/><path d="M3 8l4-4 4 4"/><path d="M17 20V4"/><path d="M13 16l4 4 4-4"/></svg><span data-zh-de="Neueste zuerst" data-zh-en="Newest first">Newest first</span></button>
+		  <span id="zh-recent-hint" class="zh-recent-hint"></span>
 		</div>
 		<div id="MiniFileList" class="SingleGuideBar">
 <!--		    <div class="FileItem GuideBlock" onClick="OnOpenRecentFile('aaaa')" fpath='d:\model\11.3mf'>
@@ -115,7 +169,7 @@
 	</div>
 	
 	<!----------Online Models--------->
-	<div id="HotModelArea">
+	<div id="HotModelArea" class="zh-reveal">
 		<div id="Online_Models_Bar" class="Title_Bar">
 		  <div class="Title_Left_Area">
 			<img class="TitleSmallIcon" src="./img/fire.svg" />
@@ -275,11 +329,11 @@
 	</div>		
 	
 	<!----------Makerlab--------->
-	<div id="MakerlabArea">
-		<div id="RecentTitleBlock">
-			<div id="Recent_LEFT_Title">
+	<div id="MakerlabArea" class="zh-reveal">
+		<div id="MakerlabTitleBlock">
+			<div id="Makerlab_LEFT_Title">
 			<img class="TitleSmallIcon" src="./img/ml.svg" />
-		    <div id="RecentTitle" class="Content-Title trans TextS1" tid="">MakerLab</div>
+		    <div id="MakerlabTitle" class="Content-Title trans TextS1" tid="">MakerLab</div>
 			</div>
             <div class="Right_Title_More TextS1" onClick="SwtichLeftMenu('makerlab')"><span class="trans" tid="t108">MORE</span> ></div>	
 		</div>
@@ -338,7 +392,7 @@
 	</div>	
 	
 	<!-------------Print History-------------->
-	<div id="PrintHistoryArea">
+	<div id="PrintHistoryArea" class="zh-reveal">
 		<div id="PrintHistory_Bar" class="Title_Bar">
 		  <div class="Title_Left_Area">
 			<img class="TitleSmallIcon" src="./img/ph.svg" />
@@ -605,34 +659,34 @@
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/studio-quick-start')">
 		<div class="UG_IMG"><img src="img/quick_start.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk1">Quick Start</div>
-		<div class="UG_DESC trans" tid="wk2">This article introduces the most basic usage of Bambu Studio. It guides users to configure software, create projects, and complete the first printing task step by step. </div>
+		<div class="UG_DESC trans" tid="wk2">This article introduces the most basic usage of ZH-Studio. It guides users to configure software, create projects, and complete the first printing task step by step. </div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/project-based-workflow')">
 		<div class="UG_IMG"><img src="img/project_based_workflow.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk3">Project Based Workflow</div>
-		<div class="UG_DESC trans" tid="wk4">Bambu Studio has put forward a leading workflow to truly achieve an “all in one” project. Based on the mainstream 3MF project format, it provides a series of revolutionary new features, such as Multi-Plate Support, a Project Resource Manager, and Assembly/Part View. It greatly improves the efficiency of both creators and regular users.</div>
+		<div class="UG_DESC trans" tid="wk4">ZH-Studio has put forward a leading workflow to truly achieve an “all in one” project. Based on the mainstream 3MF project format, it provides a series of revolutionary new features, such as Multi-Plate Support, a Project Resource Manager, and Assembly/Part View. It greatly improves the efficiency of both creators and regular users.</div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/high-speed-print-at-quality')">
 		<div class="UG_IMG"><img src="img/high_speed_print_at_quality.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk5">High Speed Print at Quality</div>
-		<div class="UG_DESC trans" tid="wk6">It is challenging to print at high speed while maintaining high quality. Bambu Studio makes this happen.
+		<div class="UG_DESC trans" tid="wk6">It is challenging to print at high speed while maintaining high quality. ZH-Studio makes this happen.
         "Arch Move" makes the toolhead move smoothly and reduces the machine's vibration. The smart cooling is based on fine-tuned cooling parameters for each filament type.
         "Auto slow down" for overhang walls works to prevent deformation at high speeds.</div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/multi-color-printing')">
 		<div class="UG_IMG"><img src="img/multi_color_printing.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk7">Multi-Color Printing</div>
-		<div class="UG_DESC trans" tid="wk8">Bambu Studio provides versatile colorizing tools to make a colorful model. You can freely add/remove filaments in a project and colorize your model with different brushes. Before printing, each filament will be auto-mapped to an AMS slot, not needing to manually change the spool placement in the AMS.</div>
+		<div class="UG_DESC trans" tid="wk8">ZH-Studio provides versatile colorizing tools to make a colorful model. You can freely add/remove filaments in a project and colorize your model with different brushes. Before printing, each filament will be auto-mapped to an AMS slot, not needing to manually change the spool placement in the AMS.</div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/how-to-set-slicing-parameters')">
 		<div class="UG_IMG"><img src="img/setting_guide_of_slicing_parameters.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk9">Setting Guide of Slicing Parameters</div>
-		<div class="UG_DESC trans" tid="wk10">The parameter management features in Bambu Studio provide very flexible and powerful control over the slicing process. This article introduces the organization of parameters and provides some skills on taking full advantage of these capabilities.</div>
+		<div class="UG_DESC trans" tid="wk10">The parameter management features in ZH-Studio provide very flexible and powerful control over the slicing process. This article introduces the organization of parameters and provides some skills on taking full advantage of these capabilities.</div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/remote-control')">
 		<div class="UG_IMG"><img src="img/remote_control_and_monitoring.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk11">Remote Control & Monitoring</div>
-		<div class="UG_DESC trans" tid="wk12">Bambu Studio support sending print job to your printer over WAN/LAN network, controlling & monitoring every aspect of your 3D printer and printing jobs. If you have more than one printer, you can easily switch between them in the device list.</div>
+		<div class="UG_DESC trans" tid="wk12">ZH-Studio support sending print job to your printer over WAN/LAN network, controlling & monitoring every aspect of your 3D printer and printing jobs. If you have more than one printer, you can easily switch between them in the device list.</div>
 	</div>
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/step')">
 		<div class="UG_IMG"><img src="img/step.png" /></div>
@@ -642,11 +696,12 @@
 	<div class="GuideBlock" onClick="OpenWikiUrl('https://wiki.bambulab.com/en/software/bambu-studio/3d-text')">
 		<div class="UG_IMG"><img src="img/3d_text.png" /></div>
 		<div class="UG_TITLE trans TextS1" tid="wk15">3D Text</div>
-		<div class="UG_DESC trans" tid="wk16">With 3D Text tool, users can easily create various 3D text shapes in the project, making the model more personalized. Bambu Studio provides dozens of fonts and supports bold and italic styles to give text greater flexibility.</div>
+		<div class="UG_DESC trans" tid="wk16">With 3D Text tool, users can easily create various 3D text shapes in the project, making the model more personalized. ZH-Studio provides dozens of fonts and supports bold and italic styles to give text greater flexibility.</div>
 	</div>
 </div>	
 	
 	
+<footer id="zh-footer" data-zh-de="ZH-Studio · Unabhängiger Community-Fork von Bambu Studio · GNU AGPLv3. Kein offizielles Bambu-Lab-Produkt." data-zh-en="ZH-Studio · Independent community fork of Bambu Studio · GNU AGPLv3. Not an official Bambu Lab product.">ZH-Studio · Independent community fork of Bambu Studio · GNU AGPLv3.</footer>
 </body>
 </html>
 

@@ -125,25 +125,17 @@ class MainFrame : public DPIFrame
     void on_presets_changed(SimpleEvent&);
     void on_value_changed(wxCommandEvent&);
 
-    bool can_start_new_project() const;
-    bool can_open_project() const;
-    bool can_add_models() const;
-    bool can_export_model() const;
     bool can_export_toolpaths() const;
     bool can_export_supports() const;
-    bool can_export_gcode() const;
-    bool can_export_all_gcode() const;
     bool can_print_3mf() const;
     bool can_send_gcode() const;
     //bool can_export_gcode_sd() const;
     //bool can_eject() const;
     bool can_slice() const;
-    bool can_change_view() const;
     bool can_toggle_camera_fullscreen() const;
     void toggle_camera_fullscreen();
     bool can_select() const;
     bool can_deselect() const;
-    bool can_clone() const;
     bool can_delete() const;
     bool can_delete_all() const;
     bool can_reslice() const;
@@ -230,6 +222,7 @@ class MainFrame : public DPIFrame
 protected:
     virtual void on_dpi_changed(const wxRect &suggested_rect) override;
     virtual void on_sys_color_changed() override;
+    bool prepare_slice(bool all_plates);
 
 #ifdef __WIN32__
     WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) override;
@@ -368,6 +361,19 @@ public:
     void        on_config_changed(DynamicPrintConfig* cfg) const ;
     void        set_print_button_to_default(PrintSelectType select_type);
 
+    bool can_start_new_project() const;
+    bool can_open_project() const;
+    bool can_add_models() const;
+    // Shared, read-only capability checks used by menus and the ZH command palette.
+    bool can_export_model() const;
+    bool can_clone() const;
+    bool can_export_gcode() const;
+    bool can_export_all_gcode() const;
+    bool can_slice_plate() const;
+    void slice_plate();
+    bool can_print_plate() const;
+    void print_plate();
+    bool can_change_view() const;
     bool can_save() const;
     bool can_save_as() const;
     //BBS

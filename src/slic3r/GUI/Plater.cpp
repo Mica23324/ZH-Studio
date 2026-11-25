@@ -1,3 +1,6 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
+#include "ZHStyle.hpp"
 #include "Plater.hpp"
 #include "libslic3r/PerfTrace.hpp"
 #include "DeviceCore/DevNozzleRack.h"
@@ -1338,7 +1341,7 @@ void Sidebar::priv::flush_printer_sync(bool restart)
         *counter_sync_printer = 6;
         timer_sync_printer->Start(500);
     }
-    btn_sync_printer->SetBackgroundColorNormal((*counter_sync_printer & 1) ? "#F8F8F8" :"#00AE42");
+    btn_sync_printer->SetBackgroundColorNormal((*counter_sync_printer & 1) ? "#F8F8F8" :"#0EA5E9");
     if (--*counter_sync_printer <= 0)
         timer_sync_printer->Stop();
 }
@@ -3405,7 +3408,7 @@ bool Sidebar::priv::sync_extruder_list(bool &only_external_material, bool is_man
 
 void Sidebar::priv::update_sync_status(const MachineObject *obj)
 {
-    StateColor not_synced_colour(std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Normal));
+    StateColor not_synced_colour(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     auto clear_all_sync_status = [this, &not_synced_colour]() {
         panel_printer_preset->ShowBadge(false);
         panel_printer_bed->ShowBadge(false);
@@ -3649,7 +3652,7 @@ Sidebar::Sidebar(Plater *parent)
     // As a result we can see the empty block at the bottom of the sidebar
     // But if we set this value to 5, layout will be better
     //p->scrolled->SetScrollRate(0, 5);
-    p->scrolled->SetBackgroundColour(*wxWHITE);
+    p->scrolled->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
 
 
     SetFont(wxGetApp().normal_font());
@@ -3661,6 +3664,7 @@ Sidebar::Sidebar(Plater *parent)
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 #endif
 #endif
+    SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
 
     int em = wxGetApp().em_unit();
     //BBS refine layout and styles
@@ -3668,7 +3672,7 @@ Sidebar::Sidebar(Plater *parent)
     auto* scrolled_sizer = m_scrolled_sizer = new wxBoxSizer(wxVERTICAL);
     p->scrolled->SetSizer(scrolled_sizer);
 
-    wxColour title_bg = ThemeColor::Grey350;
+    wxColour title_bg = ZHStyle::panel(wxGetApp().dark_mode());
     wxColour inactive_text = wxColour(86, 86, 86);
     wxColour active_text = wxColour(0, 0, 0);
     wxColour static_line_col = wxColour(166, 169, 170);
@@ -3688,6 +3692,11 @@ Sidebar::Sidebar(Plater *parent)
         p->m_printer_icon = new ScalableButton(p->m_panel_printer_title, wxID_ANY, "sidebar_menu_up");
         p->m_printer_icon->SetToolTip(_L("Collapse panel"));
         p->m_text_printer_settings = new Label(p->m_panel_printer_title, _L("Printer"), LB_PROPAGATE_MOUSE_EVENT);
+        // ZH-Studio: section heading in the accent colour on the workspace surface.
+        ZHStyle::ApplyHeading(p->m_text_printer_settings, ZHTheme::accent());
+        p->m_text_printer_settings->SetBackgroundColour(title_bg);
+        p->m_panel_printer_title->SetBackgroundColor(title_bg);
+        p->m_panel_printer_title->SetBackgroundColor2(title_bg);
 
         auto toggle_printer_content = [this]() {
             if (p->m_panel_printer_content->GetMaxHeight() == 0) {
@@ -3736,7 +3745,7 @@ Sidebar::Sidebar(Plater *parent)
         //scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
 
         // add printer title
-        scrolled_sizer->Add(p->m_panel_printer_title, 0, wxEXPAND | wxALL, 0);
+        scrolled_sizer->Add(p->m_panel_printer_title, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(10));
         // The second click of a quick double click arrives as wxEVT_LEFT_DCLICK on MSW; handle it too so no click is dropped.
         for (auto evt : {wxEVT_LEFT_DOWN, wxEVT_LEFT_DCLICK})
             p->m_panel_printer_title->Bind(evt, [toggle_printer_content] (auto & e) {
@@ -3745,19 +3754,21 @@ Sidebar::Sidebar(Plater *parent)
 
         // add spliter 2
         auto spliter_2 = new ::StaticLine(p->scrolled);
-        spliter_2->SetLineColour("#CECECE");
-        scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
+        spliter_2->SetLineColour(ZHStyle::outline(wxGetApp().dark_mode()));
+        scrolled_sizer->Add(spliter_2, 0, wxEXPAND | wxLEFT | wxRIGHT, FromDIP(10));
 
 
         /*************************** 2. add printer content ************************/
         p->m_panel_printer_content = new wxPanel(p->scrolled, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-        p->m_panel_printer_content->SetBackgroundColour(wxColour(255, 255, 255));
-        StateColor panel_bd_col(std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Pressed),
-                                std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Hovered),
-                                std::pair<wxColour, int>(wxColour("#EEEEEE"), StateColor::Normal));
+        p->m_panel_printer_content->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
+        StateColor panel_bd_col(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed),
+                                std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
+                                std::pair<wxColour, int>(ZHStyle::outline(wxGetApp().dark_mode()), StateColor::Normal));
 
         p->panel_printer_preset = new StaticBox(p->m_panel_printer_content);
         p->panel_printer_preset->SetCornerRadius(8);
+        p->panel_printer_preset->SetBackgroundColor(ZHStyle::panel(wxGetApp().dark_mode()));
+        p->panel_printer_preset->SetBackgroundColour(ZHStyle::panel(wxGetApp().dark_mode()));
         p->panel_printer_preset->SetBorderColor(panel_bd_col);
         p->panel_printer_preset->SetMinSize(PRINTER_PANEL_SIZE);
         p->panel_printer_preset->Bind(wxEVT_LEFT_DOWN, [this](auto & evt) {
@@ -3786,7 +3797,7 @@ Sidebar::Sidebar(Plater *parent)
         p->combo_printer = combo_printer;
 
         p->btn_connect_printer = new ScalableButton(p->panel_printer_preset, wxID_ANY, "monitor_signal_strong");
-        p->btn_connect_printer->SetBackgroundColour(wxColour(255, 255, 255));
+        p->btn_connect_printer->SetBackgroundColour(ZHStyle::panel(wxGetApp().dark_mode()));
         p->btn_connect_printer->SetToolTip(_L("Connection"));
         p->btn_connect_printer->Bind(wxEVT_BUTTON, [this, combo_printer](wxCommandEvent)
             {
@@ -3805,6 +3816,8 @@ Sidebar::Sidebar(Plater *parent)
         // Bed type selection
         p->panel_printer_bed = new StaticBox(p->m_panel_printer_content);
         p->panel_printer_bed->SetCornerRadius(8);
+        p->panel_printer_bed->SetBackgroundColor(ZHStyle::panel(wxGetApp().dark_mode()));
+        p->panel_printer_bed->SetBackgroundColour(ZHStyle::panel(wxGetApp().dark_mode()));
         p->panel_printer_bed->SetBorderColor(panel_bd_col);
         p->panel_printer_bed->SetMinSize(PRINTER_PANEL_SIZE);
         p->panel_printer_bed->Bind(wxEVT_LEFT_DOWN, [this](auto &evt) {
@@ -3816,9 +3829,9 @@ Sidebar::Sidebar(Plater *parent)
         wiki_bed->Bind(wxEVT_BUTTON, [this](wxCommandEvent) {
             bool is_zh  = wxGetApp().app_config->get("language") == "zh_CN";
             if (is_zh) {
-                wxLaunchDefaultBrowser("https://wiki.bambulab.com/zh/filament-acc/acc/plates");
+                Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/zh/filament-acc/acc/plates");
             } else {
-                wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/filament-acc/acc/plates");
+                Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/filament-acc/acc/plates");
             }
         });
 
@@ -3900,8 +3913,8 @@ Sidebar::Sidebar(Plater *parent)
                 std::pair<wxColour, int>(wxColour("#F8F8F8"), StateColor::Hovered),
                 std::pair<wxColour, int>(wxColour("#F8F8F8"), StateColor::Normal));
         StateColor btn_sync_bd_col(
-                std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Pressed),
-                std::pair<wxColour, int>(wxColour("#00AE42"), StateColor::Hovered),
+                std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed),
+                std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
                 std::pair<wxColour, int>(wxColour("#EEEEEE"), StateColor::Normal));
         btn_sync->SetBackgroundColor(btn_sync_bg_col);
         btn_sync->SetBorderColor(btn_sync_bd_col);
@@ -4028,7 +4041,7 @@ Sidebar::Sidebar(Plater *parent)
         p->layout_printer(true, NozzleLayout::DualExtruder);
         p->m_panel_printer_content->SetSizer(p->vsizer_printer);
         p->m_panel_printer_content->Layout();
-        scrolled_sizer->Add(p->m_panel_printer_content, 0, wxEXPAND, 0);
+        scrolled_sizer->Add(p->m_panel_printer_content, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
     }
 
     {
@@ -4074,6 +4087,10 @@ Sidebar::Sidebar(Plater *parent)
     p->m_filament_icon->SetToolTip(_L("Collapse panel"));
     p->m_filament_icon->Bind(wxEVT_BUTTON, [toggle_filament_content](wxCommandEvent &) { toggle_filament_content(); });
     p->m_staticText_filament_settings = new Label(p->m_panel_filament_title, _L("Project Filaments"), LB_PROPAGATE_MOUSE_EVENT);
+    ZHStyle::ApplyHeading(p->m_staticText_filament_settings, ZHTheme::accent());
+    p->m_staticText_filament_settings->SetBackgroundColour(title_bg);
+    p->m_panel_filament_title->SetBackgroundColor(title_bg);
+    p->m_panel_filament_title->SetBackgroundColor2(title_bg);
     bSizer39->Add(p->m_filament_icon, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, FromDIP(10));
     bSizer39->Add( p->m_staticText_filament_settings, 0, wxALIGN_CENTER );
     bSizer39->Add(FromDIP(10), 0, 0, 0, 0);
@@ -4082,12 +4099,12 @@ Sidebar::Sidebar(Plater *parent)
     p->m_panel_filament_title->SetSizer( bSizer39 );
     p->m_panel_filament_title->Layout();
     auto spliter_1 = new ::StaticLine(p->scrolled);
-    spliter_1->SetLineColour("#A6A9AA");
-    scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
-    scrolled_sizer->Add(p->m_panel_filament_title, 0, wxEXPAND | wxALL, 0);
+    spliter_1->SetLineColour(ZHStyle::outline(wxGetApp().dark_mode()));
+    scrolled_sizer->Add(spliter_1, 0, wxEXPAND | wxLEFT | wxRIGHT, FromDIP(10));
+    scrolled_sizer->Add(p->m_panel_filament_title, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(10));
     auto spliter_2 = new ::StaticLine(p->scrolled);
-    spliter_2->SetLineColour("#CECECE");
-    scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
+    spliter_2->SetLineColour(ZHStyle::outline(wxGetApp().dark_mode()));
+    scrolled_sizer->Add(spliter_2, 0, wxEXPAND | wxLEFT | wxRIGHT, FromDIP(10));
 
     bSizer39->AddStretchSpacer(1);
 
@@ -4102,7 +4119,7 @@ Sidebar::Sidebar(Plater *parent)
     StateColor purge_fg_col(std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Pressed), std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Normal));
 
-    StateColor purge_bd_col(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Pressed), std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Hovered),
+    StateColor purge_bd_col(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
 
     p->m_purge_mode_btn->SetBackgroundColor(purge_bg_col);
@@ -4143,8 +4160,8 @@ Sidebar::Sidebar(Plater *parent)
                             std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Normal));
 
-    StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Hovered),
+    StateColor flush_bd_col(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
 
     p->m_flushing_volume_btn->SetBackgroundColor(flush_bg_col);
@@ -4192,7 +4209,7 @@ Sidebar::Sidebar(Plater *parent)
     // ---- "Filament" subtitle row with +/- buttons ----
     {
         p->m_panel_filament_subtitle = new wxPanel(p->scrolled, wxID_ANY);
-        p->m_panel_filament_subtitle->SetBackgroundColour(*wxWHITE);
+        p->m_panel_filament_subtitle->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
         auto* subtitle_sizer = new wxBoxSizer(wxHORIZONTAL);
 
         // "Filament" label
@@ -4240,18 +4257,18 @@ Sidebar::Sidebar(Plater *parent)
 
     // ---- Wrapper panel for collapse/expand of all filament content ----
     p->m_filament_area_wrapper = new wxPanel(p->scrolled, wxID_ANY);
-    p->m_filament_area_wrapper->SetBackgroundColour(*wxWHITE);
+    p->m_filament_area_wrapper->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
     auto* wrapper_sizer = new wxBoxSizer(wxVERTICAL);
 
     // ---- Physical filament scroll area (independent scrollbar) ----
     p->m_physical_scroll_area = new wxScrolledWindow(p->m_filament_area_wrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
     p->m_physical_scroll_area->SetScrollbars(0, 100, 1, 2);
     p->m_physical_scroll_area->SetScrollRate(0, 5);
-    p->m_physical_scroll_area->SetBackgroundColour(*wxWHITE);
+    p->m_physical_scroll_area->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
     auto* phys_scroll_sizer = new wxBoxSizer(wxVERTICAL);
 
     p->m_panel_filament_content = new wxPanel(p->m_physical_scroll_area, wxID_ANY);
-    p->m_panel_filament_content->SetBackgroundColour(*wxWHITE);
+    p->m_panel_filament_content->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
 
     // BBS: filament double columns
     p->sizer_filaments = new wxBoxSizer(wxHORIZONTAL);
@@ -4510,6 +4527,7 @@ Sidebar::Sidebar(Plater *parent)
     auto *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(p->scrolled, 1, wxEXPAND);
     SetSizer(sizer);
+    apply_layout_theme(wxGetApp().dark_mode());
 }
 
 Sidebar::~Sidebar() {}
@@ -4540,7 +4558,61 @@ void Sidebar::on_leave_image_printer_bed(wxMouseEvent &evt) {
         p->big_bed_image_popup->on_hide();
     }
 }
+
+void Sidebar::apply_layout_theme(bool dark)
+{
+    const wxColour workspace = ZHStyle::workspace_surface(dark);
+    const wxColour panel = ZHStyle::panel(dark);
+    const wxColour border = ZHStyle::outline(dark);
+
+    SetBackgroundColour(workspace);
+    p->scrolled->SetBackgroundColour(workspace);
+    p->m_panel_printer_title->SetBackgroundColor(panel);
+    p->m_panel_printer_title->SetBackgroundColor2(panel);
+    p->m_text_printer_settings->SetBackgroundColour(panel);
+    p->m_panel_printer_content->SetBackgroundColour(workspace);
+    p->m_panel_filament_title->SetBackgroundColor(panel);
+    p->m_panel_filament_title->SetBackgroundColor2(panel);
+    p->m_staticText_filament_settings->SetBackgroundColour(panel);
+    p->m_panel_filament_subtitle->SetBackgroundColour(workspace);
+    p->m_filament_area_wrapper->SetBackgroundColour(workspace);
+    p->m_physical_scroll_area->SetBackgroundColour(workspace);
+    p->m_panel_filament_content->SetBackgroundColour(workspace);
+    p->m_panel_mixed_title->SetBackgroundColour(panel);
+    p->m_panel_mixed_content->SetBackgroundColour(workspace);
+    p->m_mixed_scroll_area->SetBackgroundColour(workspace);
+
+    StateColor printer_border(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed),
+                              std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
+                              std::pair<wxColour, int>(border, StateColor::Normal));
+    for (StaticBox* card : {p->panel_printer_preset, p->panel_printer_bed}) {
+        card->SetBackgroundColor(panel);
+        card->SetBackgroundColour(panel);
+        card->SetBorderColor(printer_border);
+    }
+
+    const wxColour filament_card = ZHStyle::panel(dark);
+    for (StaticBox* item : p->filament_items) {
+        item->SetBackgroundColor(StateColor(std::make_pair(filament_card, (int)StateColor::Normal)));
+        item->SetBackgroundColour(filament_card);
+    }
+    StateColor chip_background(std::make_pair(border, (int)StateColor::Hovered),
+                               std::make_pair(filament_card, (int)StateColor::Normal));
+    chip_background.setTakeFocusedAsHovered(false);
+    for (NozzleChipButton* label : p->filament_nozzle_labels) {
+        label->SetBackgroundColour(filament_card);
+        label->SetBackgroundColor(chip_background);
+        label->SetTextColorNormal(ZHStyle::secondary_text(dark));
+    }
+    for (wxStaticBitmap* icon : p->filament_incompatible_icons)
+        icon->SetBackgroundColour(filament_card);
+
+    p->scrolled->Refresh(false);
+    p->scrolled->Layout();
+}
+
 void Sidebar::on_change_color_mode(bool is_dark) {
+    apply_layout_theme(is_dark);
     const ModelObjectPtrs &mos = wxGetApp().model().objects;
     for (int i = 0; i < mos.size(); i++) {
         wxGetApp().obj_list()->update_info_items(i,nullptr,false,true);
@@ -4703,14 +4775,15 @@ void Sidebar::priv::relayout_mixed_filament_grid(bool force)
 void Sidebar::init_filament_combo(PlaterPresetComboBox **combo, const int filament_idx)
 {
     auto filament_item = new StaticBox(p->m_panel_filament_content);
-    filament_item->SetBackgroundColor(StateColor(std::make_pair(*wxWHITE, (int) StateColor::Normal)));
-    filament_item->SetBackgroundColour(*wxWHITE);
+    const wxColour filament_card = ZHStyle::panel(wxGetApp().dark_mode());
+    filament_item->SetBackgroundColor(StateColor(std::make_pair(filament_card, (int) StateColor::Normal)));
+    filament_item->SetBackgroundColour(filament_card);
     filament_item->SetCornerRadius(FromDIP(6));
     filament_item->SetBorderWidth(1);
     // Border starts the same colour as the card's own fill (i.e. invisible) -- refresh_filament_nozzle_label
     // switches it to ThemeColor::Danger for a whole-row outline once this slot is marked incompatible
     // (Figma node 7808:13253), rather than only flagging it with the small inline icon.
-    filament_item->SetBorderColor(StateColor(std::make_pair(*wxWHITE, (int) StateColor::Normal)));
+    filament_item->SetBorderColor(StateColor(std::make_pair(filament_card, (int) StateColor::Normal)));
     wxGetApp().UpdateDarkUIWin(filament_item);
     auto item_sizer = new wxBoxSizer(wxVERTICAL);
     filament_item->SetSizer(item_sizer);
@@ -4764,12 +4837,12 @@ void Sidebar::init_filament_combo(PlaterPresetComboBox **combo, const int filame
     // DiameterButtonPanel builds from Button directly -- but drawn as two independent text runs
     // (see its definition) so the flow-type text can use a smaller font than the diameter.
     auto *nozzle_label = new NozzleChipButton(*combo);
-    nozzle_label->SetTextColorNormal(ThemeColor::TextMuted);
+    nozzle_label->SetTextColorNormal(ZHStyle::secondary_text(wxGetApp().dark_mode()));
     // Rounded-corner rendering (SetCornerRadius below) clears its offscreen bitmap
     // using the widget's native background colour, separate from the StateColor fill
     // -- override it too so no trace of the inherited grey-ish parent background
     // shows through at the corners.
-    nozzle_label->SetBackgroundColour(*wxWHITE);
+    nozzle_label->SetBackgroundColour(filament_card);
     // StateColor falls back to a defined-but-mismatched-state color rather than "no
     // fill" when a queried state (e.g. Normal) has no explicit entry -- every other
     // hover-chip StateColor in this codebase (see StateColor::createButtonStyleGray())
@@ -4778,8 +4851,8 @@ void Sidebar::init_filament_combo(PlaterPresetComboBox **combo, const int filame
     // background is not pure white, so GetBackgroundColour() here would (and did)
     // still resolve close to Grey300. The filament row itself (filament_item, a few
     // frames up) is explicitly white, so match that instead.
-    StateColor nozzle_label_bg(std::make_pair(ThemeColor::Grey300, (int) StateColor::Hovered),
-                               std::make_pair(*wxWHITE, (int) StateColor::Normal));
+    StateColor nozzle_label_bg(std::make_pair(ZHStyle::outline(wxGetApp().dark_mode()), (int) StateColor::Hovered),
+                               std::make_pair(filament_card, (int) StateColor::Normal));
     // StateColor treats a Focused state as if it were Hovered when no explicit
     // entry matches (see StateColor::colorForStates), so once this button keeps
     // keyboard focus after being clicked to open the popup, it would otherwise
@@ -4816,7 +4889,7 @@ void Sidebar::init_filament_combo(PlaterPresetComboBox **combo, const int filame
     // parented into it ignores SetBackgroundColour and paints its own button-face box, so this is
     // a plain static bitmap instead -- it isn't clickable, only shown with a tooltip, and actually
     // honors SetBackgroundColour, matched here to combo's normal-state (white) background.
-    incompatible_icon->SetBackgroundColour(*wxWHITE);
+    incompatible_icon->SetBackgroundColour(filament_card);
     // Fallback until refresh_filament_nozzle_label() writes the slot's own reason (no preset,
     // nozzle not installed, or AMS tray unmatched).
     incompatible_icon->SetToolTip(_L("This filament does not support printing with the current nozzle"));
@@ -6234,6 +6307,7 @@ void Sidebar::msw_rescale()
 void Sidebar::sys_color_changed()
 {
     wxWindowUpdateLocker noUpdates(this);
+    apply_layout_theme(wxGetApp().dark_mode());
 
 #if 0
     for (wxWindow* win : std::vector<wxWindow*>{ this, p->sliced_info->GetStaticBox(), p->object_info->GetStaticBox(), p->btn_reslice, p->btn_export_gcode })
@@ -7547,8 +7621,8 @@ void Sidebar::set_flushing_volume_warning(const bool flushing_volume_modify)
                                 std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Hovered),
                                 std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Normal));
 
-        StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Pressed),
-                                std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Hovered),
+        StateColor flush_bd_col(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Pressed),
+                                std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Hovered),
                                 std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
         p->m_flushing_volume_btn->SetBorderColor(flush_bd_col);
         p->m_flushing_volume_btn->SetTextColor(flush_fg_col);
@@ -13883,6 +13957,11 @@ bool delete_file_name_redundant_suffix(fs::path &path, const std::wstring &suffi
     return false;
 }
 
+static bool export_file_cancelled(const wxString& path)
+{
+    return path.empty() || path == "<cancel>";
+}
+
 wxString Plater::priv::get_export_file(GUI::FileType file_type)
 {
     wxString wildcard;
@@ -17686,8 +17765,8 @@ public:
         wxBoxSizer* option2_button_sizer = new wxBoxSizer(wxHORIZONTAL);
         option2_button_sizer->AddStretchSpacer();
 
-        StateColor btn_bg_green2(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                                 std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+        StateColor btn_bg_green2(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                                 std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                                  std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
         Button* goback_button = new Button(option2_box, _L("Go Back"));
@@ -17965,8 +18044,8 @@ public:
         wxBoxSizer* option2_button_sizer = new wxBoxSizer(wxHORIZONTAL);
         option2_button_sizer->AddStretchSpacer();
 
-        StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                                std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+        StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                                std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                                 std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
         Button* goback_button = new Button(option2_box, _L("Go Back"));
@@ -18535,7 +18614,7 @@ int Plater::priv::update_helio_background_process_v2_once(std::string& printer_i
                         "", wxICON_WARNING | wxOK,
                         wxString(),
                         _L("View supported materials"),
-                        [](const wxString &) { wxLaunchDefaultBrowser("https://wiki.helioadditive.com/en/supportedprinters"); });
+                        [](const wxString &) { Slic3r::GUI::zh_open_external_browser("https://wiki.helioadditive.com/en/supportedprinters"); });
                     errordialog.ShowModal();
                     return -1;
                 }
@@ -18586,7 +18665,7 @@ int Plater::priv::update_helio_background_process_v2_once(std::string& printer_i
                             "", wxICON_WARNING | wxOK,
                             wxString(),
                             _L("View supported materials"),
-                            [](const wxString &) { wxLaunchDefaultBrowser("https://wiki.helioadditive.com/en/supportedprinters"); });
+                            [](const wxString &) { Slic3r::GUI::zh_open_external_browser("https://wiki.helioadditive.com/en/supportedprinters"); });
                         errordialog.ShowModal();
                         return -1;
                     }
@@ -18921,8 +19000,8 @@ int Plater::priv::update_helio_background_process_once(std::string& printer_id,
                     wxBoxSizer* option2_button_sizer = new wxBoxSizer(wxHORIZONTAL);
                     option2_button_sizer->AddStretchSpacer();
 
-                    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                                           std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+                    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                                           std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                                            std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
                     Button* goback_button = new Button(option2_box, _L("Go Back"));
@@ -19702,7 +19781,7 @@ void Plater::priv::on_action_send_to_multi_app(SimpleEvent &)
 
         const std::string query = "?version=v1.6.0&path=" + into_u8(filepath) + "&name=" + into_u8(filename);
         const wxString    url   = from_u8("bambu-farm-client://upload-file" + Http::url_encode(query));
-        if (!wxLaunchDefaultBrowser(url)) {
+        if (!Slic3r::GUI::zh_open_external_browser(url)) {
             GUI::MessageDialog msgdialog(nullptr, _L("Failed to start Bambu Farm Manager Client."), "", wxAPPLY | wxOK);
             msgdialog.ShowModal();
         }
@@ -25734,11 +25813,11 @@ ProjectDropDialog::ProjectDropDialog(const std::string &filename)
     wxBoxSizer *m_sizer_right  = new wxBoxSizer(wxHORIZONTAL);
 
     m_confirm = new Button(this, _L("OK"));
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                            std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     m_confirm->SetBackgroundColor(btn_bg_green);
-    m_confirm->SetBorderColor(wxColour(0, 174, 66));
+    m_confirm->SetBorderColor(ZHTheme::accent());
     m_confirm->SetTextColor(wxColour("#FFFFFE"));
     m_confirm->SetSize(PROJECT_DROP_DIALOG_BUTTON_SIZE);
     m_confirm->SetMinSize(PROJECT_DROP_DIALOG_BUTTON_SIZE);
@@ -27064,7 +27143,7 @@ void Plater::send_gcode_finish(wxString name)
 void Plater::export_core_3mf()
 {
     wxString path = p->get_export_file(FT_3MF);
-    if (path.empty()) { return; }
+    if (export_file_cancelled(path)) { return; }
     const std::string path_u8 = into_u8(path);
     export_3mf(path_u8, SaveStrategy::Silence);
 }
@@ -27249,7 +27328,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls)
     } else {
         path = p->get_export_file(FT_STL);
     }
-    if (path.empty()) { return; }
+    if (export_file_cancelled(path)) { return; }
     const std::string path_u8 = into_u8(path);
 
     wxBusyCursor wait;
@@ -27897,7 +27976,7 @@ void Plater::export_toolpaths_to_obj() const
         return;
 
     wxString path = p->get_export_file(FT_OBJ);
-    if (path.empty())
+    if (export_file_cancelled(path))
         return;
 
     wxBusyCursor wait;
@@ -30021,9 +30100,9 @@ void Plater::show_seqprintinfo_notification(bool has_error)
         auto wiki_callback = [](wxEvtHandler*) {
             bool is_zh = wxGetApp().app_config->get("language") == "zh_CN";
             if (is_zh) {
-                wxLaunchDefaultBrowser("https://wiki.bambulab.com/zh/software/bambu-studio/auto-arranging");
+                Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/zh/software/bambu-studio/auto-arranging");
             } else {
-                wxLaunchDefaultBrowser("https://wiki.bambulab.com/en/software/bambu-studio/auto-arranging");
+                Slic3r::GUI::zh_open_external_browser("https://wiki.bambulab.com/en/software/bambu-studio/auto-arranging");
             }
             return false;
         };

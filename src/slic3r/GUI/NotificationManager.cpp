@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "NotificationManager.hpp"
 #include "GLCanvas3D.hpp"
 #include "Plater.hpp"
@@ -2053,7 +2054,7 @@ void NotificationManager::push_helio_error_notification(const std::string &text)
         hypertext = _u8L("Open link for more info");
         callback = [urls](wxEvtHandler*) {
             for (const auto& url : urls)
-                wxLaunchDefaultBrowser(url);
+                Slic3r::GUI::zh_open_external_browser(url);
             return false;
         };
     }

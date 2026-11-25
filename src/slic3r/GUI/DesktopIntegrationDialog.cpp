@@ -331,7 +331,7 @@ void DesktopIntegrationDialog::perform_desktop_integration()
             // Write slicer desktop file
             std::string desktop_file = GUI::format(
                 "[Desktop Entry]\n"
-                "Name=BambuStudio%1%\n"
+                "Name=ZH-Studio%1%\n"
                 "GenericName=3D Printing Software\n"
                 "Icon=BambuStudio%2%\n"
                 "Exec=\"%3%\" %%F\n"
@@ -400,7 +400,7 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         // Desktop file
         std::string desktop_file = GUI::format(
             "[Desktop Entry]\n"
-            "Name=Bambu Gcode Viewer%1%\n"
+            "Name=ZH-Studio GCode Viewer%1%\n"
             "GenericName=3D Printing Software\n"
             "Icon=BambuStudio-gcodeviewer%2%\n"
             "Exec=\"%3%\" --gcodeviewer %%F\n"

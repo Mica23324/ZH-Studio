@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "AboutDialog.hpp"
 #include "I18N.hpp"
 
@@ -298,19 +299,19 @@ AboutDialog::AboutDialog()
         version_font.SetPointSize(FromDIP(16));
         version->SetFont(version_font);
         version->SetForegroundColour(wxColour("#FFFFFD"));
-        version->SetBackgroundColour(wxColour("#00AF42"));
+        version->SetBackgroundColour(ZHTheme::accent());
         vesizer->Add(version, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, FromDIP(5));
 #if BBL_INTERNAL_TESTING
         wxString plugin_version = wxString::Format("Plugin Version: %s", wxGetApp().getAgent() ? wxGetApp().getAgent()->get_version() : "");
         wxStaticText *plugin_version_text = new wxStaticText(this, wxID_ANY, plugin_version, wxDefaultPosition, wxDefaultSize);
         plugin_version_text->SetForegroundColour(wxColour("#FFFFFE"));
-        plugin_version_text->SetBackgroundColour(wxColour("#00AF42"));
+        plugin_version_text->SetBackgroundColour(ZHTheme::accent());
         vesizer->Add(plugin_version_text, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, FromDIP(5));
 
         wxString build_time = wxString::Format("Build Time: %s", std::string(SLIC3R_BUILD_TIME));
         wxStaticText* build_time_text = new wxStaticText(this, wxID_ANY, build_time, wxDefaultPosition, wxDefaultSize);
         build_time_text->SetForegroundColour(wxColour("#FFFFFE"));
-        build_time_text->SetBackgroundColour(wxColour("#00AF42"));
+        build_time_text->SetBackgroundColour(ZHTheme::accent());
         vesizer->Add(build_time_text, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, FromDIP(5));
 #endif
         vesizer->Add(0, 0, 1, wxEXPAND, FromDIP(5));
@@ -321,6 +322,9 @@ AboutDialog::AboutDialog()
     text_sizer_horiz->Add( 0, 0, 0, wxLEFT, FromDIP(20));
 
     std::vector<wxString> text_list;
+    text_list.push_back(wxString::FromUTF8("ZH-Studio Alpha — this is not now, it's the future."));
+    // Keep upstream attribution explicit; this is a community fork, not an official Bambu Lab release.
+    text_list.push_back(wxString::FromUTF8("ZH-Studio is an independent fork of Bambu Studio by Bambu Lab. Distributed under the GNU AGPLv3; see the bundled LICENSE and source code."));
     text_list.push_back(_L("Bambu Studio is based on PrusaSlicer by PrusaResearch and SuperSlicer by Merill(supermerill)."));
     text_list.push_back(_L("PrusaSlicer is originally based on Slic3r by Alessandro Ranellucci."));
     text_list.push_back(_L("Slic3r was created by Alessandro Ranellucci with the help of many other contributors."));

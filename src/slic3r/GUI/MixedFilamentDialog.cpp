@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "MixedFilamentDialog.hpp"
 
 #include <algorithm>
@@ -108,7 +109,7 @@ private:
         }
 
         dc.SetFont(GetFont());
-        dc.SetTextForeground(m_hovered ? wxColour("#00AE42")
+        dc.SetTextForeground(m_hovered ? ZHTheme::accent()
                                        : StateColor::darkModeColorFor(wxColour("#262E30")));
         wxSize ts = dc.GetTextExtent(m_text);
         int x = (sz.GetWidth()  - ts.GetWidth())  / 2;
@@ -1527,8 +1528,8 @@ wxBoxSizer* MixedFilamentDialog::create_button_panel()
     m_btn_cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { EndModal(wxID_CANCEL); });
 
     m_btn_ok = new Button(this, _L("OK"));
-    m_btn_ok->SetBackgroundColor(wxColour("#00AE42"));
-    m_btn_ok->SetBorderColor(wxColour("#00AE42"));
+    m_btn_ok->SetBackgroundColor(ZHTheme::accent());
+    m_btn_ok->SetBorderColor(ZHTheme::accent());
     // #FFFFFE is not remapped by dark mode, keeping the text white on the green button.
     m_btn_ok->SetTextColor(wxColour("#FFFFFE"));
     m_btn_ok->SetMinSize(wxSize(FromDIP(55), FromDIP(24)));
@@ -2138,8 +2139,8 @@ void MixedFilamentDialog::update_ok_button_state()
         m_btn_ok->SetBorderColor(wxColour("#CECECE"));
         m_btn_ok->SetToolTip(_L("Cannot mix filaments using different nozzle diameters"));
     } else {
-        m_btn_ok->SetBackgroundColor(wxColour("#00AE42"));
-        m_btn_ok->SetBorderColor(wxColour("#00AE42"));
+        m_btn_ok->SetBackgroundColor(ZHTheme::accent());
+        m_btn_ok->SetBorderColor(ZHTheme::accent());
         m_btn_ok->SetToolTip(wxEmptyString);
     }
 
@@ -2517,7 +2518,7 @@ wxBoxSizer* MixedFilamentDialog::create_mode_tabs()
     m_btn_tab_match  = make_tab(_L("Color Matching"), true);
 
     m_lbl_wiki = new wxStaticText(this, wxID_ANY, _L("Wiki"));
-    m_lbl_wiki->SetForegroundColour(wxColour(0, 174, 66));
+    m_lbl_wiki->SetForegroundColour(ZHTheme::accent());
     m_lbl_wiki->SetFont(::Label::Body_13.Underlined());
     m_lbl_wiki->SetCursor(wxCursor(wxCURSOR_HAND));
     m_lbl_wiki->Bind(wxEVT_LEFT_DOWN, [](wxMouseEvent&) {
@@ -2546,7 +2547,7 @@ wxBoxSizer* MixedFilamentDialog::create_match_header()
     auto make_section_title = [this](wxBoxSizer* row, const wxString& title) {
         auto* marker = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(FromDIP(3), FromDIP(16)));
         marker->SetMinSize(wxSize(FromDIP(3), FromDIP(16)));
-        marker->SetBackgroundColour(wxColour("#00AE42"));
+        marker->SetBackgroundColour(ZHTheme::accent());
         row->Add(marker, 0, wxALIGN_CENTER_VERTICAL);
 
         auto* label = new wxStaticText(this, wxID_ANY, title);
@@ -2617,7 +2618,7 @@ wxBoxSizer* MixedFilamentDialog::create_match_header()
     result_row->AddStretchSpacer(1);
 
     m_lbl_official_kit = new wxStaticText(this, wxID_ANY, _L("Use official mixing kits →"));
-    m_lbl_official_kit->SetForegroundColour(wxColour(0, 174, 66));
+    m_lbl_official_kit->SetForegroundColour(ZHTheme::accent());
     m_lbl_official_kit->SetFont(::Label::Body_13);
     m_lbl_official_kit->SetCursor(wxCursor(wxCURSOR_HAND));
     m_lbl_official_kit->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent&) {
@@ -2677,8 +2678,8 @@ void MixedFilamentDialog::update_tab_styles()
         const wxColour selected_bg = wxGetApp().dark_mode() ? StateColor::darkModeColorFor(*wxWHITE)
                                                             : wxColour("#E5F7EC");
         btn->SetBackgroundColor(selected ? selected_bg : wxColour("#FFFFFF"));
-        btn->SetBorderColor(selected ? wxColour("#00AE42") : wxColour("#CECECE"));
-        btn->SetTextColor(selected ? wxColour("#00AE42") : wxColour("#262E30"));
+        btn->SetBorderColor(selected ? ZHTheme::accent() : wxColour("#CECECE"));
+        btn->SetTextColor(selected ? ZHTheme::accent() : wxColour("#262E30"));
         btn->Refresh();
     };
     style(m_btn_tab_manual, !m_match_mode);

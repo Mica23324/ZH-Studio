@@ -1,3 +1,4 @@
+#include "../../ZHTheme.hpp"
 #include "wgtHotendRackControl.h"
 
 #include "slic3r/GUI/DeviceCore/DevNozzleRack.h"
@@ -20,7 +21,7 @@ namespace {
 const wxColour kButtonNormalBg = wxColour("#F2F2F2");
 const wxColour kButtonCenterBg = wxColour("#DBDBDB");
 const wxColour kButtonPressedBg = wxColour(172, 172, 172);
-const wxColour kButtonHoverBorder = wxColour(0, 174, 66);
+const wxColour kButtonHoverBorder = ZHTheme::accent();
 const wxColour kTextNormal = wxColour(48, 58, 60);
 const wxColour kTextDisabled = wxColour(171, 172, 172);
 const wxColour kLabelNormal = wxColour(107, 107, 107);

@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "GUI.hpp"
 #include "GUI_Utils.hpp"
 #include "GUI_App.hpp"
@@ -549,7 +551,7 @@ void WikiPanel::bind_events()
 
 void WikiPanel::set_hover_state(bool hover)
 {
-    wxColour color = hover ? wxColour("#00AE42") : wxColour("#6B6B6B");
+    wxColour color = hover ? ZHTheme::accent() : wxColour("#6B6B6B");
     m_wiki_bmp->SetBitmap(hover ? m_wiki_icon_hover->bmp() : m_wiki_icon->bmp());
     m_wiki_label->SetForegroundColour(color);
     m_wiki_label->SetFont(hover ? Label::Body_13.Underlined() : Label::Body_13);
@@ -561,7 +563,7 @@ void WikiPanel::set_hover_state(bool hover)
 
 void WikiPanel::open_wiki_url()
 {
-    if (!m_wiki_url.empty()) { wxLaunchDefaultBrowser(m_wiki_url); }
+    if (!m_wiki_url.empty()) { Slic3r::GUI::zh_open_external_browser(m_wiki_url); }
 }
 
 bool WikiPanel::Show(bool show)

@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "ExtruderHelpers.hpp"
 
 #include <algorithm>
@@ -165,7 +166,7 @@ void show_filament_switcher_tip(bool ready)
 
     long style = ready ? (wxICON_INFORMATION | wxOK) : (wxICON_WARNING | wxOK);
     MessageDialog dlg(static_cast<wxWindow *>(wxGetApp().mainframe), msg, _L("Tips"), style, "", _L("Learn more"),
-                      [](const wxString &url) { wxLaunchDefaultBrowser("https://e.bambulab.com/t?c=yElVKjHwyw9o3pND"); });
+                      [](const wxString &url) { Slic3r::GUI::zh_open_external_browser("https://e.bambulab.com/t?c=yElVKjHwyw9o3pND"); });
     dlg.CenterOnParent();
     dlg.ShowModal();
 }

@@ -1,5 +1,8 @@
 #include <wx/dc.h>
 #include "TabCtrl.hpp"
+#include "../ZHMotion.hpp"
+#include "../ZHTheme.hpp"
+#include "libslic3r/Log.hpp"
 
 wxDEFINE_EVENT( wxEVT_TAB_SEL_CHANGING, wxCommandEvent );
 wxDEFINE_EVENT( wxEVT_TAB_SEL_CHANGED, wxCommandEvent );
@@ -26,7 +29,7 @@ TabCtrl::TabCtrl(wxWindow *      parent,
                    const wxPoint & pos,
                    const wxSize &  size,
                    long            style)
-    : StaticBox(parent, id, pos, size, style)
+    : StaticBox(parent, id, pos, size, style), m_animation_timer(this)
 {
 #if 0
     radius = 5;
@@ -41,12 +44,14 @@ TabCtrl::TabCtrl(wxWindow *      parent,
     hsizer->Add(sizer, 0, wxEXPAND | wxBOTTOM, border_width * 4);
     SetSizer(hsizer);
     Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TabCtrl::buttonClicked, this);
+    Bind(wxEVT_TIMER, &TabCtrl::on_indicator_animation, this, m_animation_timer.GetId());
     //wxString reason;
     //IsTransparentBackgroundSupported(&reason);
 }
 
 TabCtrl::~TabCtrl()
 {
+    m_animation_timer.Stop();
     delete images;
 }
 
@@ -71,6 +76,7 @@ void TabCtrl::SelectItem(int item)
     }
     sendTabCtrlEvent();
     relayout();
+    start_indicator_animation();
     Refresh();
 }
 
@@ -81,6 +87,7 @@ void TabCtrl::Unselect()
 
 void TabCtrl::Rescale()
 {
+    m_indicator_valid = false;
     for (auto & b : btns)
         b->Rescale();
     InvalidateBestSize();
@@ -126,6 +133,8 @@ bool TabCtrl::DeleteItem(int item)
 
 void TabCtrl::DeleteAllItems()
 {
+    m_animation_timer.Stop();
+    m_indicator_valid = false;
     sizer->Clear(true);
     sizer->AddSpacer(10);
     btns.clear();
@@ -214,7 +223,48 @@ void TabCtrl::DoSetSize(int x, int y, int width, int height, int sizeFlags)
     auto size = GetSize();
     wxWindow::DoSetSize(x, y, width, height, sizeFlags);
     if (size == GetSize()) return;
+    m_indicator_valid = false;
     relayout();
+}
+
+void TabCtrl::start_indicator_animation()
+{
+    if (sel < 0 || !m_indicator_valid || !IsShownOnScreen() || !ZHMotion::enabled()) {
+        m_animation_timer.Stop();
+        m_indicator_valid = false;
+        Refresh(false);
+        return;
+    }
+    if (!m_animation_timer.IsRunning()) {
+        m_animation_tick = std::chrono::steady_clock::now();
+        if (!m_animation_timer.Start(16)) {
+            BOOST_LOG_TRIVIAL(warning) << "Could not start category tab animation timer";
+            m_indicator_valid = false;
+            Refresh(false);
+        }
+    }
+}
+
+void TabCtrl::on_indicator_animation(wxTimerEvent&)
+{
+    if (sel < 0 || sel >= static_cast<int>(btns.size()) || !IsShownOnScreen() || !ZHMotion::enabled()) {
+        m_animation_timer.Stop();
+        m_indicator_valid = false;
+        Refresh(false);
+        return;
+    }
+    const auto now = std::chrono::steady_clock::now();
+    const float factor = std::min(1.f, std::max(0.f, std::chrono::duration<float>(now - m_animation_tick).count() / 0.07f));
+    m_animation_tick = now;
+    const wxRect target = btns[sel]->GetRect();
+    m_indicator_x += (target.x - m_indicator_x) * factor;
+    m_indicator_width += (target.width - m_indicator_width) * factor;
+    if (std::abs(m_indicator_x - target.x) < 0.5f && std::abs(m_indicator_width - target.width) < 0.5f) {
+        m_indicator_x = static_cast<float>(target.x);
+        m_indicator_width = static_cast<float>(target.width);
+        m_animation_timer.Stop();
+    }
+    Refresh(false);
 }
 
 void TabCtrl::SetFitAllItems(bool fit)
@@ -314,8 +364,14 @@ void TabCtrl::doRender(wxDC& dc)
     int states = state_handler.states();
     if (sel < 0) { return; }
 
-    auto x1 = btns[sel]->GetPosition().x;
-    auto x2 = x1 + btns[sel]->GetSize().x;
+    const wxRect target = btns[sel]->GetRect();
+    if (!m_indicator_valid) {
+        m_indicator_x = static_cast<float>(target.x);
+        m_indicator_width = static_cast<float>(target.width);
+        m_indicator_valid = true;
+    }
+    auto x1 = static_cast<int>(std::lround(m_indicator_x));
+    auto x2 = x1 + static_cast<int>(std::lround(m_indicator_width));
     const int BS2 = (1 + border_width) / 2;
 #if 0
     const int BS = border_width / 2;
@@ -334,7 +390,7 @@ void TabCtrl::doRender(wxDC& dc)
 #else
     dc.SetPen(wxPen(border_color.colorForStates(states), border_width));
     dc.DrawLine(0, size.y - BS2, size.x, size.y - BS2);
-    wxColour c("#00AE42");
+    wxColour c = ZHTheme::accent();
     dc.SetPen(wxPen(c, 1));
     dc.SetBrush(c);
     dc.DrawRoundedRectangle(x1 - radius, size.y - BS2 - border_width * 3, x2 + radius * 2 - x1, border_width * 3, radius);

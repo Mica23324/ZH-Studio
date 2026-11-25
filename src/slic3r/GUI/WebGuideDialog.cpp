@@ -1,4 +1,6 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "WebGuideDialog.hpp"
+#include "ZHRounded.hpp"
 #include "ConfigWizard.hpp"
 
 #include <string.h>
@@ -24,6 +26,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <mutex>
+#include <algorithm>
 
 #include "MainFrame.hpp"
 #include "UxProgramTermsDialog.hpp"
@@ -225,11 +228,13 @@ void GuideFrame::delete_custom_filament(const std::string &filament_id, const st
 
     // Push the refreshed list back to the page so the deleted row disappears.
     wxString strJS = update_custom_filaments();
-    wxGetApp().CallAfter([this, strJS] { RunScript(strJS); });
+    wxGetApp().CallAfter([this, alive = m_callback_alive, strJS] {
+        if (alive->load(std::memory_order_acquire)) RunScript(strJS);
+    });
 }
 
 GuideFrame::GuideFrame(GUI_App *pGUI, long style)
-    : DPIDialog((wxWindow *) (pGUI->mainframe), wxID_ANY, "BambuStudio", wxDefaultPosition, wxDefaultSize, style),
+    : DPIDialog((wxWindow *) (pGUI->mainframe), wxID_ANY, SLIC3R_APP_FULL_NAME, wxDefaultPosition, wxDefaultSize, style),
 	m_appconfig_new()
 {
     SetBackgroundColour(*wxWHITE);
@@ -242,6 +247,9 @@ GuideFrame::GuideFrame(GUI_App *pGUI, long style)
     InstallNetplugin = false;
 
     m_MainPtr = pGUI;
+
+    // ZH-Studio: rounded window frame in the workspace colours.
+    ZHRounded::Apply(this, 2, RGB(45, 65, 92));
 
     // set the frame icon
     wxBoxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
@@ -312,6 +320,9 @@ GuideFrame::GuideFrame(GUI_App *pGUI, long style)
 
 GuideFrame::~GuideFrame()
 {
+    // Invalidate callbacks before joining the worker. A callback can already be in
+    // the application queue when the stack-allocated dialog leaves ShowModal().
+    m_callback_alive->store(false, std::memory_order_release);
     m_destroy = true;
     if (m_load_task && m_load_task->joinable()) {
         m_load_task->join();
@@ -474,7 +485,7 @@ void GuideFrame::OnNewWindow(wxWebViewEvent &evt)
     wxString flag = " (other)";
 
     wxString NewUrl= evt.GetURL();
-    wxLaunchDefaultBrowser(NewUrl);
+    Slic3r::GUI::zh_open_external_browser(NewUrl);
     //if (evt.GetNavigationAction() == wxWEBVIEW_NAV_ACTION_USER) { flag = " (user)"; }
     // wxLogMessage("%s", "New window; url='" + evt.GetURL() + "'" + flag);
 
@@ -543,11 +554,15 @@ void GuideFrame::OnScriptMessage(wxWebViewEvent &evt)
             wxString strJS = wxString::Format("HandleStudio(%s)", m_Res.dump(-1, ' ', true));
 
             // BOOST_LOG_TRIVIAL(trace) << "GuideFrame::OnScriptMessage;request_userguide_profile:" << strJS.c_str();
-            wxGetApp().CallAfter([this,strJS] { RunScript(strJS); });
+            wxGetApp().CallAfter([this, alive = m_callback_alive, strJS] {
+                if (alive->load(std::memory_order_acquire)) RunScript(strJS);
+            });
         }
         else if (strCmd == "request_custom_filaments") {
             wxString strJS = update_custom_filaments();
-            wxGetApp().CallAfter([this, strJS] { RunScript(strJS); });
+            wxGetApp().CallAfter([this, alive = m_callback_alive, strJS] {
+                if (alive->load(std::memory_order_acquire)) RunScript(strJS);
+            });
         }
         else if (strCmd == "create_custom_filament") {
             this->EndModal(wxID_OK);
@@ -626,10 +641,10 @@ void GuideFrame::OnScriptMessage(wxWebViewEvent &evt)
             this->EndModal(wxID_OK);
 
             if (InstallNetplugin)
-                GUI::wxGetApp().CallAfter([this] { GUI::wxGetApp().ShowDownNetPluginDlg(); });
+                GUI::wxGetApp().CallAfter([] { GUI::wxGetApp().ShowDownNetPluginDlg(); });
 
             if (bLogin)
-                GUI::wxGetApp().CallAfter([this] { login(); });
+                GUI::wxGetApp().CallAfter([] { login(); });
         }
         else if (strCmd == "user_guide_cancel") {
             this->EndModal(wxID_CANCEL);
@@ -653,11 +668,12 @@ void GuideFrame::OnScriptMessage(wxWebViewEvent &evt)
         {
             std::string strUrl = j["url"];
 
-            wxLaunchDefaultBrowser(strUrl);
+            Slic3r::GUI::zh_open_external_browser(strUrl);
         }
         else if (strCmd == "show_ux_program_terms")
         {
-            wxGetApp().CallAfter([this] {
+            wxGetApp().CallAfter([this, alive = m_callback_alive] {
+                if (!alive->load(std::memory_order_acquire)) return;
                 UxProgramTermsDialog dlg(this);
                 dlg.ShowModal();
             });
@@ -1280,7 +1296,13 @@ int GuideFrame::LoadProfileData()
         // BBS: change directories by design
         // BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  will load config from %1%.") % bbl_bundle_path;
         m_ProfileJson = json::parse("{}");
-        // m_ProfileJson["configpath"] = Slic3r::data_dir();
+        // The setup pages build image URLs from this path, so it has to be a usable
+        // file:// URL - a plain Windows path would be resolved relative to the page.
+        {
+            std::string cfg_path = Slic3r::data_dir();
+            std::replace(cfg_path.begin(), cfg_path.end(), '\\', '/');
+            m_ProfileJson["configpath"] = "file:///" + cfg_path;
+        }
         m_ProfileJson["model"]    = json::array();
         m_ProfileJson["machine"]  = json::object();
         m_ProfileJson["filament"] = json::object();
@@ -1366,12 +1388,20 @@ int GuideFrame::LoadProfileData()
         m_Res["command"]     = "userguide_profile_load_finish";
         m_Res["sequence_id"] = "10001";
         wxString strJS       = wxString::Format("HandleStudio(%s)", m_Res.dump(-1, ' ', true));
-        if (!m_destroy)
-            wxGetApp().CallAfter([this, strJS] { RunScript(strJS); });
+        if (!m_destroy) {
+            const auto alive = m_callback_alive;
+            wxGetApp().CallAfter([this, alive, strJS] {
+                if (alive->load(std::memory_order_acquire)) RunScript(strJS);
+            });
+        }
 
         //sync to appconfig
-        if (!m_destroy)
-            wxGetApp().CallAfter([this] { SaveProfileData(); });
+        if (!m_destroy) {
+            const auto alive = m_callback_alive;
+            wxGetApp().CallAfter([this, alive] {
+                if (alive->load(std::memory_order_acquire)) SaveProfileData();
+            });
+        }
 
     } catch (std::exception& e) {
         // wxLogMessage("GUIDE: load_profile_error  %s ", e.what());

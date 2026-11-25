@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "SafetyOptionsDialog.hpp"
 #include "I18N.hpp"
 #include "GUI_App.hpp"
@@ -19,8 +20,8 @@ static const wxColour STATIC_TEXT_EXPLAIN_COL = wxColour(100, 100, 100);
 namespace Slic3r { namespace GUI {
 
 static StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(194, 194, 194), StateColor::Disabled),
-                               std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                               std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+                               std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                               std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                                std::pair<wxColour, int>(wxColour(0, 177, 66), StateColor::Normal));
 
 SafetyOptionsDialog::SafetyOptionsDialog(wxWindow* parent)

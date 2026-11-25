@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "BetaVersionDialog.hpp"
 #include "I18N.hpp"
 
@@ -74,8 +75,8 @@ BetaVersionDialog::BetaVersionDialog(wxWindow *parent)
     auto *sizer_button = new wxBoxSizer(wxHORIZONTAL);
 
     StateColor btn_bg_green(
-        std::pair<wxColour, int>(wxColour(27, 136, 68),     StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115),    StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::down(),     StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(),    StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR,  StateColor::Normal));
 
     StateColor btn_bg_white(

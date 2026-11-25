@@ -124,6 +124,19 @@ endif()
 
 # Create a slic3r executable
 # Process manifests for various platforms.
+# Apple bundle versions accept at most three numeric components.
+string(REPLACE "." ";" _zh_macos_version_parts "${SLIC3R_VERSION}")
+set(_zh_macos_normalized_parts "")
+foreach(_zh_macos_version_part IN LISTS _zh_macos_version_parts)
+    string(REGEX REPLACE "^0+" "" _zh_macos_version_part "${_zh_macos_version_part}")
+    if(_zh_macos_version_part STREQUAL "")
+        set(_zh_macos_version_part "0")
+    endif()
+    list(APPEND _zh_macos_normalized_parts "${_zh_macos_version_part}")
+endforeach()
+list(SUBLIST _zh_macos_normalized_parts 0 3 _zh_macos_public_version)
+string(REPLACE ";" "." ZH_MACOS_BUNDLE_SHORT_VERSION "${_zh_macos_public_version}")
+set(ZH_MACOS_BUNDLE_VERSION "${ZH_MACOS_BUNDLE_SHORT_VERSION}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/msw/BambuStudio.rc.in ${CMAKE_CURRENT_BINARY_DIR}/BambuStudio.rc @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/msw/BambuStudio.manifest.in ${CMAKE_CURRENT_BINARY_DIR}/BambuStudio.manifest @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/osx/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
@@ -142,6 +155,19 @@ else ()
     add_executable(BambuStudio BambuStudio.cpp BambuStudio.hpp)
 endif ()
 
+if (APPLE AND CMAKE_MACOSX_BUNDLE)
+    set_target_properties(BambuStudio PROPERTIES
+        OUTPUT_NAME "${SLIC3R_APP_KEY}"
+        MACOSX_BUNDLE_BUNDLE_NAME "${SLIC3R_APP_NAME}"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "${SLIC3R_APP_KEY}"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.zhstudio.app"
+        MACOSX_BUNDLE_INFO_STRING "ZH-Studio"
+        MACOSX_BUNDLE_ICON_FILE "images/BambuStudio.icns"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${ZH_MACOS_BUNDLE_SHORT_VERSION}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${ZH_MACOS_BUNDLE_VERSION}"
+        MACOSX_BUNDLE_COPYRIGHT "Copyright(C) 2021-2025 Lunkuo All Rights Reserved")
+endif()
+
 # Apple clang 21 segfaults in the loop vectorizer (VPlanTransforms::narrowInterleaveGroups); see libslic3r/CMakeLists.txt.
 if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     set_source_files_properties(BambuStudio.cpp PROPERTIES COMPILE_OPTIONS -fno-vectorize)
@@ -154,7 +180,7 @@ endif (MINGW)
 
 if (NOT WIN32 AND NOT APPLE)
     # Binary name on unix like systems (Linux, Unix)
-    set_target_properties(BambuStudio PROPERTIES OUTPUT_NAME "bambu-studio")
+    set_target_properties(BambuStudio PROPERTIES OUTPUT_NAME "ZH-Studio")
     set(SLIC3R_APP_CMD "bambu-studio")
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/unix/BuildLinuxImage.sh.in ${CMAKE_CURRENT_BINARY_DIR}/BuildLinuxImage.sh @ONLY)
 endif ()
@@ -208,7 +234,7 @@ if (WIN32)
     endif()
     target_compile_definitions(BambuStudio_app_gui PRIVATE -DSLIC3R_WRAPPER_NOCONSOLE)
     add_dependencies(BambuStudio_app_gui BambuStudio)
-    set_target_properties(BambuStudio_app_gui PROPERTIES OUTPUT_NAME "bambu-studio")
+    set_target_properties(BambuStudio_app_gui PROPERTIES OUTPUT_NAME "ZH-Studio")
     target_link_libraries(BambuStudio_app_gui PRIVATE boost_headeronly)
 endif ()
 
@@ -264,6 +290,8 @@ if (WIN32)
             bambustudio_copy_dlls(BambuStudioDllsCopy "Release" "" output_dlls_Release)
         endif()
     else ()
+        # ZH-Studio: single-config Ninja builds also need the runtime DLLs beside the EXE.
+        bambustudio_copy_dlls(BambuStudioDllsCopy "${CMAKE_BUILD_TYPE}" "" output_dlls_Release)
         file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/resources" WIN_RESOURCES_SYMLINK)
         add_custom_command(TARGET BambuStudio POST_BUILD
             COMMAND if not exist "${WIN_RESOURCES_SYMLINK}" "(" mklink /J "${WIN_RESOURCES_SYMLINK}" "${SLIC3R_RESOURCES_DIR_WIN}" ")"
@@ -304,11 +332,8 @@ else ()
         set(BIN_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/../resources")
     endif ()
     if (CMAKE_MACOSX_BUNDLE)
-        set(BIN_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/${BIN_CONF_DIR}/BambuStudio.app/Contents/Resources")
-        set(MACOSX_BUNDLE_ICON_FILE Icon.icns)
-        set(MACOSX_BUNDLE_BUNDLE_NAME "Bambu Studio")
-        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${SLIC3R_VERSION})
-        set(MACOSX_BUNDLE_COPYRIGHT "Copyright(C) 2021-2025 Lunkuo All Rights Reserved")
+        set(BIN_RESOURCES_DIR "$<TARGET_BUNDLE_DIR:BambuStudio>/Contents/Resources")
+        set(MACOSX_BUNDLE_ICON_FILE "images/BambuStudio.icns")
     endif()
     add_custom_command(TARGET BambuStudio POST_BUILD
         COMMAND ln -sfn "${SLIC3R_RESOURCES_DIR}" "${BIN_RESOURCES_DIR}"
@@ -354,9 +379,9 @@ else ()
     # Install the standalone .dSYM next to the app bundle
     if (APPLE AND CMAKE_MACOSX_BUNDLE)
         if (CMAKE_CONFIGURATION_TYPES)
-            set(_bbl_dsym_install "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/BambuStudio.app.dSYM")
+            set(_bbl_dsym_install "$<TARGET_BUNDLE_DIR:BambuStudio>.dSYM")
         else ()
-            set(_bbl_dsym_install "${CMAKE_CURRENT_BINARY_DIR}/BambuStudio.app.dSYM")
+            set(_bbl_dsym_install "$<TARGET_BUNDLE_DIR:BambuStudio>.dSYM")
         endif ()
         install(DIRECTORY "${_bbl_dsym_install}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
     endif ()

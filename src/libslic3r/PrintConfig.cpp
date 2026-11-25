@@ -11216,6 +11216,11 @@ CLIMiscConfigDef::CLIMiscConfigDef()
 {
     ConfigOptionDef* def;
 
+    def = this->add("offline", coBool);
+    def->label = "Offline mode";
+    def->tooltip = "Disable external network access for this process while keeping local modeling, slicing and export available.";
+    def->set_default_value(new ConfigOptionBool(false));
+
     /*def = this->add("ignore_nonexistent_config", coBool);
     def->label = L("Ignore non-existent config files");
     def->tooltip = L("Do not fail if a file supplied to --load does not exist.");

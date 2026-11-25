@@ -1,6 +1,7 @@
 #include "wxMediaCtrl2.h"
 #include "I18N.hpp"
 #include "libslic3r/Utils.hpp"
+#include "libslic3r/NetworkPolicy.hpp"
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #ifdef __WIN32__
@@ -56,6 +57,14 @@ wxMediaCtrl2::wxMediaCtrl2(wxWindow *parent)
 
 void wxMediaCtrl2::Load(wxURI url)
 {
+    if (Slic3r::NetworkPolicy::is_offline()) {
+        m_error = 104;
+        wxMediaEvent event(wxEVT_MEDIA_STATECHANGED);
+        event.SetId(GetId());
+        event.SetEventObject(this);
+        wxPostEvent(this, event);
+        return;
+    }
 #ifdef __WIN32__
     InvalidateBestSize();
     if (m_imp == nullptr) {
@@ -66,7 +75,8 @@ void wxMediaCtrl2::Load(wxURI url)
                 wxString url = IsWindows10OrGreater()
                         ? "ms-settings:optionalfeatures?activationSource=SMC-Article-14209"
                         : "https://support.microsoft.com/en-au/windows/get-windows-media-player-81718e0d-cfce-25b1-aee3-94596b658287";
-                wxExecute("cmd /c start " + url, wxEXEC_HIDE_CONSOLE);
+                if (!Slic3r::NetworkPolicy::is_offline())
+                    wxExecute("cmd /c start " + url, wxEXEC_HIDE_CONSOLE);
             }
         });
         m_error = 100;
@@ -106,7 +116,7 @@ void wxMediaCtrl2::Load(wxURI url)
                 });
             } else {
                 CallAfter([] {
-                    wxMessageBox(_L("Missing BambuSource component registered for media playing! Please re-install BambuStutio or seek after-sales help."), _L("Error"), wxOK | wxICON_ERROR);
+                    wxMessageBox(_L("Missing BambuSource component registered for media playing! Please re-install ZH-Studio or seek after-sales help."), _L("Error"), wxOK | wxICON_ERROR);
                 });
             }
             m_error = clsid != CLSID_BAMBU_SOURCE ? 101 : path.empty() ? 102 : 103;

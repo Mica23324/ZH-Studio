@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "WebDownPluginDlg.hpp"
 #include "ConfigWizard.hpp"
 
@@ -32,7 +33,7 @@ using namespace nlohmann;
 
 namespace Slic3r { namespace GUI {
 
-DownPluginFrame::DownPluginFrame(GUI_App *pGUI) : wxDialog((wxWindow *) (pGUI->mainframe), wxID_ANY, "Bambu Studio"), m_appconfig_new()
+DownPluginFrame::DownPluginFrame(GUI_App *pGUI) : wxDialog((wxWindow *) (pGUI->mainframe), wxID_ANY, SLIC3R_APP_FULL_NAME), m_appconfig_new()
 {
     // INI
     m_MainPtr = pGUI;
@@ -172,7 +173,7 @@ void DownPluginFrame::OnNewWindow(wxWebViewEvent &evt)
     wxString flag = " (other)";
 
     wxString NewUrl = evt.GetURL();
-    wxLaunchDefaultBrowser(NewUrl);
+    Slic3r::GUI::zh_open_external_browser(NewUrl);
     // if (evt.GetNavigationAction() == wxWEBVIEW_NAV_ACTION_USER) { flag = " (user)"; }
     // wxLogMessage("%s", "New window; url='" + evt.GetURL() + "'" + flag);
 

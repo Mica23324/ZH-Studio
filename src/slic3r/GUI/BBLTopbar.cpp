@@ -1,4 +1,5 @@
 #include "BBLTopbar.hpp"
+#include "ZHStudioTools.hpp"
 #include "wx/artprov.h"
 #include "wx/aui/framemanager.h"
 #include "wx/display.h"
@@ -71,7 +72,8 @@ void BBLTopbarArt::DrawLabel(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& it
 
 void BBLTopbarArt::DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect)
 {
-    dc.SetBrush(wxBrush(wxColour(38, 46, 48)));
+    dc.SetPen(*wxTRANSPARENT_PEN);
+    dc.SetBrush(wxBrush(wxColour("#0B1524")));
     wxRect clipRect = rect;
     clipRect.y -= 8;
     clipRect.height += 8;
@@ -203,10 +205,10 @@ void BBLTopbar::Init(wxFrame* parent)
 
     this->AddSpacer(5);
 
-    /*wxBitmap logo_bitmap = create_scaled_bitmap("topbar_logo", nullptr, TOPBAR_ICON_SIZE);
-    wxAuiToolBarItem* logo_item = this->AddTool(ID_LOGO, "", logo_bitmap);
-    logo_item->SetHoverBitmap(logo_bitmap);
-    logo_item->SetActive(false);*/
+    wxBitmap logo_bitmap = create_scaled_bitmap("topbar_logo", nullptr, TOPBAR_ICON_SIZE);
+    wxAuiToolBarItem* logo_item = this->AddTool(ID_LOGO, "ZH-Studio", logo_bitmap);
+    logo_item->SetShortHelp("ZH-Studio Workspace");
+    this->AddSpacer(FromDIP(8));
 
     wxBitmap file_bitmap = create_scaled_bitmap("topbar_file", nullptr, TOPBAR_ICON_SIZE);
     m_file_menu_item = this->AddTool(ID_TOP_FILE_MENU, _L("File"), file_bitmap, wxEmptyString, wxITEM_NORMAL);
@@ -301,7 +303,7 @@ void BBLTopbar::Init(wxFrame* parent)
 
     Realize();
     // m_toolbar_h = this->GetSize().GetHeight();
-    m_toolbar_h = FromDIP(30);
+    m_toolbar_h = std::max(FromDIP(34), GetMinSize().y);
 
     int client_w = parent->GetClientSize().GetWidth();
     this->SetSize(client_w, m_toolbar_h);
@@ -324,6 +326,24 @@ void BBLTopbar::Init(wxFrame* parent)
     this->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, &BBLTopbar::OnUndo, this, wxID_UNDO);
     //this->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, &BBLTopbar::OnModelStoreClicked, this, ID_MODEL_STORE);
     this->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, &BBLTopbar::OnPublishClicked, this, ID_PUBLISH);
+    this->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, [this](wxAuiToolBarEvent&) {
+        wxMenu menu;
+        const bool de = wxGetApp().app_config->get("language").rfind("de", 0) == 0;
+        const wxString ctrl = wxString::FromUTF8(Slic3r::GUI::shortkey_ctrl_prefix().c_str());
+        const int costs_id = wxWindow::NewControlId();
+        const int workspace_id = wxWindow::NewControlId();
+        const int commands_id = wxWindow::NewControlId();
+        menu.Append(costs_id, de ? "Druckkosten" : "Print costs");
+        menu.Append(workspace_id, de ? "Workspace / Themes" : "Workspace / Themes");
+        menu.Append(commands_id, (de ? wxString("Befehle · ") : wxString("Commands · ")) + ctrl + "K");
+        menu.Bind(wxEVT_MENU, [this](wxCommandEvent&) { show_zh_print_costs(m_frame); }, costs_id);
+        menu.Bind(wxEVT_MENU, [this](wxCommandEvent&) { show_zh_workspace_settings(m_frame); }, workspace_id);
+        menu.Bind(wxEVT_MENU, [this](wxCommandEvent&) { show_zh_command_palette(m_frame); }, commands_id);
+        PopupMenu(&menu);
+        wxWindow::UnreserveControlId(costs_id);
+        wxWindow::UnreserveControlId(workspace_id);
+        wxWindow::UnreserveControlId(commands_id);
+    }, ID_LOGO);
 }
 
 BBLTopbar::~BBLTopbar()
@@ -503,8 +523,8 @@ void BBLTopbar::Rescale() {
     int em = em_unit(this);
     wxAuiToolBarItem* item;
 
-    /*item = this->FindTool(ID_LOGO);
-    item->SetBitmap(create_scaled_bitmap("topbar_logo", nullptr, TOPBAR_ICON_SIZE));*/
+    item = this->FindTool(ID_LOGO);
+    if (item) item->SetBitmap(create_scaled_bitmap("topbar_logo", this, TOPBAR_ICON_SIZE));
 
     item = this->FindTool(ID_TOP_FILE_MENU);
     item->SetBitmap(create_scaled_bitmap("topbar_file", this, TOPBAR_ICON_SIZE));
@@ -558,6 +578,8 @@ void BBLTopbar::Rescale() {
     item->SetBitmap(create_scaled_bitmap("topbar_close", this, TOPBAR_ICON_SIZE));
 
     Realize();
+    m_toolbar_h = std::max(FromDIP(34), GetMinSize().y);
+    SetMinSize(wxSize(-1, m_toolbar_h));
 }
 
 void BBLTopbar::OnIconize(wxAuiToolBarEvent& event)

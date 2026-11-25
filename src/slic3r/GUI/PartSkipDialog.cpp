@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "GUI_Utils.hpp"
 #include "GUI_App.hpp"
 #include <wx/panel.h>
@@ -59,8 +60,8 @@ static StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(194, 194, 194), 
                               std::pair<wxColour, int>(wxColour(194, 194, 194), StateColor::Hovered),
                               std::pair<wxColour, int>(wxColour(194, 194, 194), StateColor::Normal));
 
-static StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                               std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+static StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                               std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                                std::pair<wxColour, int>(wxColour(0, 177, 66), StateColor::Normal));
 
 PartSkipDialog::PartSkipDialog(wxWindow *parent) : DPIDialog(parent, wxID_ANY, _L("Skip Objects"), wxDefaultPosition, wxDefaultSize, wxCAPTION | wxCLOSE_BOX)
@@ -177,7 +178,7 @@ PartSkipDialog::PartSkipDialog(wxWindow *parent) : DPIDialog(parent, wxID_ANY, _
     m_cnt_label = new Label(m_book_third_panel, wxEmptyString);
     m_cnt_label->Wrap(-1);
     m_cnt_label->SetBackgroundColour(*wxWHITE);
-    m_cnt_label->SetForegroundColour(wxColour(0, 174, 66));
+    m_cnt_label->SetForegroundColour(ZHTheme::accent());
     m_cnt_label->SetFont(Label::Head_16);
     m_cnt_label->SetSize(wxSize(-1, FromDIP(20)));
     m_cnt_label->SetMaxSize(wxSize(-1, FromDIP(20)));
@@ -627,7 +628,7 @@ void PartSkipDialog::OnSwitchDrag(wxCommandEvent &event)
         m_switch_drag_btn->SetIcon("canvas_drag");
     } else {
         m_is_drag = true;
-        m_switch_drag_btn->SetBackgroundColor(wxColour(0, 174, 66));
+        m_switch_drag_btn->SetBackgroundColor(ZHTheme::accent());
         m_switch_drag_btn->SetIcon("canvas_drag_active");
     }
     m_canvas->SwitchDrag(m_is_drag);
@@ -1008,7 +1009,7 @@ PartSkipConfirmDialog::PartSkipConfirmDialog(wxWindow *parent) : DPIDialog(paren
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(0, 177, 66), StateColor::Normal));
 
     m_apply_button = new Button(this, _L("Continue"));

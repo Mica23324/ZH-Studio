@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "AMSDryControl.hpp"
 #include "DeviceCore/DevFilaSystem.h"
 #include "GUI_App.hpp"
@@ -610,7 +611,7 @@ void AMSDryCtrWin::on_overlay_paint(wxPaintEvent&)
     double cx = dryable_x + sz_dryable.GetWidth() / 2.0;
     double y_top = dryable_y + sz_dryable.GetHeight();
     double y_bot = y_top + FromDIP(18);
-    wxPen pen(wxColour(0, 174, 66), FromDIP(1));
+    wxPen pen(ZHTheme::accent(), FromDIP(1));
     wxDash dashes[2] = { 2, 2 };
     pen.SetStyle(wxPENSTYLE_USER_DASH);
     pen.SetDashes(2, dashes);

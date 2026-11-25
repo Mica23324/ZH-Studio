@@ -1,3 +1,4 @@
+#include "ZHTheme.hpp"
 #include "MixingKitsHelpDialog.hpp"
 
 #include "GUI.hpp"
@@ -25,7 +26,7 @@ namespace GUI {
 
 namespace {
 
-const wxColour COLOR_BRAND("#00AE42");
+const wxColour COLOR_BRAND("#0EA5E9");
 const wxColour COLOR_BG_CARD("#F8F8F8");
 const wxColour COLOR_BORDER("#EEEEEE");
 const wxColour COLOR_TEXT_DARK("#262E30");
@@ -344,12 +345,12 @@ void MixingKitsHelpDialog::build_ui()
 
     StateColor btn_bg(
         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+        std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     StateColor btn_bd(
         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+        std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     StateColor btn_text(
         std::pair<wxColour, int>(wxColour("#FFFFFE"), StateColor::Disabled),
         std::pair<wxColour, int>(wxColour("#FFFFFE"), StateColor::Normal));

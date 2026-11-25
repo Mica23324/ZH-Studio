@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "ParamTooltip.hpp"
 
 #include "GUI.hpp"
@@ -673,7 +674,7 @@ void ParamTooltip::build_layout()
     m_wiki->SetFont(Label::Body_13);
     m_wiki->SetCursor(wxCursor(wxCURSOR_HAND));
     m_wiki->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent &) {
-        if (!m_wiki_url.IsEmpty()) wxLaunchDefaultBrowser(m_wiki_url);
+        if (!m_wiki_url.IsEmpty()) Slic3r::GUI::zh_open_external_browser(m_wiki_url);
     });
     col->Add(m_wiki, 0, wxTOP, FromDIP(GAP));
 

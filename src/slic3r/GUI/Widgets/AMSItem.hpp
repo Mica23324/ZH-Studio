@@ -1,3 +1,4 @@
+#include "../ZHTheme.hpp"
 #ifndef slic3r_GUI_AMSITEM_hpp_
 #define slic3r_GUI_AMSITEM_hpp_
 
@@ -16,7 +17,7 @@
 #include "slic3r/GUI/DeviceCore/DevFilaSwitch.h"
 
 
-#define AMS_CONTROL_BRAND_COLOUR wxColour(0, 174, 66)
+#define AMS_CONTROL_BRAND_COLOUR ZHTheme::accent()
 #define AMS_CONTROL_GRAY700 wxColour(107, 107, 107)
 #define AMS_CONTROL_GRAY800 wxColour(50, 58, 61)
 #define AMS_CONTROL_GRAY500 wxColour(172, 172, 172)

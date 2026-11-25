@@ -1,3 +1,5 @@
+#include "ZHTheme.hpp"
+#include "ZHStyle.hpp"
 ///////////////////////////////////////////////////////////////////////////
 // C++ code generated with wxFormBuilder (version 3.10.0-4761b0c)
 // http://www.wxformbuilder.org/
@@ -132,11 +134,11 @@ wxBoxSizer *TipsDialog::create_item_checkbox(wxString title, wxWindow *parent, w
 Button *TipsDialog::add_button(wxWindowID btn_id, const wxString &label, bool set_focus /*= false*/)
 {
     Button* btn = new Button(this, label, "", 0, 0, btn_id);
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed),
+                            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                            std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
-    StateColor btn_bd_green(std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    StateColor btn_bd_green(std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
 
     StateColor btn_text_green(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Normal));
 
@@ -273,23 +275,33 @@ ParamsPanel::ParamsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, c
     if (dynamic_cast<Notebook*>(parent)) {
         // BBS: new layout
         m_top_panel = new StaticBox(this, wxID_ANY, wxDefaultPosition);
-        m_top_panel->SetBackgroundColor(ThemeColor::Grey350);
-        m_top_panel->SetBackgroundColor2(ThemeColor::Grey350);
+        const wxColour panel_bg = ZHStyle::panel(wxGetApp().dark_mode());
+        m_top_panel->SetBackgroundColour(ZHStyle::workspace_surface(wxGetApp().dark_mode()));
+        m_top_panel->SetBackgroundColor(panel_bg);
+        m_top_panel->SetBackgroundColor2(StateColor());
+        m_top_panel->SetCornerRadius(FromDIP(8));
 
         m_process_icon = new ScalableButton(m_top_panel, wxID_ANY, "sidebar_menu_process");
 
         m_title_label = new Label(m_top_panel, _L("Process"));
+        m_title_label->SetBackgroundColour(panel_bg);
+        m_title_label->SetForegroundColour(ZHStyle::primary_text(wxGetApp().dark_mode()));
 
         //int width, height;
         // BBS: new layout
         m_mode_region = new SwitchButton(m_top_panel);
         m_mode_region->SetMaxSize({em_unit(this) * 12, -1});
         m_mode_region->SetLabels(_L("Global"), _L("Objects"));
+        m_mode_region->SetTrackColor(ZHStyle::raised(wxGetApp().dark_mode()));
+        m_mode_region->SetThumbColor(ZHTheme::accent());
+        m_mode_region->Rescale();
         //m_mode_region->GetSize(&width, &height);
         m_tips_arrow = new ScalableButton(m_top_panel, wxID_ANY, "tips_arrow");
         m_tips_arrow->Hide();
 
         m_title_view = new Label(m_top_panel, _L("Advance"));
+        m_title_view->SetBackgroundColour(panel_bg);
+        m_title_view->SetForegroundColour(ZHStyle::secondary_text(wxGetApp().dark_mode()));
         m_mode_view = new SwitchButton(m_top_panel, wxID_ABOUT);
 
         // BBS: new layout
@@ -441,7 +453,7 @@ void ParamsPanel::create_layout()
         m_mode_sizer->AddSpacer(FromDIP(16));
         //m_mode_sizer->Add( m_search_btn, 0, wxALIGN_CENTER );
         //m_mode_sizer->AddSpacer(16);
-        m_mode_sizer->SetMinSize(-1, FromDIP(30));
+        m_mode_sizer->SetMinSize(-1, FromDIP(36));
         m_top_panel->SetSizer(m_mode_sizer);
         //m_left_sizer->Add( m_top_panel, 0, wxEXPAND );
     }
@@ -706,7 +718,9 @@ void ParamsPanel::msw_rescale()
     if (m_tips_arrow) m_tips_arrow->msw_rescale();
     if (m_left_sizer) m_left_sizer->SetMinSize(wxSize(40 * em_unit(this), -1));
     if (m_mode_sizer)
-        m_mode_sizer->SetMinSize(-1, 3 * em_unit(this));
+        m_mode_sizer->SetMinSize(-1, FromDIP(36));
+    if (m_top_panel)
+        m_top_panel->SetCornerRadius(FromDIP(8));
     if (m_mode_region)
         ((SwitchButton* )m_mode_region)->Rescale();
     if (m_mode_view)

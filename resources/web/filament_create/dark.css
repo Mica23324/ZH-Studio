@@ -7,7 +7,7 @@
 /* ---- CSS variable overrides (main palette) ------------------------ */
 :root {
     /* keep brand green as-is — same value in light and dark */
-    --color-brand:              #00AE42;
+    --color-brand:              #0EA5E9;
     --color-brand-hover:        #00C74E;
 
     --color-text-main:          #E6E6E8;

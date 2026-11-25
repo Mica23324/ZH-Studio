@@ -52,3 +52,12 @@ resources/web/device_page_html/
 src/slic3r/GUI/DeviceWeb/DeviceWebHtml/tools/out/
 
 _toolchain/
+ZH-Studio-win64/
+ZH-Studio-Release/
+ZH-Studio-Refresh*/
+ZH-Studio-Alpha-*/
+/UsersmicajDesktopZH-Studio_toolchainzh-runtimecommand-refresh-profile/
+/result.json
+/log_iotc.txt
+*.incomplete-*/
+**/__pycache__/

@@ -1,3 +1,5 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
+#include "ZHTheme.hpp"
 #include "AMSMaterialsSetting.hpp"
 #include "ExtrusionCalibration.hpp"
 #include "MsgDialog.hpp"
@@ -209,10 +211,10 @@ void AMSMaterialsSetting::create()
     m_sizer_button->Add(0, 0, 1, wxEXPAND, 0);
 
     m_button_confirm = new Button(this, _L("Confirm"));
-    m_btn_bg_green   = StateColor(std::pair<wxColour, int>(wxColour(27, 136, 68), StateColor::Pressed), std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(0, 174, 66), StateColor::Normal));
+    m_btn_bg_green   = StateColor(std::pair<wxColour, int>(ZHTheme::down(), StateColor::Pressed), std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+                            std::pair<wxColour, int>(ZHTheme::accent(), StateColor::Normal));
     m_button_confirm->SetBackgroundColor(m_btn_bg_green);
-    m_button_confirm->SetBorderColor(wxColour(0, 174, 66));
+    m_button_confirm->SetBorderColor(ZHTheme::accent());
     m_button_confirm->SetTextColor(wxColour("#FFFFFE"));
     m_button_confirm->SetMinSize(AMS_MATERIALS_SETTING_BUTTON_SIZE);
     m_button_confirm->SetCornerRadius(FromDIP(12));
@@ -527,7 +529,7 @@ void AMSMaterialsSetting::create_panel_kn(wxWindow* parent)
     wxString link_url = wxString::Format("https://wiki.bambulab.com/%s/software/bambu-studio/calibration_pa", region);
     m_wiki_ctrl = new Label(parent, _L("View Wiki for details"));
     m_wiki_ctrl->SetFont(Label::Body_13);
-    m_wiki_ctrl->SetForegroundColour(wxColour(0, 174, 66));
+    m_wiki_ctrl->SetForegroundColour(ZHTheme::accent());
     m_wiki_ctrl->Bind(wxEVT_ENTER_WINDOW, [this](wxMouseEvent &e) {
         e.Skip();
         m_wiki_ctrl->SetForegroundColour(wxColour(0, 150, 57));
@@ -536,12 +538,12 @@ void AMSMaterialsSetting::create_panel_kn(wxWindow* parent)
     });
     m_wiki_ctrl->Bind(wxEVT_LEAVE_WINDOW, [this](wxMouseEvent &e) {
         e.Skip();
-        m_wiki_ctrl->SetForegroundColour(wxColour(0, 174, 66));
+        m_wiki_ctrl->SetForegroundColour(ZHTheme::accent());
         m_wiki_ctrl->SetCursor(wxCURSOR_ARROW);
         m_wiki_ctrl->Refresh();
     });
     m_wiki_ctrl->Bind(wxEVT_LEFT_UP, [link_url](wxMouseEvent &) {
-        wxLaunchDefaultBrowser(link_url);
+        Slic3r::GUI::zh_open_external_browser(link_url);
     });
 
     wxBoxSizer *m_sizer_nozzle_type = new wxBoxSizer(wxHORIZONTAL);
@@ -1144,9 +1146,9 @@ public:
         SetBackgroundColour(StateColor::darkModeColorFor(*wxWHITE));
 
         StateColor btn_bg_green(
-            std::pair<wxColour, int>(wxColour(27, 136, 68),  StateColor::Pressed),
-            std::pair<wxColour, int>(wxColour(61, 203, 115), StateColor::Hovered),
-            std::pair<wxColour, int>(wxColour(0, 174, 66),   StateColor::Normal));
+            std::pair<wxColour, int>(ZHTheme::down(),  StateColor::Pressed),
+            std::pair<wxColour, int>(ZHTheme::hovered(), StateColor::Hovered),
+            std::pair<wxColour, int>(ZHTheme::accent(),   StateColor::Normal));
         StateColor btn_bg_white(
             std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
             std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
@@ -1381,7 +1383,7 @@ void AMSMaterialsSetting::on_select_ok(wxCommandEvent& event)
 
             auto tpu_check_url = DevPrinterConfigUtil::support_user_first_setup_tpu_check_url(obj->printer_type);
             if (!tpu_check_url.empty()) {
-                wxLaunchDefaultBrowser(tpu_check_url);
+                Slic3r::GUI::zh_open_external_browser(tpu_check_url);
             }
         };
     }
@@ -2823,7 +2825,7 @@ void AMSMaterialsSetting::apply_filament_selection()
     }
     else {
         m_button_confirm->SetBackgroundColor(m_btn_bg_green);
-        m_button_confirm->SetBorderColor(wxColour(0, 174, 66));
+        m_button_confirm->SetBorderColor(ZHTheme::accent());
         m_button_confirm->SetTextColor(wxColour("#FFFFFE"));
         m_button_confirm->Enable(true);
     }

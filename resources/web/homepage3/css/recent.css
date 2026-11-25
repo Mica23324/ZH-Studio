@@ -22,7 +22,7 @@
 	display: none;	
 }
 
-#RecentTitleBlock
+#RecentTitleBlock,#MakerlabTitleBlock
 {
 	display:flex;
 	align-items: center;
@@ -48,7 +48,7 @@
 	background-color:#CDCECE;
 }
 
-#Recent_LEFT_Title
+#Recent_LEFT_Title,#Makerlab_LEFT_Title
 {
 	display:flex;
 	align-items: center;

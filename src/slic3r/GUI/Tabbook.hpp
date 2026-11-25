@@ -5,6 +5,8 @@
 
 #include <wx/bookctrl.h>
 #include <wx/sizer.h>
+#include <wx/timer.h>
+#include <chrono>
 #include "wxExtensions.hpp"
 
 
@@ -19,7 +21,7 @@ class TabButtonsListCtrl : public wxControl
 public:
     // BBS
     TabButtonsListCtrl(wxWindow *parent, wxBoxSizer *side_tools = NULL);
-    ~TabButtonsListCtrl() {}
+    ~TabButtonsListCtrl() override;
 
     void OnPaint(wxPaintEvent&);
     void SetSelection(int sel);
@@ -35,14 +37,28 @@ public:
     TabButton*                      pageButton;
 
 private:
+    struct TabMotion { float selection = 0.f; float hover = 0.f; };
+    void update_tab_style(size_t index);
+    void start_animation();
+    void snap_animation();
+    void on_size(wxSizeEvent& event);
+    void on_animation(wxTimerEvent& event);
+    void on_tab_enter(wxMouseEvent& event);
+    void on_tab_leave(wxMouseEvent& event);
     wxWindow*                       m_parent;
     wxFlexGridSizer*                m_buttons_sizer;
     wxBoxSizer*                     m_sizer;
     ScalableBitmap                  m_arrow_img;
     std::vector<TabButton*>         m_pageButtons;
+    std::vector<TabMotion>          m_tab_motion;
+    TabButton*                      m_hovered_button {nullptr};
+    wxTimer                         m_animation_timer;
+    std::chrono::steady_clock::time_point m_last_animation_tick;
+    float                           m_indicator_y {0.f};
+    float                           m_indicator_height {0.f};
+    bool                            m_indicator_valid {false};
     int                             m_selection {-1};
     int                             m_btn_margin;
-    int                             m_line_margin;
 };
 
 class Tabbook: public wxBookCtrlBase
@@ -184,17 +200,19 @@ public:
 
     bool RemovePage(size_t n)
     {
-        if (!wxBookCtrlBase::RemovePage(n))
-            return false;
-
-        SetSelection(0);
+        if (!wxBookCtrlBase::RemovePage(n)) return false;
+        const int selection = GetSelection();
+        if (selection != wxNOT_FOUND && selection < static_cast<int>(GetPageCount()))
+            GetBtnsListCtrl()->SetSelection(selection);
         return true;
     }
 
     virtual int SetSelection(size_t n) override
     {
-        GetBtnsListCtrl()->SetSelection(n);
         int ret = DoSetSelection(n, SetSelection_SendEvent);
+        if (GetSelection() != n)
+            return ret;
+        GetBtnsListCtrl()->SetSelection(static_cast<int>(n));
 
         // check that only the selected page is visible and others are hidden:
         for (size_t page = 0; page < m_pages.size(); page++) {
@@ -210,8 +228,10 @@ public:
 
     virtual int ChangeSelection(size_t n) override
     {
-        GetBtnsListCtrl()->SetSelection(n);
-        return DoSetSelection(n);
+        int ret = DoSetSelection(n);
+        if (GetSelection() == n)
+            GetBtnsListCtrl()->SetSelection(static_cast<int>(n));
+        return ret;
     }
 
     // Neither labels nor images are supported but we still store the labels

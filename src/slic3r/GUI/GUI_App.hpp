@@ -753,7 +753,7 @@ public:
 
     void            report_consent_common(bool agree, std::string scene, std::string formID);
     virtual bool OnExceptionInMainLoop();
-    // Calls wxLaunchDefaultBrowser if user confirms in dialog.
+    // Opens the offline-aware external browser helper if the user confirms in a dialog.
     bool            open_browser_with_warning_dialog(const wxString& url, int flags = 0);
 #ifdef __APPLE__
     void            OSXStoreOpenFiles(const wxArrayString &files);

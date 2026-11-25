@@ -1,3 +1,4 @@
+#include "slic3r/GUI/ZHBrowser.hpp"
 #include "Tab.hpp"
 #include "Project.hpp"
 #include "libslic3r/Utils.hpp"
@@ -444,7 +445,7 @@ void ProjectPanel::OnScriptMessage(wxWebViewEvent& evt)
                         if (auto n = l.find('_'); n != std::string::npos)
                             l = l.substr(0, n);
                         auto url = (boost::format("%1%%2%/models/%3%") % h % l % model_id).str();
-                        wxLaunchDefaultBrowser(url);
+                        Slic3r::GUI::zh_open_external_browser(url);
                     }
                 }
             }

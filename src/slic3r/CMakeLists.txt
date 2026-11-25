@@ -140,6 +140,12 @@ set(SLIC3R_GUI_SOURCES
     GUI/ColorDecomposeSupport.hpp
     GUI/GradientCurveEditor.cpp
     GUI/GradientCurveEditor.hpp
+    GUI/ZHStudioTools.cpp
+    GUI/ZHStudioTools.hpp
+    GUI/ZHTheme.hpp
+    GUI/ZHCostModel.hpp
+    GUI/ZHSplash.cpp
+    GUI/ZHSplash.hpp
     GUI/AboutDialog.cpp
     GUI/AboutDialog.hpp
     GUI/NetworkTestDialog.cpp
@@ -857,6 +863,13 @@ target_include_directories(libslic3r_gui PRIVATE Utils)
 target_include_directories(libslic3r_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 if (WIN32)
+    # The offline WebView2 firewall uses the all-frame resource filter from
+    # ICoreWebView2_22. Prefer the project-local SDK when present; the bundled
+    # dependency SDK remains the fallback for other build environments.
+    if (EXISTS "${CMAKE_SOURCE_DIR}/_toolchain/webview2-sdk/native/include/WebView2.h")
+        target_include_directories(libslic3r_gui BEFORE PRIVATE
+            "${CMAKE_SOURCE_DIR}/_toolchain/webview2-sdk/native/include")
+    endif()
     target_include_directories(libslic3r_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/WebView2/include)
 endif()
 
@@ -950,7 +963,15 @@ if (WIN32)
     endif ()
 endif ()
 
-if (NOT APPLE)
+if (MSVC)
+    # ZH-Studio: the dependency bundle provides Windows FFmpeg headers/import libraries.
+    find_path(ZH_FFMPEG_INCLUDE_DIR libavcodec/avcodec.h REQUIRED)
+    foreach(_lib avcodec swscale avutil)
+        find_library(ZH_FFMPEG_${_lib}_LIBRARY NAMES ${_lib} REQUIRED)
+        target_link_libraries(libslic3r_gui ${ZH_FFMPEG_${_lib}_LIBRARY})
+    endforeach()
+    target_include_directories(libslic3r_gui PRIVATE ${ZH_FFMPEG_INCLUDE_DIR})
+elseif (NOT APPLE)
     pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
         libavcodec
         libswscale

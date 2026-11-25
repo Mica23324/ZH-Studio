@@ -251,8 +251,8 @@ extern "C" {
         if (load_mesa) {
             bool res = opengl_version_check.unload_opengl_dll();
             if (!res) {
-                MessageBox(nullptr, L"Error:BambuStudio was unable to automatically switch to MESA OpenGL library.",
-                    L"BambuStudio Error", MB_OK);
+                MessageBox(nullptr, L"Error:ZH-Studio was unable to automatically switch to MESA OpenGL library.",
+                    L"ZH-Studio Error", MB_OK);
                 return -1;
             }
             else {
